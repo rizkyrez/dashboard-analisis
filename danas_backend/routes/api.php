@@ -19,12 +19,16 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::group(['prefix' => 'v1'], function () {
+
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', 'Auth\AuthController@login');
         Route::get('refresh', 'Auth\AuthController@refresh');
-        Route::group(['middleware' => 'auth:api'], function(){
-            Route::get('user', 'Auth\AuthController@user');
-            Route::post('logout', 'AuthController@logout')->middleware('jwt.verify'); ;
-        });
+        Route::get('user', 'Auth\AuthController@user')->middleware('jwt.verify');
+        Route::post('logout', 'AuthController@logout')->middleware('jwt.verify');  
     });
+
+    Route::group(['prefix' => 'calons'], function() {
+        Route::get('/', 'CalonSiswaController@trendcs');
+    });
+
 });

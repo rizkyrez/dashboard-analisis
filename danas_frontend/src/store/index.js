@@ -3,13 +3,11 @@ import axios from 'axios'
 /* eslint-disable */
 export default createStore({
   state: {
-    /* User */
-    // userName: null,
-    // userEmail: null,
-    // userAvatar: null,
+
     isAuthenticated: false,
     token: null,
     // username: null,
+    itemHeader: [],
     isLoading: false,
 
     /* fullScreen - fullscreen form layout (e.g. login page) */
@@ -46,11 +44,7 @@ export default createStore({
       state.token = token
       state.isAuthenticated = true
     },
-    // setUser(state, data) {
-    //   if(data.login) {
-    //       state.username = data.login
-    //   }
-    // },
+
     removeToken(state) {
       state.token = null
       state.username = null
@@ -60,6 +54,10 @@ export default createStore({
     basic (state, payload) {
       state[payload.key] = payload.value
     },
+
+    getHeader(state, arr) {
+        state.itemHeader.push(arr)
+    }
 
     // /* User */
     // user (state, payload) {

@@ -32,6 +32,7 @@
 
 <script>
 /* eslint-disable */
+import axios from 'axios'
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
@@ -43,7 +44,7 @@ import {
   LegendComponent
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, watch, computed, onMounted, beforeCreate } from 'vue'
 import { mdiMonitorCellphone, mdiAccountMultiple, mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
@@ -79,47 +80,77 @@ export default defineComponent({
     VChart
 
   },
+  props: {
+      key: String,
+  },
   setup () {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const trendcs = ref({
-      aria: {
-        show: true
-      },
-      // title: {
-      //   text: "Trend Jumlah Calon Siswa",
-      //   left: "center"
-      // },
-      tooltip: {
-        // trigger: "item",
-        // formatter: "{a} <br/>{b} : {c} ({d}%)"
-      },
-      legend: {
-        orient: 'vertical',
-        right: 10,
-        // top: 'center'
-      },
-      dataset: {
-        source: [
-            ['Departemen', 'Gelombang TA 2021/2022', 'Gelombang TA 2022/2023'],
-            ['TK', 26, 32],
-            ['SD', 104, 87],
-            ['SMP', 49, 65],
-            ['SMA', 36, 53]
-        ]
-      },
-      xAxis: {type: 'category'},
-      yAxis: {},
-      series: [
-        {
-          type: "bar",
-          color: '#3322ee',
-        },
-        {
-          type: "bar",
-          color: '#efab22'
-        },
-      ]
-    })
+    const dataset = ref([])
+    const trendcs = ref()
+
+    onMounted(async () =>  {
+        await axios.get('/api/v1/calons/')
+        .then(res => {
+            dataset.value = res.data.dataset
+        })
+        .catch(error =>{
+            if (error.response) {
+                for (const property in error.response.data) {
+                    this.errors.push(`${property}: ${error.response.data[property]}`)
+                }
+                console.log(JSON.stringify(error.response.data))
+            } else if (error.message) {
+                this.errors.push('something wrong')
+                console.log(JSON.stringify(error))
+            }
+        })
+        trendcs.value = {
+            aria: {
+                show: true
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer:{
+                type: 'shadow',
+                label: {
+                    show: true
+                }
+                }
+            },
+            grid: {
+                left: '6%',
+                right: '6%',
+                bottom: '6%',
+                top:80,
+                z: 4
+            },
+            legend: {
+                orient: 'horizontal',
+                left: 'center',
+                top: 'top',
+                itemGap: 12,
+                padding: 8
+                // top: 'center'
+            },
+            xAxis: {type: 'category'},
+            yAxis: {type: 'value'},
+            series: dataset
+        };
+
+        const dataseries =  computed({
+            get: () => dataset.value,
+            set: val => {
+                dataset.value = val
+            }
+        });
+
+        watch(dataseries, dataset => {
+            if (trendcs) {
+                trendcs.series = d
+                trendcs.update()
+            }
+        });
+    });
 
     return {
       titleStack,
@@ -132,55 +163,26 @@ export default defineComponent({
       trendcs
     }
   },
-  // data () {
 
-  //   let data = []
-  //   for (let i = 0; i <= 360; i++) {
-  //       let t = i / 180 * Math.PI
-  //       let r = Math.sin(2 * t) * Math.cos(2 * t)
-  //       data.push([r, i])
-  //   }
+//   watch: {
+//      arrData: function () {
+//        this.getChartData()
+//     },
+//   },
+//   methods: {
+//      async getChartData () {
+//       await axios
+//         .get(`/api/v1/calons/`)
+//         .then(response => {
+//           dataset.value = response.data.data
+//         })
+//         .catch(error => {
+//             this.errors.push('something wrong')
+//             console.log(JSON.stringify(error))
+//         })
+//     }
+//   },
 
-  //   return {
-  //     initOptions: {
-  //       renderer: 'canvas'
-  //     },
-  //     polar: {
-  //       title: {
-  //         text: '极坐标双数值轴'
-  //       },
-  //       legend: {
-  //         data: ['line']
-  //       },
-  //       polar: {
-  //         center: ['50%', '54%']
-  //       },
-  //       tooltip: {
-  //         trigger: 'axis',
-  //         axisPointer: {
-  //           type: 'cross'
-  //         }
-  //       },
-  //       angleAxis: {
-  //         type: 'value',
-  //         startAngle: 0
-  //       },
-  //       radiusAxis: {
-  //         min: 0
-  //       },
-  //       series: [
-  //         {
-  //           coordinateSystem: 'polar',
-  //           name: 'line',
-  //           type: 'line',
-  //           showSymbol: false,
-  //           data: data
-  //         }
-  //       ],
-  //       animationDuration: 2000
-  //     }
-  //   }
-  // }
 });
 </script>
 <style>
@@ -191,7 +193,6 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
-  min-height: 350px;
-  max-height: 100%;
+  height: 400px;
 }
 </style>
