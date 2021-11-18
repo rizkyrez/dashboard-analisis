@@ -44,7 +44,8 @@ import {
   LegendComponent
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, computed, watchEffect, onBeforeUpdate, onBeforeMount, onMounted, provide, nextTick } from 'vue'
+import axios from 'axios'
 import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
@@ -81,54 +82,72 @@ export default defineComponent({
     VChart
 
   },
-  setup () {
+  setup (props) {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const agama = ref({
-      title: {
-        text: "Total Agama",
-        left: "center",
-      },
-      tooltip: {
-        trigger: "item",
-        // formatter: "{a} <br/>{b} : {c} ({d}%)"
-      },
-      legend: {
-        orient: 'horizontal',
-        left: 'center',
-        top: 70
-      },
-      dataset: {
-        source: [
-            ['Agama', 'jumlah'],
-            ['Buddha', 41],
-            ['Islam', 1],
-            ['Katolik', 9],
-            ['Kong Hu Cu', 1],
-            ['Kristen', 3],
-            ['NULL', 10]
-        ]
-      },
-      series: [
-        {
-            type: "pie",
-            radius: "75%",
-            label: {
-                position: 'outer',
-                alignTo: 'labelLine',
-                bleedMargin: 6
-            },
-            emphasis: {
-                itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            },
-            top: 100
-        },
+    const agdata = ref([])
+    const agama = ref()
 
-      ]
+    onMounted(async() => {
+        await axios
+            .get('/api/v1/calons/agama/')
+            .then(res => {
+                agdata.value = res.data.agdata
+            })
+            .catch(error => {
+                if (error.message) {
+                    console.log("somthieng wrong")
+                    console.log(JSON.stringify(error))
+                }
+            })
+
+        console.log(agdata.value)
+        agama.value = {
+            title: {
+                text: "Total Agama",
+                left: "center",
+            },
+            tooltip: {
+                trigger: "item",
+                // formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'horizontal',
+                left: 'center',
+                top: 60
+            },
+
+            series: [
+                {
+                    type: "pie",
+                    radius: "75%",
+                    label: {
+                        position: 'outer',
+                        alignTo: 'labelLine',
+                        bleedMargin: 6
+                    },
+                    data: agdata,
+                    emphasis: {
+                        itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    top: 100
+                },
+
+            ]
+        }
     })
+
+    watchEffect(() => {
+        agdata.value
+        agama
+    });
+
+
+
+    provide('dataTable', agdata)
 
     return {
       titleStack,
@@ -136,6 +155,7 @@ export default defineComponent({
       mdiTableOff,
       mdiChartBar,
       mdiTableMultiple,
+      agdata,
       agama
     }
   },

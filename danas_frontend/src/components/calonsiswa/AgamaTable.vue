@@ -1,61 +1,59 @@
 <template>
-
+    <!-- eslint-disable -->
   <table class="border border-collapse border-green-400 text-xs">
     <thead>
     <tr class="bg-green-300">
-      <th class="font-semibold w-1">No</th>
       <th class="font-semibold">Agama</th>
-      <th class="font-semibold">Jumlah</th>
+      <th class="font-semibold">Total</th>
     </tr>
     </thead>
     <tbody>
-      <tr >
-          <td>1</td>
-          <td data-label="agama">
-            Buddha
+      <tr v-for="agm in dataTable" :key="agm.name">
+          <td >
+            {{agm.name}}
           </td>
-          <td data-label="total">41</td>
+          <td>{{agm.value}}</td>
       </tr>
-      <tr>
-          <td>2</td>
+      <!-- <tr>
+
           <td data-label="agama">
               Islam
           </td>
           <td data-label="total">1</td>
       </tr>
       <tr>
-          <td>3</td>
+
           <td data-label="agama">
             Katolik
           </td>
           <td data-label="total">9</td>
       </tr>
       <tr >
-          <td>4</td>
+
           <td data-label="agama">
             Kong Hu Cu
           </td>
           <td data-label="total">9</td>
       </tr>
       <tr >
-          <td>5</td>
+
           <td data-label="agama">
             Kristen
           </td>
           <td data-label="total">3</td>
       </tr>
       <tr >
-          <td>6</td>
+
           <td data-label="agama">
             Null
           </td>
           <td data-label="total">10</td>
-      </tr>
+      </tr> -->
       <tr >
-          <td data-label="agama" colspan="2">
+          <td class="font-semibold" >
             Grand Total
           </td>
-          <td data-label="total">65</td>
+          <td >{{grandtotal}}</td>
       </tr>
     <!-- <tr v-for="client in itemsPaginated" :key="client.id">
       <checkbox-cell v-if="checkable" @checked="checked($event, client)"/>
@@ -85,7 +83,7 @@
 
 <script>
 /* eslint-disable */
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect, toRefs, inject, watch  } from 'vue'
 import { useStore } from 'vuex'
 import { mdiEye, mdiTrashCan } from '@mdi/js'
 import ModalBox from '@/components/ModalBox'
@@ -110,20 +108,13 @@ export default {
   },
   setup () {
     const store = useStore()
-
     const darkMode = computed(() => store.state.darkMode)
-
-    const items = computed(() => store.state.clients)
-
     const isModalActive = ref(false)
-
     const isModalDangerActive = ref(false)
-
     const perPage = ref(10)
-
     const currentPage = ref(0)
-
     const checkedRows = ref([])
+    const dataTable = inject('dataTable')
 
     const itemsPaginated = computed(
       () => items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
@@ -163,6 +154,19 @@ export default {
       }
     }
 
+    const grandtotal = computed(() => {
+        const arr = dataTable.value
+
+        return arr.reduce((acc, curV) => {
+            return acc += curV.value
+        },0)
+    })
+
+    watchEffect(() => {
+        grandtotal,
+        dataTable.value
+    })
+
     return {
       darkMode,
       isModalActive,
@@ -173,9 +177,8 @@ export default {
       checkedRows,
       itemsPaginated,
       pagesList,
-      checked,
-      mdiEye,
-      mdiTrashCan
+      dataTable,
+      grandtotal
     }
   }
 }
