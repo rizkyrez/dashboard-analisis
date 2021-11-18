@@ -7,7 +7,7 @@ export default createStore({
     isAuthenticated: false,
     token: null,
     // username: null,
-    itemHeader: [],
+    totalTrend: [],
     isLoading: false,
 
     /* fullScreen - fullscreen form layout (e.g. login page) */
@@ -37,6 +37,11 @@ export default createStore({
         state.isAuthenticated = false
       }
     },
+
+    listTotal(state, total) {
+        state.totalTrend.push(total)
+    },
+
     setIsLoading(state, status) {
       state.isLoading = status
     },
@@ -55,9 +60,9 @@ export default createStore({
       state[payload.key] = payload.value
     },
 
-    getHeader(state, arr) {
-        state.itemHeader.push(arr)
-    }
+    // getHeader(state, arr) {
+    //     state.itemHeader.push(arr)
+    // }
 
     // /* User */
     // user (state, payload) {
@@ -73,6 +78,7 @@ export default createStore({
     // }
   },
   actions: {
+
     asideMobileToggle ({ commit, state }, payload = null) {
       const isShow = payload !== null ? payload : !state.isAsideMobileExpanded
 
@@ -106,6 +112,8 @@ export default createStore({
         value
       })
     },
+
+
 
     fetch ({ commit }, payload) {
       axios

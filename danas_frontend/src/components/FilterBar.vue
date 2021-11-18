@@ -14,14 +14,14 @@
       <div class="grid grid-cols-3 grid-flow-col auto-cols-max md:auto-cols-min gap-3">
 
         <div class="px-3">
-        <field label="Proses">
-            <control :options="opsiTahunajaran" v-model="tahunajaran" />
+        <field label="Departemen">
+            <control :options="opsiDepartmen" v-model="departemen" @change="changeProses()" />
         </field>
         </div>
 
         <div class="px-3">
-        <field label="Departemen">
-            <control :options="opsiDepartmen" v-model="departemen" />
+        <field label="Proses">
+            <control :options="opsiProses" v-model="proses" :isdisable="valu"/>
         </field>
         </div>
 
@@ -42,9 +42,8 @@
             <control :options="opsiAchiement" v-model="achievement" />
         </field>
         </div> -->
-
         <div class="flex items-end ">
-            <jb-button label="Filter" color="success" @click.prevent="filter()"></jb-button>
+            <jb-button label="Filter" color="success" @click="clickedFilter()"></jb-button>
         </div>
     </div>
 
@@ -54,7 +53,8 @@
 
 <script>
 /* eslint-disable */
-import { mdiGithub } from '@mdi/js'
+import { computed, ref, inject, watchEffect } from 'vue'
+import axios from 'axios'
 import Level from '@/components/Level'
 import Field from '@/components/Field'
 import Control from '@/components/Control'
@@ -76,43 +76,71 @@ export default {
       type: Array,
       default: () => []
     },
+
     menutp: String
   },
-  setup () {
-    const opsiDepartmen = [
-      { id: 1, label: 'TK' },
-      { id: 2, label: 'SD' },
-      { id: 3, label: 'SMP' },
-      { id: 4, label: 'SMA' }
-    ]
 
-    const opsiTahunajaran = [
-      { id: 1, label: 'TA 21/22' },
-      { id: 2, label: 'TA 22/23' },
-    ]
+  emits : ['changeProses','clickedFilter'],
+  setup (props,{emit}) {
+    const opsiDepartmen = inject('list_departemen')
+    const opsiProses = inject('list_proses')
+    const departemen = ref('All')
+    const proses = ref('All')
 
     const opsiAgama = [
-      { id: 1, label: 'Buddha' },
-      { id: 2, label: 'Islam' },
-      { id: 3, label: 'Kong Hu Cu' },
-      { id: 4, label: 'Kristen' }
+        { id: 1, label: 'Buddha' },
+        { id: 2, label: 'Islam' },
+        { id: 3, label: 'Kong Hu Cu' },
+        { id: 4, label: 'Kristen' }
     ]
 
     const opsiArea = [
-      { id: 1, label: 'Kosambi' },
-      { id: 2, label: 'Green Lake City' },
-      { id: 3, label: 'TSI' },
-      { id: 4, label: 'Poris Indah' },
-      { id: 5, label: 'Kosambi Baru' },
-      { id: 6, label: 'Green Village' },
+        { id: 1, label: 'Kosambi' },
+        { id: 2, label: 'Green Lake City' },
+        { id: 3, label: 'TSI' },
+        { id: 4, label: 'Poris Indah' },
+        { id: 5, label: 'Kosambi Baru' },
+        { id: 6, label: 'Green Village' },
     ]
+
+    watchEffect(() => {
+        departemen.value,
+        proses.value
+        if (proses.value == '' || proses.value == null) {
+            proses.value = 'All'
+        }
+
+    })
+
+    const changeProses = () => {
+        emit('changeProses', departemen.value)
+    }
+
+    const valu = computed(() => {
+        if(departemen.value == 'All') {
+            return true
+        }
+    })
+
+
+    const clickedFilter = () => {
+        const filterData = {
+            departemen: departemen.value,
+            proses: proses.value
+        }
+        emit('clickedFilter', filterData)
+    };
 
     return {
       opsiDepartmen,
-      opsiTahunajaran,
       opsiAgama,
-      opsiArea
-      // mdiGithub
+      opsiArea,
+      opsiProses,
+      changeProses,
+      clickedFilter,
+      departemen,
+      proses,
+      valu
     }
   }
 }

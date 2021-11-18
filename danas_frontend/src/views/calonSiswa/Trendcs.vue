@@ -2,7 +2,7 @@
 <template>
 
   <hero-bar>Trend Jumlah Calon Siswa</hero-bar>
-  <filter-bar/>
+  <filter-bar @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -32,7 +32,9 @@
 
 <script>
 /* eslint-disable */
+import { ref, defineComponent, computed, watchEffect, onBeforeUpdate, onBeforeMount, onMounted, provide, nextTick} from 'vue'
 import axios from 'axios'
+import _ from 'lodash'
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
@@ -41,10 +43,10 @@ import {
   DatasetComponent,
   TooltipComponent,
   GridComponent,
-  LegendComponent
+  LegendComponent,
 } from 'echarts/components';
+import { useStore } from 'vuex'
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, defineComponent, watch, computed, onMounted, beforeCreate } from 'vue'
 import { mdiMonitorCellphone, mdiAccountMultiple, mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
@@ -78,79 +80,202 @@ export default defineComponent({
     BottomOtherPagesSection,
     TrendTable,
     VChart
-
   },
   props: {
       key: String,
   },
-  setup () {
+  setup (props) {
+    const store = useStore()
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const dataset = ref([])
+    const dataTable = ref([])
     const trendcs = ref()
+    const sum = ref([])
+    const listDep = ref([])
+    const listProp = ref([])
+    const header = ref([])
+    const vpros = ref()
 
-    onMounted(async () =>  {
-        await axios.get('/api/v1/calons/')
-        .then(res => {
-            dataset.value = res.data.dataset
-        })
-        .catch(error =>{
-            if (error.response) {
-                for (const property in error.response.data) {
-                    this.errors.push(`${property}: ${error.response.data[property]}`)
+    onMounted(async () => {
+
+        await axios
+            .get('/api/v1/calons/')
+            .then(res => {
+                dataset.value = res.data.dataset
+                dataTable.value = res.data.data_table
+                sum.value = res.data.sum_pros
+                listDep.value = res.data.list_departemen
+                listProp.value = res.data.list_proses
+                header.value = res.data.header
+            })
+            .catch(error =>{
+                if (error.message) {
+                    this.errors.push('something wrong')
+                    console.log(JSON.stringify(error))
                 }
-                console.log(JSON.stringify(error.response.data))
-            } else if (error.message) {
-                this.errors.push('something wrong')
-                console.log(JSON.stringify(error))
-            }
-        })
+            })
+
+
         trendcs.value = {
-            aria: {
-                show: true
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer:{
-                type: 'shadow',
-                label: {
-                    show: true
-                }
-                }
-            },
+            notMerge:  true,
+            tooltip: tooltip,
             grid: {
                 left: '6%',
                 right: '6%',
-                bottom: '6%',
-                top:80,
+                bottom: '20%',
+                top:30,
                 z: 4
             },
             legend: {
                 orient: 'horizontal',
                 left: 'center',
-                top: 'top',
+                bottom: 'bottom',
                 itemGap: 12,
-                padding: 8
+                padding: 8,
+                data: legendat,
+                // selectedMode: selectmode,
+                // selected: selected,
                 // top: 'center'
             },
-            xAxis: {type: 'category'},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: xaxis,
+                axisTick: {
+                    alignWithLabel: true
+                }
+            },
             yAxis: {type: 'value'},
             series: dataset
         };
+    })
 
-        const dataseries =  computed({
-            get: () => dataset.value,
-            set: val => {
-                dataset.value = val
-            }
-        });
+    const xaxis = computed(() => {
+        let arrobj = dataTable.value
 
-        watch(dataseries, dataset => {
-            if (trendcs) {
-                trendcs.series = d
-                trendcs.update()
+        let dep = arrobj.map(p => p.departemen)
+
+        return dep
+    })
+
+    const legendat = computed(() => {
+        let arobj = dataset.value
+
+        let prop = arobj.map(p => p.name)
+
+        return prop
+    })
+    // const selectmode = computed(() => {
+    //     if(xaxis.value.length == 1) {
+    //         return 'single'
+    //     } else {
+    //         return 'multiple'
+    //     }
+    // })
+
+    const tooltip = computed(() => {
+        let lenxaxis = xaxis.value.length
+
+        if(lenxaxis == 1) {
+            const atr = {
+                trigger: 'item'
             }
-        });
+            return atr
+        }
+        else {
+            const atr = {
+               trigger: 'axis',
+                axisPointer:{
+                    type: 'shadow',
+                        label: {
+                            show: true
+                        }
+                }
+            }
+
+            return atr
+        }
+    })
+
+    // const selected = computed(() => {
+    //     const vps = vpros.value
+    //     const listpros = legendat.value
+
+    //     const obj = listpros.reduce(function (a, v) {
+    //         if(v in a) {
+    //             a[v]++
+    //         } else {
+    //             a[v] = true
+    //         }
+
+    //         return a
+    //     }, {})
+
+    //     if (obj[vps]) {
+    //         obj[vps] = treue
+    //     }
+    //     return obj
+    // })
+
+    const changepros = async (event) => {
+        await axios
+            .post("/api/v1/calons/change/", {departmen: event})
+            .then(res => {
+                listProp.value = res.data.list_proses
+            })
+            .catch(error =>{
+                    console.log('something wrong')
+                    console.log(JSON.stringify(error))
+            })
+    }
+
+    const filter = async (e) => {
+        if(e.proses == 'All' || e.proses == null || e.proses == '') {
+            e.proses = ''
+        }
+
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.proses = ''
+        }
+
+        const fil = {
+            departmen: e.departemen,
+            proses: e.proses
+        }
+
+        await axios
+            .post("/api/v1/calons/filter/", fil)
+            .then(res => {
+                dataset.value = res.data.dataset
+                dataTable.value = res.data.data_table
+                sum.value = res.data.sum_pros
+                header.value = res.data.header
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error))
+            })
+    }
+
+    watchEffect(() => {
+        dataTable.value,
+        listProp.value,
+        sum.value,
+        dataset.value,
+        trendcs.value,
+        header.value
+        legendat,
+        xaxis,
+        tooltip
     });
+
+    provide('arrdata', dataset)
+    provide('dataTable', dataTable)
+    provide('sum_proses', sum)
+    provide('list_departemen', listDep)
+    provide('header', header)
+    provide('list_proses', listProp)
 
     return {
       titleStack,
@@ -160,28 +285,14 @@ export default defineComponent({
       mdiTableOff,
       mdiChartBar,
       mdiTableMultiple,
-      trendcs
+      trendcs,
+      dataTable,
+      sum,
+      dataset,
+      changepros,
+      filter,
     }
   },
-
-//   watch: {
-//      arrData: function () {
-//        this.getChartData()
-//     },
-//   },
-//   methods: {
-//      async getChartData () {
-//       await axios
-//         .get(`/api/v1/calons/`)
-//         .then(response => {
-//           dataset.value = response.data.data
-//         })
-//         .catch(error => {
-//             this.errors.push('something wrong')
-//             console.log(JSON.stringify(error))
-//         })
-//     }
-//   },
 
 });
 </script>

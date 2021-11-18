@@ -5,8 +5,8 @@
       v-model="computedValue"
       :name="name"
       :id="id"
-      :class="inputElClass">
-      <option v-for="option in options" :key="option.id ?? option" :value="option">{{ option.label ?? option }}</option>
+      :class="inputElClass" :disabled="isdisable">
+      <option v-for="option in options" :key="option.id ?? option" :value="option" >{{ option.label ?? option }}</option>
     </select>
     <textarea
       v-else-if="computedType === 'textarea'"
@@ -65,7 +65,8 @@ export default {
     },
     borderless: Boolean,
     transparent: Boolean,
-    ctrlKFocus: Boolean
+    ctrlKFocus: Boolean,
+    isdisable: Boolean
   },
   emits: ['update:modelValue', 'right-icon-click'],
   setup (props, { emit }) {
@@ -78,7 +79,7 @@ export default {
 
     const inputElClass = computed(() => {
       const base = [
-        'px-2 py-2 max-w-full focus:ring focus:outline-none border-gray-700 rounded w-full',
+        'px-2 py-0 max-w-full focus:ring focus:outline-none border-gray-700 rounded w-full',
         'dark:placeholder-gray-400',
         computedType.value === 'textarea' ? 'h-24' : 'h-8',
         props.borderless ? 'border-0' : 'border',
