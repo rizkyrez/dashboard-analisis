@@ -271,6 +271,36 @@ class CalonSiswaController extends Controller
         return null;
     }
 
+    public function filtered() {
+        $akad =  DB::connection('mysqlakad');
+        $umum = DB::connection('mysqlumum');  
+
+        // query list option departemen
+        $departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
+
+        $list_agama = $umum->select('select agama from agama order by uturan asc');
+
+        // query list option proses
+        $list_proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps right join departemen as dp on pps.departemen = dp.departemen group by pps.replid, dp.departemen" );
+
+        $list_area = $akad->select("select diasn"); 
+        
+        return response()->json([
+            'list_departemen' => $departemen,
+            'list_agama' => $list_agama,
+            'list_proses' => $list_proses
+        ]);
+    }
+
+    // public function area() {
+
+    // }
+
+    // public function exin_asalsekolah() {
+    //     $akad = DB::connection('mysqlakad');
+        
+    // }
+
     protected function changeToArr($arr) {
         // change to array  
         $rconvert = array_map(function($arrdp){
@@ -279,4 +309,8 @@ class CalonSiswaController extends Controller
 
         return $rconvert;
     }
+
+    // protected function gendataset() { 
+
+    // }
 }
