@@ -2,7 +2,7 @@
 <template>
 
   <hero-bar>Agama</hero-bar>
-  <filter-bar menutp="agama" @change-proses="changepros" @clicked-filter="filter"/>
+  <filter-bar @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -135,11 +135,18 @@ export default defineComponent({
                 trigger: "item",
                 // formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
-
+            legend: {
+                type: 'scroll',
+                orient: 'horizontal',
+                right: 10,
+                bottom: -5,
+                itemHeight: 12,
+                height: 100
+            },
             series: [
                 {
                     type: "pie",
-                    radius: "75%",
+                    radius: "55%",
                     label: {
                         position: 'outer',
                         alignTo: 'labelLine',
@@ -148,12 +155,13 @@ export default defineComponent({
                     data: askdata,
                     emphasis: {
                         itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            shadowBlur: 15,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 5, 0, 0.9)'
                         }
                     },
-                    top: 100
+                    top: 30,
+                    bottom: 20
                 },
 
             ]
@@ -169,7 +177,7 @@ export default defineComponent({
         asalSekolah
     });
 
-    const filter = async (e) => {
+    const filter = (e) => {
         if(e.proses == 'All' || e.proses == null || e.proses == '') {
             e.proses = ''
         }
@@ -179,20 +187,19 @@ export default defineComponent({
             e.proses = ''
         }
 
-        if(e.ask == 'All') {
-            e.ask = ''
-        }
+        // if(e.ask == 'All') {
+        //     e.ask = ''
+        // }
 
         const fil = {
             departmen: e.departemen,
             proses: e.proses,
-            asalsekolah: e.ask
         }
 
-        await axios
+        axios
             .post("/api/v1/calons/filterask/", fil)
             .then(res => {
-                agdata.value = res.data.agdata
+                askdata.value = res.data.askdata
             })
             .catch(error =>{
                 console.log('something wrong')
@@ -276,7 +283,7 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
-  min-height: 350px;
+  min-height: 550px;
   max-height: 100%;
 }
 </style>

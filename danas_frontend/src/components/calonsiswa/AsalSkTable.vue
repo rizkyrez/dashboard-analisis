@@ -87,7 +87,6 @@
 /* eslint-disable */
 import { computed, ref, watchEffect, toRefs, inject, watch  } from 'vue'
 import { useStore } from 'vuex'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
 import ModalBox from '@/components/ModalBox'
 import CheckboxCell from '@/components/CheckboxCell'
 import Level from '@/components/Level'
@@ -96,7 +95,7 @@ import JbButton from '@/components/JbButton'
 import UserAvatar from '@/components/UserAvatar'
 
 export default {
-  name: 'AgamaTable',
+  name: 'AsalSkTable',
   components: {
     ModalBox,
     CheckboxCell,

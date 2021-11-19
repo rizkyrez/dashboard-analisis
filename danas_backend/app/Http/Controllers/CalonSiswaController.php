@@ -37,12 +37,11 @@ class CalonSiswaController extends Controller
         $array_table = [];
         $arraydata = [];
         $array_departemen = ['All'];
-        $array_proses = ['All'];
         $total_by_proses = [];
         $total_by_departemen = [];
         $arr_headpros = [];
 
-        
+        $array_proses = ['All'];
         foreach($proses as $prs) {
             $array_proses[] = $prs->proses;
         }
@@ -325,15 +324,6 @@ class CalonSiswaController extends Controller
 
     
 
-    protected function searchArrId($field, $value, $array) {
-        foreach ($array as $val) {
-            if ($val[$field] === $value) {
-                return $val;
-            }
-        }
-        return null;
-    }
-
     public function exin_asalsekolah() {
         $akad = DB::connection('mysqlakad');
 
@@ -381,19 +371,44 @@ class CalonSiswaController extends Controller
         
     }
 
-    public function filtered() {
+    public function filterask(Request $request) { 
+        $akad = DB::connection('mysqlakad');
+
+        // fetch request
+        $filter_departemen = ($request->departmen) ? "pps.departemen ='".$request->departmen."'" : "";
+        $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
+        $condition = ($filter_departemen && $filter_proses) ? " and " : "";
+
+        // where clause trendcs
+        $clause_asalsekolah = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen.$condition.$filter_proses : "";
+
+        // main query
+        $main_query = "select count(cs.replid) as total, ak.sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join asalsekolah as ak on cs.asalsekolah = ak.sekolah $clause_asalsekolah group by ak.sekolah";
+        $asalsekolah = $akad->select($main_query);
+
+        $asalsekolah = $this->changeToArr($asalsekolah);
+
+        $arraskdata = [];
+        foreach ($asalsekolah as $ask) {
+            $arraskdata[] = array('value' => $ask['total'], 'name' => $ask['sekolah']);
+        }
+
+        return response()->json([
+            'askdata' => $arraskdata,
+        ]);
+    }
+
+    public function listFilter(Request $request) {
         $akad =  DB::connection('mysqlakad');
         $umum = DB::connection('mysqlumum');  
 
         // query list option departemen
         $departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
 
-        $list_agama = $umum->select('select agama from agama order by uturan asc');
-
         // query list option proses
         $list_proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps right join departemen as dp on pps.departemen = dp.departemen group by pps.replid, dp.departemen" );
 
-        $list_area = $akad->select("select diasn"); 
+        $list_agama = $umum->select('select agama from agama order by uturan asc');
         
         return response()->json([
             'list_departemen' => $departemen,
@@ -402,9 +417,23 @@ class CalonSiswaController extends Controller
         ]);
     }
 
+    public function filterse(Request $request) {
+        $akad = DB::connection('mysqlakad');
+        $umum = DB::connection('mysqlumum');
+    }
+
     // public function area() {
 
     // }
+
+    protected function searchArrId($field, $value, $array) {
+        foreach ($array as $val) {
+            if ($val[$field] === $value) {
+                return $val;
+            }
+        }
+        return null;
+    }
 
     protected function changeToArr($arr) {
         // change to array  
