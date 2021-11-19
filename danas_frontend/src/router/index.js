@@ -4,6 +4,7 @@ import Home from '../views/Home'
 import trendcs from '../views/calonSiswa/Trendcs'
 import agama from '../views/calonSiswa/Agamav'
 import area from '../views/calonSiswa/Areav'
+import inexask from '../views/calonSiswa/Asalsekolahcs'
 import achievement from '../views/calonSiswa/Achievementcs'
 /* eslint-disable */
 const routes = [
@@ -42,6 +43,15 @@ const routes = [
     path: '/area',
     name: 'Area',
     component: area
+  },
+  {
+    meta: {
+      title: 'Dashboard - Calon Siswa - Internal VS External',
+      requireLogin: true
+    },
+    path: '/inex',
+    name: 'Asalsekolah',
+    component: inexask
   },
   {
     meta: {

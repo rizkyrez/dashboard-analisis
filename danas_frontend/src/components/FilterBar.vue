@@ -125,7 +125,7 @@ export default {
             proses: proses.value,
             agama: agama.value
         }
-        console.log(filterData);
+
         emit('clickedFilter', filterData)
     };
 

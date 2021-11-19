@@ -323,6 +323,8 @@ class CalonSiswaController extends Controller
         ]);
     }
 
+    
+
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
             if ($val[$field] === $value) {
@@ -330,6 +332,53 @@ class CalonSiswaController extends Controller
             }
         }
         return null;
+    }
+
+    public function exin_asalsekolah() {
+        $akad = DB::connection('mysqlakad');
+
+        // main query
+        $asalsekolah = $akad->select("select count(cs.replid) as total, ak.sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join asalsekolah as ak on cs.asalsekolah = ak.sekolah group by ak.sekolah");
+
+        $asalsekolah = $this->changeToArr($asalsekolah);
+
+        // query list option proses
+        $proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps inner join calonsiswa as cs on pps.replid = cs.idproses group by pps.replid,pps.departemen" );
+
+        // query list option departemen
+        $list_departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
+
+        // query list agama
+        $list_asalsekolah = $akad->select("select sekolah from asalsekolah order by departemen");
+
+        $array_departemen = ['All'];
+        $array_proses = ['All'];
+        $array_asalsekolah = ['All'];
+
+        foreach($proses as $prs) {
+            $array_proses[] = $prs->proses;
+        }
+        
+        foreach($list_departemen as $depart) {
+            $array_departemen[] = $depart->departemen;
+        }
+
+        foreach($list_asalsekolah as $ask) {
+            $array_asalsekolah[] = $ask->sekolah;
+        }
+
+        $arraskdata = [];
+        foreach ($asalsekolah as $ask) {
+            $arraskdata[] = array('value' => $ask['total'], 'name' => $ask['sekolah']);
+        }
+
+        return response()->json([
+            'askdata' => $arraskdata,
+            'list_proses' => $array_proses,
+            'list_departemen' => $array_departemen,
+            'list_asalsekolah' => $array_asalsekolah
+        ]);
+        
     }
 
     public function filtered() {
@@ -355,11 +404,6 @@ class CalonSiswaController extends Controller
 
     // public function area() {
 
-    // }
-
-    // public function exin_asalsekolah() {
-    //     $akad = DB::connection('mysqlakad');
-        
     // }
 
     protected function changeToArr($arr) {

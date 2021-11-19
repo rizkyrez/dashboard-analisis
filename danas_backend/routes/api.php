@@ -33,6 +33,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/filter', 'CalonSiswaController@filter');
         Route::get('/agama', 'CalonSiswaController@agama');
         Route::post('/filterag', 'CalonSiswaController@filterag');
+        Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
     });
 
 });
