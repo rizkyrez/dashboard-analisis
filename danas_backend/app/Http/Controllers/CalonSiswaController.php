@@ -37,11 +37,12 @@ class CalonSiswaController extends Controller
         $array_table = [];
         $arraydata = [];
         $array_departemen = ['All'];
+        $array_proses = ['All'];
         $total_by_proses = [];
         $total_by_departemen = [];
         $arr_headpros = [];
 
-        $array_proses = ['All'];
+        
         foreach($proses as $prs) {
             $array_proses[] = $prs->proses;
         }
@@ -246,9 +247,69 @@ class CalonSiswaController extends Controller
 
     public function agama() {
         $akad = DB::connection('mysqlakad');
+        $umum = DB::connection('mysqlumum');
 
         // main query
         $agama = $akad->select("select count(cs.replid) as total, ag.agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid right join jbsumum.agama as ag on cs.agama = ag.agama group by ag.agama");
+
+        $agama = $this->changeToArr($agama);
+
+        // query list option proses
+        $proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps inner join calonsiswa as cs on pps.replid = cs.idproses group by pps.replid,pps.departemen" );
+
+        // query list option departemen
+        $list_departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
+
+        // query list agama
+        $list_agama = $umum->select("select agama from agama order by urutan asc");
+
+        $array_departemen = ['All'];
+        $array_proses = ['All'];
+        $array_agama = ['All'];
+
+        foreach($proses as $prs) {
+            $array_proses[] = $prs->proses;
+        }
+        
+        foreach($list_departemen as $depart) {
+            $array_departemen[] = $depart->departemen;
+        }
+
+        foreach($list_agama as $agm) {
+            $array_agama[] = $agm->agama;
+        }
+
+        $arragdata = [];
+        foreach ($agama as $agd) {
+            $arragdata[] = array('value' => $agd['total'], 'name' => $agd['agama']);
+        }
+
+        return response()->json([
+            'agdata' => $arragdata,
+            'list_proses' => $array_proses,
+            'list_departemen' => $array_departemen,
+            'list_agama' => $array_agama
+        ]);
+    }
+
+    public function filterag(Request $request) {
+        $akad = DB::connection('mysqlakad');
+
+        // fetch request
+        $filter_departemen = ($request->departmen) ? "pps.departemen ='".$request->departmen."'" : "";
+        $filter_agama =    ($request->agama) ? "ag.agama ='".$request->agama."'" : "";
+        $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
+        $condition = ($filter_departemen && $filter_proses) ? " and " : "";
+
+        $condition2 = (($filter_departemen && $filter_agama && $filter_proses) && ($filter_proses != "")) ? " and ".$filter_agama: $filter_agama;
+
+        // where clause trendcs
+        $clause_agama = ($filter_departemen || $filter_proses || $filter_agama) ? "where ".$filter_departemen.$condition.$filter_proses.$condition2 : "";
+
+        $main_query = "select count(cs.replid) as total, ag.agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join jbsumum.agama as ag on cs.agama = ag.agama $clause_agama group by ag.agama";
+
+        // main query
+        $agama = $akad->select($main_query);
 
         $agama = $this->changeToArr($agama);
 

@@ -32,6 +32,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/change', 'CalonSiswaController@change');
         Route::post('/filter', 'CalonSiswaController@filter');
         Route::get('/agama', 'CalonSiswaController@agama');
+        Route::post('/filterag', 'CalonSiswaController@filterag');
     });
 
 });

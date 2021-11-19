@@ -2,7 +2,7 @@
 <template>
 
   <hero-bar>Agama</hero-bar>
-  <filter-bar menutp="agama"/>
+  <filter-bar menutp="agama" @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -84,14 +84,42 @@ export default defineComponent({
   },
   setup (props) {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const agdata = ref([])
     const agama = ref()
+    const agdata = ref([])
+    const listDep = ref([])
+    const listProp = ref([])
+    const listAgm = ref([])
+
+     const legendat = computed(() => {
+        let arobj = agdata.value
+
+        let prop = arobj.map(p => p.name)
+
+        return prop
+    })
+
+    const changepros = async (event) => {
+        await axios
+            .post("/api/v1/calons/change/", {departmen: event})
+            .then(res => {
+                listProp.value = res.data.list_proses
+            })
+            .catch(error =>{
+                    console.log('something wrong')
+                    console.log(JSON.stringify(error))
+            })
+    }
+
+    console.log(legendat);
 
     onMounted(async() => {
         await axios
             .get('/api/v1/calons/agama/')
             .then(res => {
                 agdata.value = res.data.agdata
+                listDep.value = res.data.list_departemen
+                listProp.value = res.data.list_proses
+                listAgm.value = res.data.list_agama
             })
             .catch(error => {
                 if (error.message) {
@@ -100,7 +128,6 @@ export default defineComponent({
                 }
             })
 
-        console.log(agdata.value)
         agama.value = {
             title: {
                 text: "Total Agama",
@@ -141,13 +168,49 @@ export default defineComponent({
     })
 
     watchEffect(() => {
-        agdata.value
+        listDep.value,
+        listProp.value,
+        listAgm.value,
+        agdata.value,
+        legendat,
         agama
     });
 
+    const filter = async (e) => {
+        if(e.proses == 'All' || e.proses == null || e.proses == '') {
+            e.proses = ''
+        }
 
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.proses = ''
+        }
+
+        if(e.agama == 'All') {
+            e.agama = ''
+        }
+
+        const fil = {
+            departmen: e.departemen,
+            proses: e.proses,
+            agama: e.agama
+        }
+
+        await axios
+            .post("/api/v1/calons/filterag/", fil)
+            .then(res => {
+                agdata.value = res.data.agdata
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error))
+            })
+    }
 
     provide('dataTable', agdata)
+    provide('list_departemen', listDep)
+    provide('list_proses', listProp)
+    provide('list_agama',listAgm)
 
     return {
       titleStack,
@@ -156,7 +219,9 @@ export default defineComponent({
       mdiChartBar,
       mdiTableMultiple,
       agdata,
-      agama
+      agama,
+      filter,
+      changepros
     }
   },
   // data () {

@@ -84,15 +84,10 @@ export default {
   setup (props,{emit}) {
     const opsiDepartmen = inject('list_departemen')
     const opsiProses = inject('list_proses')
+    const opsiAgama = inject('list_agama')
     const departemen = ref('All')
     const proses = ref('All')
-
-    const opsiAgama = [
-        { id: 1, label: 'Buddha' },
-        { id: 2, label: 'Islam' },
-        { id: 3, label: 'Kong Hu Cu' },
-        { id: 4, label: 'Kristen' }
-    ]
+    const agama = ref('All')
 
     const opsiArea = [
         { id: 1, label: 'Kosambi' },
@@ -105,7 +100,8 @@ export default {
 
     watchEffect(() => {
         departemen.value,
-        proses.value
+        proses.value,
+        agama.value
         if (proses.value == '' || proses.value == null) {
             proses.value = 'All'
         }
@@ -126,8 +122,10 @@ export default {
     const clickedFilter = () => {
         const filterData = {
             departemen: departemen.value,
-            proses: proses.value
+            proses: proses.value,
+            agama: agama.value
         }
+        console.log(filterData);
         emit('clickedFilter', filterData)
     };
 
@@ -140,6 +138,7 @@ export default {
       clickedFilter,
       departemen,
       proses,
+      agama,
       valu
     }
   }

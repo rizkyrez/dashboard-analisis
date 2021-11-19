@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
 <!-- eslint-disable  -->
     <div class="overflow-auto">
@@ -7,7 +6,7 @@
                 <tr class="bg-green-300">
 
                    <th class="font-semibold">Departemen</th>
-                   <th v-for="hdr in header" class="font-semibold">{{hdr}}</th>
+                   <th v-for="hdr in header" :key="hdr" class="font-semibold">{{hdr}}</th>
                    <th class="font-semibold">Grand Total</th>
                     <!-- <th class="font-semibold">gelombang 1</th>
                     <th class="font-semibold">GD 1 </th>
@@ -23,7 +22,7 @@
                 <!-- eslint-disable -->
                 <tr v-for="(rowData,y) in dataTable" :key="rowData.departemen">
                     <td>{{rowData.departemen}}</td>
-                    <td v-for="detailTotal in rowData.total">{{detailTotal}}</td>
+                    <td v-for="detailTotal in rowData.total" :key="detailTotal">{{detailTotal}}</td>
                     <td >{{rowData.grandtotal}}</td>
 
                     <!-- <td v-for="col in">{{ datap.data[i] }}</td> -->
@@ -86,7 +85,7 @@
                     <td class="font-semibold" >
                         Grand Total
                     </td>
-                    <td v-for="stpros in sumTotalPros">{{stpros}}</td>
+                    <td v-for="stpros in sumTotalPros" :key="stpros">{{stpros}}</td>
                     <!-- <td data-label="g21">82</td>
                     <td data-label="g22">34</td>
                     <td data-label="g21">10</td>
