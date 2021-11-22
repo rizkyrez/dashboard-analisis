@@ -28,13 +28,19 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     Route::group(['prefix' => 'calons'], function() {
-        Route::get('/', 'CalonSiswaController@trendcs');
+        Route::get('/trendcs', 'CalonSiswaController@trendcs');
+        Route::get('/agama', 'CalonSiswaController@agama');
+        Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
+        Route::get('/listfilter', 'CalonSiswaController@ListFilter');
         Route::post('/change', 'CalonSiswaController@change');
         Route::post('/filter', 'CalonSiswaController@filter');
-        Route::get('/agama', 'CalonSiswaController@agama');
         Route::post('/filterag', 'CalonSiswaController@filterag');
-        Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
         Route::post('/filterask', 'CalonSiswaController@filterask');
+    });
+
+    Route::group(['prefix' => 'siswa'], function() {
+        Route::get('/trend', 'SiswaController@trendsiswa');
+        Route::get('/listfiltersiswa', 'SiswaController@ListFilterSiswa');
     });
 
 });
