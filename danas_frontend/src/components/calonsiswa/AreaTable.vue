@@ -126,27 +126,6 @@
           <td data-label="g22">53</td>
           <td data-label="grdtotal1">89</td>
       </tr>
-    <!-- <tr v-for="client in itemsPaginated" :key="client.id">
-      <checkbox-cell v-if="checkable" @checked="checked($event, client)"/>
-      <td class="image-cell">
-        <user-avatar :username="client.name" class="image" />
-      </td>
-      <td data-label="Name">{{ client.name }}</td>
-      <td data-label="Company">{{ client.company }}</td>
-      <td data-label="City">{{ client.city }}</td>
-      <td data-label="Progress" class="progress-cell">
-        <progress max="100" :value="client.progress">{{ client.progress }}</progress>
-      </td>
-      <td data-label="Created">
-        <small class="text-gray-500 dark:text-gray-400" :title="client.created">{{ client.created }}</small>
-      </td>
-      <td class="actions-cell">
-        <jb-buttons type="justify-start lg:justify-end" no-wrap>
-          <jb-button class="mr-3" color="success" :icon="mdiEye" small @click="isModalActive = true" />
-          <jb-button color="danger" :icon="mdiTrashCan" small @click="isModalDangerActive = true" />
-        </jb-buttons>
-      </td>
-    </tr> -->
     </tbody>
   </table>
 
@@ -156,21 +135,12 @@
 /* eslint-disable */
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
-import ModalBox from '@/components/ModalBox'
-import CheckboxCell from '@/components/CheckboxCell'
 import Level from '@/components/Level'
-import JbButtons from '@/components/JbButtons'
-import JbButton from '@/components/JbButton'
 
 export default {
   name: 'AreaTable',
   components: {
-    ModalBox,
-    CheckboxCell,
     Level,
-    JbButtons,
-    JbButton,
   },
   props: {
     checkable: Boolean
@@ -180,69 +150,8 @@ export default {
 
     const darkMode = computed(() => store.state.darkMode)
 
-    const items = computed(() => store.state.clients)
-
-    const isModalActive = ref(false)
-
-    const isModalDangerActive = ref(false)
-
-    const perPage = ref(10)
-
-    const currentPage = ref(0)
-
-    const checkedRows = ref([])
-
-    const itemsPaginated = computed(
-      () => items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
-    )
-
-    const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
-
-    const currentPageHuman = computed(() => currentPage.value + 1)
-
-    const pagesList = computed(() => {
-      const pagesList = []
-
-      for (let i = 0; i < numPages.value; i++) {
-        pagesList.push(i)
-      }
-
-      return pagesList
-    })
-
-    const remove = (arr, cb) => {
-      const newArr = []
-
-      arr.forEach(item => {
-        if (!cb(item)) {
-          newArr.push(item)
-        }
-      })
-
-      return newArr
-    }
-
-    const checked = (isChecked, client) => {
-      if (isChecked) {
-        checkedRows.value.push(client)
-      } else {
-        checkedRows.value = remove(checkedRows.value, row => row.id === client.id)
-      }
-    }
-
     return {
       darkMode,
-      isModalActive,
-      isModalDangerActive,
-      currentPage,
-      currentPageHuman,
-      numPages,
-      checkedRows,
-      itemsPaginated,
-      pagesList,
-      checked,
-      mdiEye,
-      mdiTrashCan
     }
   }
 }

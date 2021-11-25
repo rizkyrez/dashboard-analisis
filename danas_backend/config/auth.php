@@ -46,6 +46,12 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'api2' => [
+            'driver' => 'jwt',
+            'provider' => 'landlord',
+            'hash' => false,
+        ]
     ],
 
     /*
@@ -71,6 +77,11 @@ return [
             'model' => \App\User::class,
         ],
 
+        'landlord' => [
+            'driver' => 'database',
+            'table' => 'landlord',
+        ],
+
         'users' => [
             'driver' => 'database',
             'table' => 'login',
@@ -93,6 +104,12 @@ return [
     */
 
     'passwords' => [
+        'landlord' => [
+            'provider' => 'landlord',
+            'table' => 'password_resets',
+            'expire' => 1000,
+        ],
+
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',

@@ -1,27 +1,28 @@
-import { ref, onBeforeMount, onMounted, watchEffect, provide, toRefs, watch, nextTick, on} from 'vue'
+/* eslint-disable */
+import { ref, reactive, watchEffect, computed, onBeforeMount, onMounted} from 'vue'
 import axios from 'axios'
 
 export default function useTrendCs(){
     const dataset = ref([])
-    const dataTable = ref([])
-    const trendcs = ref()
+    const datatable = ref([])
+    const header = ref([])
     const sum = ref([])
 
-    const getDataset = async () => {
-        await axios
-            .get('/api/v1/calons/trendcs')
-            .then(res => {
-                dataset.value = res.data.dataset
-                dataTable.value = res.data.data_table
-                sum.value = res.data.sum_pros
-            })
-            .catch(error => {
-                console.log(JSON.stringify(error))
-            })
-    }
+    axios
+        .get('/api/v1/calons/trendcs/')
+        .then(res => {
+            dataset.value = res.data.dataset
+            datatable.value = res.data.data_table
+            sum.value = res.data.sum_pros
+            header.value = res.data.header
+        })
+        .catch(error => {
+            console.log(JSON.stringify(error))
+            console.log(JSON.stringify(error.message))
+        })
 
     const xaxis = computed(() => {
-        let arrobj = dataTable.value
+        let arrobj = datatable.value
 
         let dep = arrobj.map(p => p.departemen)
 
@@ -34,10 +35,6 @@ export default function useTrendCs(){
         let prop = arobj.map(p => p.name)
 
         return prop
-    })
-
-    const grandtotal = computed(() => {
-
     })
 
     const tooltip = computed(() => {
@@ -65,8 +62,8 @@ export default function useTrendCs(){
     })
 
     const grdtotal = computed(() => {
-        const prosTotal = sumTotalPros.value
-        const arrDtable = dataTable.value
+        const prosTotal = sum.value
+        const arrDtable = datatable.value
         const depTotal = arrDtable.map(p => p.grandtotal)
 
         let sumdep = depTotal.reduce((ac, va) => {
@@ -79,80 +76,64 @@ export default function useTrendCs(){
 
         let result = sumpros + sumdep
         return result
-     })
+    })
 
-      onBeforeMount(async () => {
-          await axios
-          .get('/api/v1/calons/trendcs')
+    const trendcs = reactive({
+        notMerge:  true,
+        tooltip: tooltip,
+        grid: {
+            left: '6%',
+            right: '6%',
+            bottom: '20%',
+            top:30,
+            z: 4
+        },
+        legend: {
+            orient: 'horizontal',
+            left: 'center',
+            bottom: 'bottom',
+            itemGap: 12,
+            padding: 8,
+            data: legendat,
+            // selectedMode: selectmode,
+            // selected: selected,
+            // top: 'center'
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: xaxis,
+            axisTick: {
+                alignWithLabel: true
+            }
+        },
+        yAxis: {type: 'value'},
+        series: dataset
+    })
 
-          .catch(error =>{
-              if (error.message) {
-                  this.errors.push('something wrong')
-                  console.log(JSON.stringify(error))
-              }
-          })
+    onBeforeMount(trendcs, dataset)
 
-          trendcs.value = {
-              aria: {
-                  show: true
-              },
-              tooltip: {
-                  trigger: 'axis',
-                  axisPointer:{
-                  type: 'shadow',
-                      label: {
-                          show: true
-                      }
-                  }
-              },
-              grid: {
-                  left: '6%',
-                  right: '6%',
-                  bottom: '6%',
-                  top:80,
-                  z: 4
-              },
-              legend: {
-                  orient: 'horizontal',
-                  left: 'center',
-                  top: 'top',
-                  itemGap: 12,
-                  padding: 8
-                  // top: 'center'
-              },
-              xAxis: {type: 'category'},
-              yAxis: {type: 'value'},
-              series: dataset
-          };
-      })
-
-      watchEffect(() => {
-              dataset.value,
-              dataTable.value,
-              trendcs.value,
-              sum.value,
-              listDep.value,
-              listProp.value
-          });
-
-
-      // const dataseries =  computed({
-      //         get: () => dataset.value,
-      //         set: val => {
-      //             dataset.value = val
-      //         }
-      //     });
-
-      provide('arrdata', dataset)
-      provide('dataTable', dataTable)
-      provide('sum_proses', sum)
-      provide('list_departemen', listDep)
-      provide('list_proses', listProp)
-
-      return {
+    watchEffect(() => {
+        dataset.value,
+        header.value,
+        datatable.value,
+        sum.value,
         trendcs,
+        tooltip,
+        legendat,
+        xaxis,
+        grdtotal
+    })
+
+    return {
         dataset,
-        dataTable,
-        sum
-      }
+        header,
+        datatable,
+        sum,
+        grdtotal,
+        tooltip,
+        legendat,
+        xaxis,
+        trendcs
+    }
   };

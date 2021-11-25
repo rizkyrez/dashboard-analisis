@@ -28,27 +28,12 @@ class CalonSiswaController extends Controller
         // change to array  
         $departemen = $this->changeToArr($departemen);
 
-        // query list option proses
-        $proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps inner join calonsiswa as cs on pps.replid = cs.idproses group by pps.replid,pps.departemen" );
-
-        // query list option departemen
-        $list_departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
 
         $array_table = [];
         $arraydata = [];
-        $array_departemen = ['All'];
         $total_by_proses = [];
         $total_by_departemen = [];
         $arr_headpros = [];
-
-        $array_proses = ['All'];
-        foreach($proses as $prs) {
-            $array_proses[] = $prs->proses;
-        }
-        
-        foreach($list_departemen as $depart) {
-            $array_departemen[] = $depart->departemen;
-        }
 
         // array for series chart
         foreach ($array_group as $key => $arr_proses) {
@@ -78,6 +63,7 @@ class CalonSiswaController extends Controller
         // array for table
         foreach ($departemen as $prodep) {
             $array_detail_table = [];
+            $array_prs = [];
             foreach ($array_group as $key => $value) {
                 $src_data = $this->searchArrId('departemen', $prodep['departemen'], $value);
                 $total2 = $src_data['total'];
@@ -85,11 +71,11 @@ class CalonSiswaController extends Controller
                     $total2 = 0;
                 }
                 $array_detail_table[] = $total2;
-                
+                $array_prs[] = $key;
             }
 
             $total_by_departemen = array_sum(array_values($array_detail_table));
-            $array_table[] = array('departemen' => $prodep['departemen'],'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
+            $array_table[] = array('departemen' => $prodep['departemen'],'proses'=> $array_prs, 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
             // print_r($total_by_departemen);
         }
 
@@ -98,11 +84,9 @@ class CalonSiswaController extends Controller
         return response()->json([
             'data_table' => $array_table,
             'dataset' => $arraydata,
-            'list_proses' => $array_proses,
-            'list_departemen' => $array_departemen,
             'sum_pros' => $total_by_proses,
             'header' => $arr_headpros
-        ]);
+        ],200);
     }
 
     public function change(Request $request) {
@@ -122,7 +106,7 @@ class CalonSiswaController extends Controller
 
         return response()->json([
             'list_proses' => $array_proses,
-        ]);
+        ],200);
     }
 
     public function filter(Request $request) {
@@ -246,37 +230,11 @@ class CalonSiswaController extends Controller
 
     public function agama() {
         $akad = DB::connection('mysqlakad');
-        $umum = DB::connection('mysqlumum');
 
         // main query
         $agama = $akad->select("select count(cs.replid) as total, ag.agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid right join jbsumum.agama as ag on cs.agama = ag.agama group by ag.agama");
 
         $agama = $this->changeToArr($agama);
-
-        // query list option proses
-        $proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps inner join calonsiswa as cs on pps.replid = cs.idproses group by pps.replid,pps.departemen" );
-
-        // query list option departemen
-        $list_departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
-
-        // query list agama
-        $list_agama = $umum->select("select agama from agama order by urutan asc");
-
-        $array_departemen = ['All'];
-        $array_proses = ['All'];
-        $array_agama = ['All'];
-
-        foreach($proses as $prs) {
-            $array_proses[] = $prs->proses;
-        }
-        
-        foreach($list_departemen as $depart) {
-            $array_departemen[] = $depart->departemen;
-        }
-
-        foreach($list_agama as $agm) {
-            $array_agama[] = $agm->agama;
-        }
 
         $arragdata = [];
         foreach ($agama as $agd) {
@@ -284,10 +242,7 @@ class CalonSiswaController extends Controller
         }
 
         return response()->json([
-            'agdata' => $arragdata,
-            'list_proses' => $array_proses,
-            'list_departemen' => $array_departemen,
-            'list_agama' => $array_agama
+            'agdata' => $arragdata
         ]);
     }
 
@@ -321,8 +276,6 @@ class CalonSiswaController extends Controller
             'agdata' => $arragdata
         ]);
     }
-
-    
 
     public function exin_asalsekolah() {
         $akad = DB::connection('mysqlakad');
@@ -398,33 +351,40 @@ class CalonSiswaController extends Controller
         ]);
     }
 
-    public function listFilter(Request $request) {
-        $akad =  DB::connection('mysqlakad');
+    public function ListFilter() {
+        $akad = DB::connection('mysqlakad');
         $umum = DB::connection('mysqlumum');  
 
         // query list option departemen
         $departemen = $akad->select('select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc');
 
         // query list option proses
-        $list_proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps right join departemen as dp on pps.departemen = dp.departemen group by pps.replid, dp.departemen" );
+        $list_proses = $akad->select("select distinct pps.proses COLLATE utf8_bin as proses from prosespenerimaansiswa as pps inner join departemen as dp on pps.departemen = dp.departemen group by pps.replid, dp.departemen");
 
-        $list_agama = $umum->select('select agama from agama order by uturan asc');
+        $list_agama = $umum->select('select agama from agama order by urutan asc');
+
+        $array_departemen = ['All'];
+        $array_proses = ['All'];
+        $array_agama = ['All'];
+
+        foreach($list_proses as $prs) {
+            $array_proses[] = $prs->proses;
+        }
         
+        foreach($departemen as $depart) {
+            $array_departemen[] = $depart->departemen;
+        }
+
+        foreach($list_agama as $agm) {
+            $array_agama[] = $agm->agama;
+        }
+
         return response()->json([
-            'list_departemen' => $departemen,
-            'list_agama' => $list_agama,
-            'list_proses' => $list_proses
+            'list_departemen' => $array_departemen,
+            'list_agama' => $array_agama,
+            'list_proses' => $array_proses
         ]);
     }
-
-    public function filterse(Request $request) {
-        $akad = DB::connection('mysqlakad');
-        $umum = DB::connection('mysqlumum');
-    }
-
-    // public function area() {
-
-    // }
 
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
@@ -437,8 +397,8 @@ class CalonSiswaController extends Controller
 
     protected function changeToArr($arr) {
         // change to array  
-        $rconvert = array_map(function($arrdp){
-            return (array) $arrdp;
+        $rconvert = array_map(function($arrpar){
+            return (array) $arrpar;
         }, $arr);
 
         return $rconvert;

@@ -7,27 +7,45 @@
           v-for="(title, index) in titleStack"
           :key="index"
           class="title-stack-item inline-block pr-3 text-2xl text-gray-500 dark:text-gray-400 last:pr-0 last:font-black last:text-black
-            dark:text-gray-100">
+            ">
           {{ title }}
         </li>
       </ul> -->
       <div class="grid grid-cols-3 grid-flow-col auto-cols-max md:auto-cols-min gap-3">
 
-        <div class="px-3">
+        <div v-if="category == 'calons'" class="px-3">
         <field label="Departemen">
-            <control :options="opsiDepartmen" v-model="departemen" @change="changeProses()" />
+            <control :options="listdepartemen" v-model="departemen" @change="changeProses()" />
         </field>
         </div>
 
-        <div class="px-3">
+        <div v-if="category == 'siswa'" class="px-3">
+        <field label="Departemen">
+            <control :options="listdepartemenv2" v-model="departemen" @change="changeTahunajaran()" />
+        </field>
+        </div>
+
+        <div v-if="category == 'calons'" class="px-3">
         <field label="Proses">
-            <control :options="opsiProses" v-model="proses" :isdisable="valu"/>
+            <control :options="listproses" v-model="proses" :isdisable="valu"/>
         </field>
         </div>
 
-        <div v-if="menutp === 'agama'" class="px-3">
+        <div v-if="category == 'siswa'" class="px-3">
+        <field label="Tahun Ajaran">
+            <control :options="listTahunAjaran" v-model="tahunajaran" :isdisable="valu"/>
+        </field>
+        </div>
+
+        <div v-if="menutp == 'agama' && category == 'calons'" class="px-3">
         <field label="Agama">
-            <control :options="opsiAgama" v-model="agama" />
+            <control :options="listagama" v-model="agama" />
+        </field>
+        </div>
+
+        <div v-if="menutp == 'agama' && category == 'siswa'" class="px-3">
+        <field label="Agama">
+            <control :options="listagamav2" v-model="agama" />
         </field>
         </div>
 
@@ -53,13 +71,14 @@
 
 <script>
 /* eslint-disable */
-import { computed, ref, inject, watchEffect } from 'vue'
+import { computed, ref, watchEffect, onBeforeMount, onMounted, nextTick } from 'vue'
 import axios from 'axios'
 import Level from '@/components/Level'
 import Field from '@/components/Field'
 import Control from '@/components/Control'
 import JbButton from '@/components/JbButton'
 import CardComponent from '@/components/CardComponent'
+import useFilter from '@/composables/useFilter'
 
 export default {
   name: 'FilterBar',
@@ -68,8 +87,7 @@ export default {
     Field,
     JbButton,
     Control,
-    CardComponent,
-
+    CardComponent
   },
   props: {
     titleStack: {
@@ -77,17 +95,28 @@ export default {
       default: () => []
     },
 
-    menutp: String
+    menutp: String,
+    category: String
   },
 
   emits : ['changeProses','clickedFilter'],
   setup (props,{emit}) {
-    const opsiDepartmen = inject('list_departemen')
-    const opsiProses = inject('list_proses')
-    const opsiAgama = inject('list_agama')
     const departemen = ref('All')
     const proses = ref('All')
     const agama = ref('All')
+    const tahunajaran = ref('All')
+    const { getList, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2 } = useFilter()
+
+    onBeforeMount(getList)
+
+    // const eachpros = computed(() => {
+    //     let pros = proses.value
+    //     let arr = listproses.value
+    //     let match = arr.filter(function(el) {
+    //         return el.indexOf(pros) !== -1
+    //     })
+    //     return match
+    // })
 
     const opsiArea = [
         { id: 1, label: 'Kosambi' },
@@ -101,15 +130,44 @@ export default {
     watchEffect(() => {
         departemen.value,
         proses.value,
-        agama.value
-        if (proses.value == '' || proses.value == null) {
+        agama.value,
+        tahunajaran.value
+        if (proses.value == '' || proses.value == null || departemen.value == 'All' ) {
             proses.value = 'All'
         }
-
     })
 
-    const changeProses = () => {
-        emit('changeProses', departemen.value)
+    const changeProses = async () => {
+        const fildat = {
+            departmen: departemen.value
+        }
+
+        await axios
+            .post('/api/v1/calons/change/', fildat)
+            .then(res => {
+                listproses.value = res.data.list_proses
+            })
+            .catch(error => {
+                console.log(JSON.stringify(error))
+                console.log(JSON.stringify(error.message))
+            })
+
+    }
+
+    const changeTahunajaran = async () => {
+        const filterdat = {
+            departmen: departemen.value
+        }
+
+        await axios
+            .post('/api/v1/siswa/change/', filterdat)
+            .then(res => {
+                listTahunAjaran.value = res.data.list_tahunajaran
+            })
+            .catch(error => {
+                alert(error.message)
+                console.log(JSON.stringify(error))
+            })
     }
 
     const valu = computed(() => {
@@ -123,19 +181,25 @@ export default {
         const filterData = {
             departemen: departemen.value,
             proses: proses.value,
-            agama: agama.value
+            agama: agama.value,
+            tahunajaran: tahunajaran.value
         }
 
         emit('clickedFilter', filterData)
     };
 
     return {
-      opsiDepartmen,
-      opsiAgama,
-      opsiArea,
-      opsiProses,
+      getList,
+      listdepartemenv2,
+      listdepartemen,
+      listagama,
+      listagamav2,
+      listproses,
+      listTahunAjaran,
       changeProses,
+      changeTahunajaran,
       clickedFilter,
+      tahunajaran,
       departemen,
       proses,
       agama,

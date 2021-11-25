@@ -1,8 +1,7 @@
-
 <template>
-
+    <!-- eslint-disable -->
   <hero-bar>Agama</hero-bar>
-  <filter-bar menutp="agama" @change-proses="changepros" @clicked-filter="filter"/>
+  <filter-bar category="calons" menutp="agama" @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -26,8 +25,6 @@
     </div>
 
   </main-section>
-
-  <bottom-other-pages-section />
 </template>
 
 <script>
@@ -86,9 +83,6 @@ export default defineComponent({
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const agama = ref()
     const agdata = ref([])
-    const listDep = ref([])
-    const listProp = ref([])
-    const listAgm = ref([])
 
      const legendat = computed(() => {
         let arobj = agdata.value
@@ -110,16 +104,11 @@ export default defineComponent({
             })
     }
 
-    console.log(legendat);
-
     onMounted(async() => {
         await axios
             .get('/api/v1/calons/agama/')
             .then(res => {
                 agdata.value = res.data.agdata
-                listDep.value = res.data.list_departemen
-                listProp.value = res.data.list_proses
-                listAgm.value = res.data.list_agama
             })
             .catch(error => {
                 if (error.message) {
@@ -135,7 +124,7 @@ export default defineComponent({
             },
             tooltip: {
                 trigger: "item",
-                // formatter: "{a} <br/>{b} : {c} ({d}%)"
+                formatter: "{b} : {c} ({d}%)"
             },
             legend: {
                 orient: 'horizontal',
@@ -150,7 +139,14 @@ export default defineComponent({
                     label: {
                         position: 'outer',
                         alignTo: 'labelLine',
+                        minMargin: 4,
+                        distanceToLabelLine: 5,
+                        formatter: '{b}\n {d}%',
                         bleedMargin: 6
+                    },
+                    labelLine: {
+                        length: 25,
+                        length2: 15
                     },
                     data: agdata,
                     emphasis: {
@@ -168,9 +164,6 @@ export default defineComponent({
     })
 
     watchEffect(() => {
-        listDep.value,
-        listProp.value,
-        listAgm.value,
         agdata.value,
         legendat,
         agama
@@ -208,9 +201,6 @@ export default defineComponent({
     }
 
     provide('dataTable', agdata)
-    provide('list_departemen', listDep)
-    provide('list_proses', listProp)
-    provide('list_agama',listAgm)
 
     return {
       titleStack,
@@ -224,55 +214,6 @@ export default defineComponent({
       changepros
     }
   },
-  // data () {
-
-  //   let data = []
-  //   for (let i = 0; i <= 360; i++) {
-  //       let t = i / 180 * Math.PI
-  //       let r = Math.sin(2 * t) * Math.cos(2 * t)
-  //       data.push([r, i])
-  //   }
-
-  //   return {
-  //     initOptions: {
-  //       renderer: 'canvas'
-  //     },
-  //     polar: {
-  //       title: {
-  //         text: '极坐标双数值轴'
-  //       },
-  //       legend: {
-  //         data: ['line']
-  //       },
-  //       polar: {
-  //         center: ['50%', '54%']
-  //       },
-  //       tooltip: {
-  //         trigger: 'axis',
-  //         axisPointer: {
-  //           type: 'cross'
-  //         }
-  //       },
-  //       angleAxis: {
-  //         type: 'value',
-  //         startAngle: 0
-  //       },
-  //       radiusAxis: {
-  //         min: 0
-  //       },
-  //       series: [
-  //         {
-  //           coordinateSystem: 'polar',
-  //           name: 'line',
-  //           type: 'line',
-  //           showSymbol: false,
-  //           data: data
-  //         }
-  //       ],
-  //       animationDuration: 2000
-  //     }
-  //   }
-  // }
 });
 </script>
 <style>

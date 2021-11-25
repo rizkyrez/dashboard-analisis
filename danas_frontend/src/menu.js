@@ -1,48 +1,46 @@
 /* eslint-disable */
 import {
   mdiAccountCircle,
+  mdiAccountGroup,
+  mdiAccountMultiple,
   mdiDesktopMac,
-  mdiGithub,
-  mdiLock,
   mdiAlertCircle,
   mdiMonitorClean,
   mdiSquareEditOutline,
   mdiTable,
   mdiViewList,
-  mdiTelevisionGuide,
-  mdiResponsive
 } from '@mdi/js'
 
 export default [
   'Akademik',
   [
     {
-      icon: mdiDesktopMac,
+      icon: mdiAccountMultiple,
       label: 'Calon Siswa',
       subLabel: 'Calon Siswa',
       menu: [
         {
-          to: '/tjcs',
+          to: '/calon-siswa/trends',
           label: 'Trend Jumlah Calon Siswa',
         },
         {
-          to: '/agama',
+          to: '/calon-siswa/agama',
           label: 'Agama',
         },
         {
-          to: '/area',
+          to: '/calon-siswa/area',
           label: 'Area',
         },
         {
-          to: '/inex',
+          to: '/calon-siswa/inex',
           label: 'Internal vs External',
         },
         {
-          to: '/achievement',
+          to: '/calon-siswa/achievement',
           label: 'Achievement-LIVE',
         },
         {
-          to: '/tarpon',
+          to: '/calon-siswa/tarpon',
           label: 'Target Potensial CSB vs Achievement',
         },
       ]
@@ -50,31 +48,32 @@ export default [
     {
       // to: '/tables',
       label: 'Siswa',
-      icon: mdiTable,
+      subLabel: 'Siswa',
+      icon: mdiAccountGroup,
       updateMark: true,
       menu: [
         {
-          to: '/tjcs',
+          to: '/siswa/trends',
           label: 'Trend Jumlah Siswa',
         },
         {
-          to: '/kelas',
+          to: '/siswa/kelas',
           label: 'Class Occupancy',
         },
         {
-          to: '/jumlahkelas',
+          to: '/siswa/jumlahkelas',
           label: 'Jumlah Kelas per Tingkat',
         },
         {
-          to: '/agama',
+          to: '/siswa/agama',
           label: 'Agama',
         },
         {
-          to: '/area',
+          to: '/siswa/area',
           label: 'Area',
         },
         {
-          to: '/siblings',
+          to: '/siswa/siblings',
           label: 'siblings',
         },
         // {
@@ -144,17 +143,6 @@ export default [
   ],
   'Keuangan',
   [
-    // {
-    //   href: 'https://justboil.me/tailwind-admin-templates/vue-dashboard',
-    //   label: 'Premium version',
-    //   icon: mdiMonitorClean,
-    //   target: '_blank'
-    // },
-    // {
-    //   href: 'https://github.com/justboil/admin-one-vue-tailwind',
-    //   label: 'GitHub',
-    //   icon: mdiGithub,
-    //   target: '_blank'
-    // }
+
   ]
 ]

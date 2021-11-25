@@ -1,6 +1,5 @@
-
 <template>
-
+    <!-- eslint-disable -->
   <hero-bar>Agama</hero-bar>
   <filter-bar @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
@@ -26,8 +25,6 @@
     </div>
 
   </main-section>
-
-  <bottom-other-pages-section />
 </template>
 
 <script>
@@ -128,7 +125,7 @@ export default defineComponent({
 
         asalSekolah.value = {
             title: {
-                text: "Total Agama",
+                text: "Total Asal Sekolah",
                 left: "center",
             },
             tooltip: {
@@ -215,7 +212,6 @@ export default defineComponent({
     return {
       titleStack,
       mdiTableBorder,
-      mdiTableOff,
       mdiChartBar,
       mdiTableMultiple,
       askdata,

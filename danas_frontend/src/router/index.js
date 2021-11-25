@@ -6,6 +6,9 @@ import agama from '../views/calonSiswa/Agamav'
 import area from '../views/calonSiswa/Areav'
 import inexask from '../views/calonSiswa/Asalsekolahcs'
 import achievement from '../views/calonSiswa/Achievementcs'
+
+import trendsiswa from '../views/siswa/TrendSiswa'
+import agamasiswa from '../views/siswa/AgamaSiswa'
 /* eslint-disable */
 const routes = [
   {
@@ -22,7 +25,7 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Trend',
       requireLogin: true
     },
-    path: '/tjcs',
+    path: '/calon-siswa/trends',
     name: 'TrendCalonSiswa',
     component: trendcs
   },
@@ -31,8 +34,8 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Agama',
       requireLogin: true
     },
-    path: '/agama',
-    name: 'Agama',
+    path: '/calon-siswa/agama',
+    name: 'Agamav',
     component: agama
   },
   {
@@ -40,7 +43,7 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Area',
       requireLogin: true
     },
-    path: '/area',
+    path: '/calon-siswa/area',
     name: 'Area',
     component: area
   },
@@ -49,7 +52,7 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Internal VS External',
       requireLogin: true
     },
-    path: '/inex',
+    path: '/calon-siswa/inex',
     name: 'Asalsekolah',
     component: inexask
   },
@@ -58,10 +61,64 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Achievement',
       requireLogin: true
     },
-    path: '/achievement',
+    path: '/calon-siswa/achievement',
     name: 'Achievement',
     component: achievement
   },
+  {
+    meta: {
+      title: 'Dashboard - Siswa - Trend',
+      requireLogin: true
+    },
+    path: '/siswa/trends',
+    name: 'TrendSiswa',
+    component: trendsiswa
+  },
+  {
+    meta: {
+      title: 'Dashboard - Siswa - Agama',
+      requireLogin: true
+    },
+    path: '/siswa/agama',
+    name: 'AgamaSiswa',
+    component: agamasiswa
+  },
+//   {
+//     meta: {
+//       title: 'Dashboard - Siswa - Agama',
+//       requireLogin: true
+//     },
+//     path: '/siswa/agama',
+//     name: 'Agama',
+//     component: agama
+//   },
+//   {
+//     meta: {
+//       title: 'Dashboard - Siswa - Area',
+//       requireLogin: true
+//     },
+//     path: '/siswa/area',
+//     name: 'Area',
+//     component: area
+//   },
+//   {
+//     meta: {
+//       title: 'Dashboard - Siswa - Internal VS External',
+//       requireLogin: true
+//     },
+//     path: '/siswa/inex',
+//     name: 'Asalsekolah',
+//     component: inexask
+//   },
+//   {
+//     meta: {
+//       title: 'Dashboard - Siswa - Achievement',
+//       requireLogin: true
+//     },
+//     path: '/siswa/achievement',
+//     name: 'Achievement',
+//     component: achievement
+//   },
   {
     meta: {
       title: 'Login',

@@ -26,26 +26,22 @@
 </template>
 
 <script>
-// import { reactive } from 'vue'
-// import { useRouter } from 'vue-router'
+/* eslint-disable */
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import axios from 'axios'
 import FullScreenSection from '@/components/FullScreenSection'
 import CardComponent from '@/components/CardComponent'
-import CheckRadioPicker from '@/components/CheckRadioPicker'
 import Field from '@/components/Field'
 import Control from '@/components/Control'
 import Divider from '@/components/Divider.vue'
 import JbButton from '@/components/JbButton'
 import JbButtons from '@/components/JbButtons'
-/* eslint-disable */
 
 export default {
   name: 'Login',
   components: {
     FullScreenSection,
     CardComponent,
-    CheckRadioPicker,
     Field,
     Control,
     Divider,
@@ -53,17 +49,6 @@ export default {
     JbButtons
   },
   setup () {
-    // const form = reactive({
-    //   username: '',
-    //   password: '',
-    //   // remember: ['remember']
-    // })
-
-  //   const router = useRouter()
-
-  //   const submit = () => {
-  //     router.push('/')
-  //   }
 
     return {
       mdiAccount,
@@ -118,13 +103,11 @@ export default {
             })
             .catch(error => {
                 if (error.response) {
-                    // for (const property in error.response.data) {
-                    //     this.errors.push(`${property}: ${error.response.data[property]}`)
-                    // }
-                    console.log(JSON.stringify(error.response.data))
+                    alert(error.response.data)
+                    console.log(JSON.stringify(error.request))
                 } else if (error.message) {
-                    // this.errors.push('something wrong')
-                    console.log(JSON.stringify(error))
+                    alert(error.message)
+                    console.log(JSON.stringify(error.message))
                 }
             })
       }
