@@ -9,6 +9,7 @@ import achievement from '../views/calonSiswa/Achievementcs'
 
 import trendsiswa from '../views/siswa/TrendSiswa'
 import agamasiswa from '../views/siswa/AgamaSiswa'
+import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 /* eslint-disable */
 const routes = [
   {
@@ -73,6 +74,15 @@ const routes = [
     path: '/siswa/trends',
     name: 'TrendSiswa',
     component: trendsiswa
+  },
+  {
+    meta: {
+      title: 'Dashboard - Siswa - Jumlah Kelas Per Tingkat',
+      requireLogin: true
+    },
+    path: '/siswa/statistik-jumlah-kelas',
+    name: 'StatisClassTingkat',
+    component: StatisClassTingkat
   },
   {
     meta: {

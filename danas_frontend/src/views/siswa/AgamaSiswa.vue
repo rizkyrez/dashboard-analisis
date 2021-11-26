@@ -80,7 +80,7 @@ export default defineComponent({
 
   },
   setup (props) {
-    const titleStack = ref(['Dashboard', 'Calon Siswa'])
+    const titleStack = ref(['Dashboard', 'Siswa'])
     const agama = ref()
     const agdata = ref([])
 

@@ -63,19 +63,12 @@ export default function useTrendCs(){
 
     const grdtotal = computed(() => {
         const prosTotal = sum.value
-        const arrDtable = datatable.value
-        const depTotal = arrDtable.map(p => p.grandtotal)
-
-        let sumdep = depTotal.reduce((ac, va) => {
-            return ac += va
-        },0)
 
         let sumpros = prosTotal.reduce((a, v) => {
             return a += v
         },0)
 
-        let result = sumpros + sumdep
-        return result
+        return sumpros
     })
 
     const trendcs = reactive({

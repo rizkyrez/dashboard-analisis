@@ -132,7 +132,7 @@ export default defineComponent({
             detail: {
                 fontSize: 17,
                 valueAnimation: true,
-                formatter: '{value}%'
+                formatter: '{d}%'
             },
             data: [
                 {

@@ -61,7 +61,7 @@ export default [
           label: 'Class Occupancy',
         },
         {
-          to: '/siswa/jumlahkelas',
+          to: '/siswa/statistik-jumlah-kelas',
           label: 'Jumlah Kelas per Tingkat',
         },
         {

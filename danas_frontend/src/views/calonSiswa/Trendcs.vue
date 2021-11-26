@@ -18,7 +18,7 @@
 
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
         <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-          <trend-table cat="calons" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal"/>
+          <trend-table cat="calons" typedata="trend" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal"/>
         </card-component>
       </div>
 

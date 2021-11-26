@@ -1,7 +1,6 @@
 <template>
     <v-chart
     :option="option"
-    autoresize
     />
 </template>
 <script>
@@ -40,7 +39,8 @@ export default {
 <style lang="postcss">
     .echarts {
         width: 100%;
-        width: 45vw;
-        height: 400px;
+        height: 40vw;
+        min-height: 400px;
+        max-height: 1500px;
     }
 </style>

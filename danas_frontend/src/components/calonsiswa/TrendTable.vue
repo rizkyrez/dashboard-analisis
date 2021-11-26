@@ -5,29 +5,38 @@
         <table class="border border-collapse overflow-auto w-max-full border-green-400 text-xs">
             <thead>
                 <tr class="bg-green-300">
-
-                   <th class="font-semibold text-center">Departemen</th>
-                   <th v-for="hdr in header" :key="hdr" class="font-semibold text-center"><span v-if="cat == 'siswa'">Tahun Ajaran </span>{{hdr}}</th>
-                   <th class="font-semibold text-center" v-if="cat == 'calons'">Total Calon Siswa</th>
-                   <th class="font-semibold text-center" v-if="cat == 'siswa'">Total Siswa</th>
+                   <th class="font-semibold text-center" v-if="typedata == 'kelas'">Tingkat</th>
+                   <th class="font-semibold text-center" v-else>Departemen</th>
+                   <th v-for="hdr in header" class="font-semibold text-center"><span v-if="cat == 'siswa' || 'kelas'">Tahun Ajaran </span>{{hdr}}</th>
+                   <th class="font-semibold text-center" v-if="cat == 'calons' && header.length > 1">Total Calon Siswa</th>
+                   <th class="font-semibold text-center" v-else-if="cat == 'siswa'  && header.length > 1">Total Siswa</th>
+                   <th class="font-semibold text-center" v-else-if="cat == 'kelas'  && header.length > 1">Total Kelas</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(rowData,y) in datatable" :key="rowData.departemen">
+                <tr v-if="typedata == 'trend'" v-for="(rowData,y) in datatable" :key="rowData.departemen">
                     <td>{{rowData.departemen}}</td>
                     <td v-for="detailTotal in rowData.total" :key="detailTotal">{{detailTotal}}</td>
-                    <td>{{rowData.grandtotal}}</td>
+                    <td v-if="header.length > 1">{{rowData.grandtotal}}</td>
+                </tr>
+                <tr v-if="typedata == 'kelas'" v-for="(rowData,y) in datatable" :key="rowData.tingkat">
+                    <td>{{rowData.tingkat}}</td>
+                    <td v-for="detailTotal in rowData.total" :key="detailTotal">{{detailTotal}}</td>
+                    <td v-if="header.length > 1">{{rowData.grandtotal}}</td>
                 </tr>
                 <tr >
                     <td class="font-semibold" v-if="cat == 'calons'">
                         Total Calon Siswa
                     </td>
-                    <td class="font-semibold" v-if="cat == 'siswa'">
+                    <td class="font-semibold" v-else-if="cat == 'siswa'">
                         Total Siswa
+                    </td>
+                    <td class="font-semibold" v-else-if="cat == 'kelas'">
+                        Total Kelas
                     </td>
                     <td v-for="stpros in sum" :key="stpros">{{stpros}}</td>
 
-                    <td class="font-bold">
+                    <td v-if="header.length > 1" class="font-bold">
                         {{grdtotal}}
                     </td>
                 </tr>
@@ -52,6 +61,7 @@ export default {
     header: Array,
     datatable: Array,
     sum: Array,
+    typedata: String,
     grdtotal: Number,
     cat: String
   },

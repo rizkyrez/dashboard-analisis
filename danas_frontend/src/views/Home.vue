@@ -30,7 +30,7 @@
         label="Performance"
       />
     </div> -->
-    <div class="grid grid-flow-col place-content-center sm:grid-flow-col grid-rows-2 grid-cols-2 xl:grid-rows-2 xl:grid-cols-2 gap-6 mx-2">
+    <div class="grid grid-flow-col place-content-center sm:grid-flow-col grid-rows-2 grid-cols-2 xl:grid-rows-2 xl:grid-cols-2 gap-4 mx-2">
         <card-component title="custom chart">
             <div class="h-80">
                 <h3 class="text-gray-500">

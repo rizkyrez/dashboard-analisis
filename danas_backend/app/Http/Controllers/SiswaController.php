@@ -10,7 +10,7 @@ class SiswaController extends Controller
     public function trendsiswa() {
         $akad = DB::connection('mysqlakad');
 
-        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, ta.departemen');
+        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by ta.replid, ta.departemen');
         
         // change to array 
         $trend_siswa = $this->changeToArr($trend_siswa);
@@ -31,7 +31,6 @@ class SiswaController extends Controller
         $arraydata = [];
         $total_by_tahunajaran = [];
         $total_by_departemen = [];
-        $arr_headerta = [];
         
         // array for series chart
         foreach ($array_group as $key => $arr_tahunajaran) {
@@ -49,8 +48,6 @@ class SiswaController extends Controller
             }
             $sum = array_sum($arr_total);
             $total_by_tahunajaran[] = $sum;
-
-            $arr_headerta[] = $key;
             
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;   
@@ -69,11 +66,10 @@ class SiswaController extends Controller
                     $total2 = 0;
                 }
                 $array_detail_table[] = $total2;
-                $header[] = $key;
             }
 
             $total_by_departemen = array_sum(array_values($array_detail_table));
-            $array_table[] = array('departemen' => $prodep['departemen'],'header' => $header, 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
+            $array_table[] = array('departemen' => $prodep['departemen'], 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
             // print_r($total_by_departemen);
         }
 
@@ -136,6 +132,74 @@ class SiswaController extends Controller
         return response()->json([
             'dataset' => $arraydata
         ]);
+    }
+
+    public function JmlKelasTingkat() {
+        $akad = DB::connection('mysqlakad');
+
+        $jml_kelas_ptingkat = $akad->select("select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid group by ta.replid, t.tingkat");
+
+        $jml_kelas_ptingkat = $this->changeToArr($jml_kelas_ptingkat);
+
+        // grouping by tahunajaran
+        $array_group = [];
+        foreach ($jml_kelas_ptingkat as $key => $item) {
+            $array_group[$item['tahunajaran']][$key] =$item;
+        }
+
+        // find tingkat
+        $tingkat = $akad->select("select distinct tingkat from tingkat as t inner join departemen as d on t.departemen = d.departemen inner join tahunajaran as ta on d.departemen = ta.departemen order by t.urutan asc");
+
+        $tingkat = $this->changeToArr($tingkat);
+
+        $array_table = [];
+        $arraydata = [];
+        $total_by_tahunajaran = [];
+        $total_by_tingkat = [];
+
+        foreach($array_group as $key => $arrth) {
+            $array_detail = [];
+            $arr_total = [];
+            foreach($tingkat as $tkt) {
+                $src_data = $this->searchArrId('tingkat', $tkt['tingkat'], $arrth);
+                $total = $src_data['total'];
+                if ($src_data == null) {
+                    $total = 0;
+                }
+                $array_detail[] = $total;
+                $arr_total[]  = $total;
+            
+            }
+            $sum = array_sum($arr_total);
+            $total_by_tahunajaran[] = $sum;
+            
+            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
+            $arraydata[] = $array_series;
+        }
+
+        // array for table
+        foreach ($tingkat as $tnkt) {
+            $array_detail_table = [];
+            foreach ($array_group as $key => $value) {
+                $src_data = $this->searchArrId('tingkat', $tnkt['tingkat'], $value);
+                $total2 = $src_data['total'];
+                if ($src_data == null) {
+                    $total2 = 0;
+                }
+                $array_detail_table[] = $total2;
+            }
+
+            $total_by_tingkat = array_sum(array_values($array_detail_table));
+            $array_table[] = array('tingkat' => $tnkt['tingkat'], 'total' => $array_detail_table,'grandtotal' => $total_by_tingkat);
+            // print_r($total_by_departemen);
+        }
+
+        return response()->json([
+            'data_table' => $array_table,
+            'dataset' => $arraydata,
+            'sum_thj' => $total_by_tahunajaran,
+            // 'header' => $arr_headerta
+        ],200);
     }
 
     public function change(Request $request) {

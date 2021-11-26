@@ -14,7 +14,7 @@
 
         <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
             <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-                <trend-table cat="siswa" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal"/>
+                <trend-table cat="siswa" typedata="trend" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal"/>
             </card-component>
         </div>
 
@@ -56,7 +56,7 @@ export default {
   },
   setup () {
     const store = useStore()
-    const titleStack = ref(['Dashboard', 'Calon Siswa'])
+    const titleStack = ref(['Dashboard', 'Siswa'])
     const { trendOption, dataset, datatable, header, sum, grdtotal } = useTrendSiswa()
 
     const filter = async (e) => {

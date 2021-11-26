@@ -63,31 +63,21 @@ export default function useTrendSiswa(){
     })
 
     const header = computed(() => {
-        const arrobj = datatable.value
+        const arrobj = dataset.value
 
-        let arr = arrobj.map(p => p.header)
+        let arr = arrobj.map(p => p.name)
 
-        let finalres = arr.map((v,i) => {
-            return v[i]
-        })
-        return finalres
+        return arr
     })
 
     const grdtotal = computed(() => {
         const prosTotal = sum.value
-        const arrDtable = datatable.value
-        const depTotal = arrDtable.map(p => p.grandtotal)
-
-        let sumdep = depTotal.reduce((ac, va) => {
-            return ac += va
-        },0)
 
         let sumpros = prosTotal.reduce((a, v) => {
             return a += v
         },0)
 
-        let result = sumpros + sumdep
-        return result
+        return sumpros
     })
 
     onBeforeMount(getData)
