@@ -232,7 +232,7 @@ class CalonSiswaController extends Controller
         $akad = DB::connection('mysqlakad');
 
         // main query
-        $agama = $akad->select("select count(cs.replid) as total, ag.agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid right join jbsumum.agama as ag on cs.agama = ag.agama group by ag.agama");
+        $agama = $akad->select("select count(cs.replid) as total, (CASE WHEN cs.agama is null THEN 'NULL' ELSE ag.agama END) as agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid left join jbsumum.agama as ag on cs.agama = ag.agama group by ag.agama");
 
         $agama = $this->changeToArr($agama);
 
@@ -260,7 +260,7 @@ class CalonSiswaController extends Controller
         // where clause trendcs
         $clause_agama = ($filter_departemen || $filter_proses || $filter_agama) ? "where ".$filter_departemen.$condition.$filter_proses.$condition2 : "";
 
-        $main_query = "select count(cs.replid) as total, ag.agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join jbsumum.agama as ag on cs.agama = ag.agama $clause_agama group by ag.agama";
+        $main_query = "select count(cs.replid) as total, (CASE WHEN ag.agama is null THEN 'NULL' ELSE ag.agama END) as agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid left join jbsumum.agama as ag on cs.agama = ag.agama $clause_agama group by ag.agama";
 
         // main query
         $agama = $akad->select($main_query);
@@ -281,7 +281,7 @@ class CalonSiswaController extends Controller
         $akad = DB::connection('mysqlakad');
 
         // main query
-        $asalsekolah = $akad->select("select count(cs.replid) as total, ak.sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join asalsekolah as ak on cs.asalsekolah = ak.sekolah group by ak.sekolah");
+        $asalsekolah = $akad->select("select count(cs.replid) as total, (CASE WHEN cs.asalsekolah is null THEN 'NULL' ELSE ak.sekolah END) as sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid left join asalsekolah as ak on cs.asalsekolah = ak.sekolah group by ak.sekolah");
 
         $asalsekolah = $this->changeToArr($asalsekolah);
 

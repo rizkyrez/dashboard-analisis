@@ -1,6 +1,6 @@
 <template>
   <section
-    class="px-0 md:px-2"
+    class="px-1 md:px-3"
     :class="[ isFullScreen ? 'flex h-screen items-center justify-center' : 'py-3' ]"
   >
     <slot/>

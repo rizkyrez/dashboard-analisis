@@ -1,6 +1,7 @@
 <template>
 <!-- eslint-disable  -->
-    <div class="overflow-auto">
+    <div class="overflow-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400 scrollbar-track-gray-200
+    dark:scrollbar-track-gray-800 dark:scrollbar-thumb-gray-600">
         <table class="border border-collapse overflow-auto w-max-full border-green-400 text-xs">
             <thead>
                 <tr class="bg-green-300">

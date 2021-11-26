@@ -1,5 +1,5 @@
 <template >
-    <bar-chart :option="options" />
+    <bar-chart :option="trendOption" />
 </template>
 <script>
 /* eslint-disable */
@@ -12,8 +12,12 @@ export default {
     components: {
         BarChart
     },
-    props: {
-        options: Object
-    },
+    setup(props) {
+        const { trendOption } = useTrendSiswa()
+
+        return {
+            trendOption
+        }
+    }
 }
 </script>

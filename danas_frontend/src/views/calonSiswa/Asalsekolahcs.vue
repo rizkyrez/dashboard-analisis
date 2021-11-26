@@ -1,7 +1,7 @@
 <template>
     <!-- eslint-disable -->
   <hero-bar>Agama</hero-bar>
-  <filter-bar @change-proses="changepros" @clicked-filter="filter"/>
+  <filter-bar category="calons" @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -95,6 +95,32 @@ export default defineComponent({
         return prop
     })
 
+    const sumva = computed(() => {
+        let arrobj = askdata.value
+
+        let result = arrobj.filter(({name}) => name !== 'Narada School')
+                            .reduce((acc, v) =>{
+                                return acc += v.value
+                            },0)
+
+        let result2 = arrobj.filter(({name}) => name === 'Narada School')
+                            .reduce((a, v) => {
+                                return a += v.value
+                            },0)
+
+        const dataset = [];
+        dataset.push({
+                name: 'Narada School',
+                value: result2
+            },
+            {
+                name: 'External',
+                value: result
+            })
+
+        return dataset
+    })
+
     const changepros = async (event) => {
         await axios
             .post("/api/v1/calons/change/", {departmen: event})
@@ -130,7 +156,7 @@ export default defineComponent({
             },
             tooltip: {
                 trigger: "item",
-                // formatter: "{a} <br/>{b} : {c} ({d}%)"
+                formatter: "{b} : {c} ({d}%)"
             },
             legend: {
                 type: 'scroll',
@@ -149,7 +175,7 @@ export default defineComponent({
                         alignTo: 'labelLine',
                         bleedMargin: 6
                     },
-                    data: askdata,
+                    data: sumva,
                     emphasis: {
                         itemStyle: {
                             shadowBlur: 15,
@@ -204,7 +230,7 @@ export default defineComponent({
             })
     }
 
-    provide('dataTable', askdata)
+    provide('dataTable', sumva)
     provide('list_departemen', listDep)
     provide('list_proses', listProp)
     provide('list_asalsekolah',listAsk)

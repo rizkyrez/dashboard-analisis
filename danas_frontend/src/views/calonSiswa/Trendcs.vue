@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable -->
   <hero-bar>Trend Jumlah Calon Siswa</hero-bar>
-  <filter-bar category="calons" @clicked-filter="filter"/>
+  <filter-bar category="calons" @clicked-filter="filters"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -30,7 +30,7 @@
 <script>
 /* eslint-disable */
 import axios from 'axios'
-import { ref, defineComponent, provide} from 'vue'
+import { ref, defineComponent, provide, onUpdated, nextTick} from 'vue'
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
@@ -83,36 +83,39 @@ export default defineComponent({
     const store = useStore()
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const { dataset, trendcs, datatable, sum, header, grdtotal } = useTrendCs()
-    // const { filters } = useFilter()
+    const { filters, filterData } = useFilter()
 
-    const filter = async (e) => {
-        if(e.proses == 'All' || e.proses == null || e.proses == '') {
-            e.proses = ''
-        }
+    console.log(filterData.value)
 
-        if(e.departemen == 'All') {
-            e.departemen = ''
-            e.proses = ''
-        }
 
-        const fil = {
-            departmen: e.departemen,
-            proses: e.proses
-        }
+    // const filter = async (e) => {
+    //     if(e.proses == 'All' || e.proses == null || e.proses == '') {
+    //         e.proses = ''
+    //     }
 
-        await axios
-            .post("/api/v1/calons/filter/", fil)
-            .then(res => {
-                dataset.value = res.data.dataset
-                datatable.value = res.data.data_table
-                sum.value = res.data.sum_pros
-                header.value = res.data.header
-            })
-            .catch(error =>{
-                console.log(JSON.stringify(error))
-                alert(error.message)
-            })
-    }
+    //     if(e.departemen == 'All') {
+    //         e.departemen = ''
+    //         e.proses = ''
+    //     }
+
+    //     const fil = {
+    //         departmen: e.departemen,
+    //         proses: e.proses
+    //     }
+
+    //     await axios
+    //         .post("/api/v1/calons/filter/", fil)
+    //         .then(res => {
+    //             dataset.value = res.data.dataset
+    //             datatable.value = res.data.data_table
+    //             sum.value = res.data.sum_pros
+    //             header.value = res.data.header
+    //         })
+    //         .catch(error =>{
+    //             console.log(JSON.stringify(error))
+    //             alert(error.message)
+    //         })
+    // }
 
 
     return {
@@ -126,7 +129,8 @@ export default defineComponent({
       grdtotal,
       dataset,
       trendcs,
-      filter
+      filterData,
+      filters
     }
   },
 

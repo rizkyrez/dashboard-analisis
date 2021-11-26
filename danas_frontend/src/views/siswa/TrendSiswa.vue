@@ -8,7 +8,7 @@
 
         <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-3 sm:w-1/3 md:w-full ">
             <card-component title="Statistik" :icon="mdiChartBar">
-                <chart-trend-siswa :options="trendOption"/>
+                <chart-trend-siswa/>
             </card-component>
         </div>
 
@@ -57,40 +57,7 @@ export default {
   setup () {
     const store = useStore()
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const { dataset, tooltip, legendat, xaxis, datatable, header, sum, grdtotal } = useTrendSiswa()
-
-    const trendOption = reactive({
-        notMerge:  true,
-        tooltip: tooltip,
-        grid: {
-            left: '6%',
-            right: '6%',
-            bottom: '20%',
-            top:30,
-            z: 4
-        },
-        legend: {
-            orient: 'horizontal',
-            left: 'center',
-            bottom: 'bottom',
-            itemGap: 12,
-            padding: 8,
-            data: legendat,
-            // selectedMode: selectmode,
-            // selected: selected,
-            // top: 'center'
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: true,
-            data: xaxis,
-            axisTick: {
-                alignWithLabel: true
-            }
-        },
-        yAxis: {type: 'value'},
-        series: dataset
-    })
+    const { trendOption, dataset, datatable, header, sum, grdtotal } = useTrendSiswa()
 
     const filter = async (e) => {
         if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {

@@ -10,7 +10,7 @@ class SiswaController extends Controller
     public function trendsiswa() {
         $akad = DB::connection('mysqlakad');
 
-        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, dp.departemen');
+        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, ta.departemen');
         
         // change to array 
         $trend_siswa = $this->changeToArr($trend_siswa);
@@ -124,7 +124,7 @@ class SiswaController extends Controller
         $akad = DB::connection('mysqlakad');
 
         // main query
-        $agama = $akad->select("select count(s.replid) as total, ag.agama from jbsakad.siswa as s inner join jbsakad.kelas as k on s.idkelas = k.replid inner join jbsakad.tahunajaran as ta on k.idtahunajaran = ta.replid right join jbsumum.agama as ag on s.agama = ag.agama group by ag.agama");
+        $agama = $akad->select("select count(s.replid) as total, (CASE WHEN s.agama is null THEN 'NULL' ELSE ag.agama END) as agama from jbsakad.siswa as s inner join jbsakad.kelas as k on s.idkelas = k.replid inner join jbsakad.tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen left join jbsumum.agama as ag on s.agama = ag.agama group by ag.agama");
 
         $agama = $this->changeToArr($agama);
 

@@ -99,50 +99,58 @@ export default [
       menu: [
         {
           to: '/report/success-report',
-          label: 'Trend Jumlah Calon Siswa',
+          label: 'Succes Report',
         },
         {
-          to: '/agama',
-          label: 'Agama',
+          to: '/failure-report',
+          label: 'Failure Report',
         },
         {
-          to: '/area',
-          label: 'Area',
+          to: '/teacher-occupancy',
+          label: 'Teachers Occupancy',
         },
         {
-          to: '/inex',
-          label: 'Internal vs External',
-        },
-        {
-          to: '/achievement',
-          label: 'Achievement-LIVE',
-        },
-        {
-          to: '/tarpon',
-          label: 'Target Potensial CSB vs Achievement',
+          to: '/Administrative',
+          label: 'Administrativ Monitoring',
         },
       ]
     },
   ],
-  'Kepegawaian',
+  'KEPEGAWAIAN',
   [
-
     {
-      label: 'Submenus',
-      subLabel: 'Submenus Example',
-      icon: mdiViewList,
-      menu: [
-        {
-          label: 'Sub-item One'
-        },
-        {
-          label: 'Sub-item Two'
-        }
-      ]
-    }
+        to: '/agama',
+        label: 'Agama',
+        icon: mdiViewList
+    },
+    {
+        to: '/area',
+        label: 'Area',
+        icon: mdiViewList
+    },
+    {
+        to: '/pendidikan',
+        label: 'Pendidikan',
+        icon: mdiViewList
+    },
+    {
+        to: '/masa-kerja',
+        label: 'Masa Kerja',
+        icon: mdiViewList
+    },
+    {
+        to: '/punishment',
+        label: 'Punishment',
+        icon: mdiViewList
+    },
+
   ],
   'Keuangan',
   [
-
+    {
+        to: '/oustanding-ar',
+        label: 'Oustanding AR',
+        icon: mdiViewList
+    }
   ]
 ]

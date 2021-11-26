@@ -8,17 +8,19 @@ export default function useTrendSiswa(){
     const datatable = ref([])
     const sum = ref([])
 
-    axios
-        .get('/api/v1/siswa/trend/')
-        .then(res => {
-            dataset.value = res.data.dataset
-            datatable.value = res.data.data_table
-            sum.value = res.data.sum_pros
-        })
-        .catch(error => {
-            console.log(JSON.stringify(error))
-            console.log(JSON.stringify(error.message))
-        })
+    const getData = async () => {
+        await axios
+            .get('/api/v1/siswa/trend/')
+            .then(res => {
+                dataset.value = res.data.dataset
+                datatable.value = res.data.data_table
+                sum.value = res.data.sum_pros
+            })
+            .catch(error => {
+                console.log(JSON.stringify(error))
+                console.log(JSON.stringify(error.message))
+            })
+    }
 
     const xaxis = computed(() => {
         let arrobj = datatable.value
@@ -88,6 +90,41 @@ export default function useTrendSiswa(){
         return result
     })
 
+    onBeforeMount(getData)
+
+    const trendOption = reactive({
+        notMerge:  true,
+        tooltip: tooltip,
+        grid: {
+            left: '6%',
+            right: '6%',
+            bottom: '20%',
+            top:30,
+            z: 4
+        },
+        legend: {
+            orient: 'horizontal',
+            left: 'center',
+            bottom: 'bottom',
+            itemGap: 12,
+            padding: 8,
+            data: legendat,
+            // selectedMode: selectmode,
+            // selected: selected,
+            // top: 'center'
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: xaxis,
+            axisTick: {
+                alignWithLabel: true
+            }
+        },
+        yAxis: {type: 'value'},
+        series: dataset
+    })
+
     watchEffect(() => {
         dataset.value,
         datatable.value,
@@ -96,10 +133,12 @@ export default function useTrendSiswa(){
         tooltip,
         legendat,
         xaxis,
-        grdtotal
+        grdtotal,
+        trendOption
     })
 
     return {
+        trendOption,
         dataset,
         header,
         datatable,
@@ -108,5 +147,6 @@ export default function useTrendSiswa(){
         tooltip,
         legendat,
         xaxis,
+        getData
     }
   };

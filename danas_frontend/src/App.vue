@@ -1,4 +1,5 @@
 <template>
+    <!-- eslint-disable -->
   <nav-bar/>
   <aside-menu :menu="menu"/>
   <router-view/>

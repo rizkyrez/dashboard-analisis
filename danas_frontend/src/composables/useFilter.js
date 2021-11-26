@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {ref, toRefs, reactive, watchEffect, onBeforeMount, onMounted} from 'vue'
+import {ref, toRefs, reactive, watchEffect, onBeforeMount, onMounted, nextTick, watch, computed} from 'vue'
 import axios from 'axios'
 
 export default function useFilter() {
@@ -10,6 +10,7 @@ export default function useFilter() {
     const listTahunAjaran = ref([])
     const listagamav2 = ref([])
 
+    const filterData = ref([])
     // const dataset = ref([])
     // const datatable = ref([])
     // const header = ref([])
@@ -42,34 +43,38 @@ export default function useFilter() {
             });
     }
 
-    // const filters = async (e) => {
-    //     if(e.proses == 'All' || e.proses == null || e.proses == '') {
-    //         e.proses = ''
-    //     }
+    const filters = async (e) => {
 
-    //     if(e.departemen == 'All') {
-    //         e.departemen = ''
-    //         e.proses = ''
-    //     }
+        if(e.proses == 'All' || e.proses == null || e.proses == '') {
+            e.proses = ''
+        }
 
-    //     const fil = {
-    //         departmen: e.departemen,
-    //         proses: e.proses
-    //     }
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.proses = ''
+        }
 
-    //     await axios
-    //         .post("/api/v1/calons/filter/", fil)
-    //         .then(res => {
-    //             dataset.value = res.data.dataset
-    //             datatable.value = res.data.data_table
-    //             sum.value = res.data.sum_pros
-    //             header.value = res.data.header
-    //         })
-    //         .catch(error =>{
-    //             console.log('something wrong')
-    //             console.log(JSON.stringify(error.message))
-    //         })
-    // }
+        const fil = {
+            departmen: e.departemen,
+            proses: e.proses
+        }
+
+        await axios
+            .post("/api/v1/calons/filter/", fil)
+            .then(res => {
+                filterData.value = res.data.dataset
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error.message))
+            })
+    }
+
+    watch(filterData, (newv, prevv) => {
+        filterData.value = newv
+    },{
+        immediate:true
+    })
 
     watchEffect(() => {
         listdepartemen.value,
@@ -78,10 +83,6 @@ export default function useFilter() {
         listdepartemenv2.value,
         listTahunAjaran.value,
         listagamav2.value
-        // dataset.value,
-        // header.value,
-        // datatable.value,
-        // sum.value
     })
 
     return {
@@ -91,6 +92,8 @@ export default function useFilter() {
         listTahunAjaran,
         listdepartemen,
         listagamav2,
+        filterData,
+        filters,
         getList
         // dataset,
         // header,
