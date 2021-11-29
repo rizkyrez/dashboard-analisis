@@ -41,14 +41,25 @@ export default function useKelas(){
     const tooltip = computed(() => {
         let lenxaxis = yaxis.value.length
 
+        if(lenxaxis == 1) {
+            const atr = {
+                trigger: 'item',
+            }
+            return atr
+        }
+        else {
             const atr = {
                trigger: 'axis',
                 axisPointer:{
                     type: 'shadow',
+                        label: {
+                            show: true,
+                        }
                 }
             }
 
             return atr
+        }
 
     })
 
@@ -94,7 +105,7 @@ export default function useKelas(){
             // selected: selected,
             // top: 'center'
         },
-        xAxis: { type: 'value', boundaryGap: true, },
+        xAxis: { type: 'value' },
         yAxis: {
             type: 'category',
             data: yaxis,
@@ -104,6 +115,16 @@ export default function useKelas(){
         },
         series: dataset
     })
+
+    const tes = computed(() => {
+        const datat =  dataset.value
+
+        let tess = datat.map(p => p.name)
+
+        return tess
+    })
+
+    console.log(tes)
 
     watchEffect(() => {
         dataset.value,

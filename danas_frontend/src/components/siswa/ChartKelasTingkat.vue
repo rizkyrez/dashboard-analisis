@@ -1,5 +1,5 @@
 <template>
-    <bar-chart :option="kelasOption" />
+    <bar-chart :option="options" />
 </template>
 
 <script>
@@ -12,12 +12,8 @@ export default {
     components: {
         BarChart
     },
-    setup(props) {
-        const { kelasOption } = useKelas()
-
-        return {
-            kelasOption
-        }
+    props: {
+        options: Array || Object
     }
 }
 </script>

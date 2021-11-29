@@ -46,6 +46,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/change', 'SiswaController@change');
         Route::post('/filtertrend', 'SiswaController@FilterTrend');
         Route::post('/filterag', 'SiswaController@FilterAg');
+        Route::post('/filtertkt', 'SiswaController@FilterTkt');
     });
 
 });

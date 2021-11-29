@@ -1,20 +1,20 @@
 <template>
     <!-- eslint-disable -->
     <hero-bar>Jumlah Kelas Per Tingkat</hero-bar>
-    <filter-bar category="siswa" @clicked-filter="filter"/>
+    <filter-bar menutp="tingkat" @clicked-filter="filter"/>
     <main-section>
 
         <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
 
             <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-3 sm:w-1/3 md:w-full ">
                 <card-component title="Statistik" :icon="mdiChartBar">
-                    <chart-kelas-tingkat/>
+                    <chart-kelas-tingkat :options="kelasOption"/>
                 </card-component>
             </div>
 
             <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
                 <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-                    <trend-table cat="kelas" typedata="kelas" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal"/>
+                    <trend-table cat="kelas" typedata="kelas" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal" :hgtable="changetb"/>
                 </card-component>
             </div>
 
@@ -26,7 +26,7 @@
 <script>
 /* eslint-disable */
 import axios from 'axios'
-import { computed, ref, onBeforeMount, reactive, watchEffect } from 'vue'
+import { computed, ref, onBeforeMount, reactive, watchEffect, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { mdiTableBorder, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
@@ -56,8 +56,9 @@ export default {
      setup () {
         const store = useStore()
         const titleStack = ref(['Dashboard', 'Siswa'])
-        const { dataset, datatable, sum, header, grdtotal } = useKelas()
-
+        const changetb = ref('on')
+        const hd = ref([])
+        const { kelasOption, dataset, datatable, sum, header, grdtotal } = useKelas()
 
         const filter = async (e) => {
             if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
@@ -70,36 +71,41 @@ export default {
             }
 
             const fil = {
-                departmen: e.departemen,
-                tahunajaran: e.tahunajaran
+                tahunajaran: e.tahunajaran,
+                tingkat: e.tingkat
             }
 
             await axios
-                .post("/api/v1/siswa/filterkelas/", fil)
+                .post("/api/v1/siswa/filtertkt/", fil)
                 .then(res => {
                     dataset.value = res.data.dataset
                     datatable.value = res.data.data_table
-                    sum.value = res.data.sum_pros
-                    // header.value = res.data.header
+                    sum.value = res.data.sum_thj
+                    hd.value = res.data.header
                 })
                 .catch(error =>{
                     console.log(JSON.stringify(error))
                     alert(error.message)
                 })
-        }
 
-        console.log(dataset.value)
+                await nextTick()
+                    const hdr = header.value
+                    hdr.push(hd.value)
+                    changetb.value = ''
+        }
 
         return {
             titleStack,
             mdiTableBorder,
             mdiChartBar,
             mdiTableMultiple,
+            kelasOption,
             dataset,
             datatable,
             header,
             sum,
             grdtotal,
+            changetb,
             filter
         }
     },

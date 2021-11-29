@@ -25,15 +25,21 @@
         </field>
         </div>
 
+        <div v-if="menutp === 'tingkat'" class="px-3">
+        <field label="Tingkat">
+            <control :options="listTingkat" v-model="tingkat" />
+        </field>
+        </div>
+
         <div v-if="category == 'calons'" class="px-3">
         <field label="Proses">
             <control :options="listproses" v-model="proses" :isdisable="valu"/>
         </field>
         </div>
 
-        <div v-if="category == 'siswa'" class="px-3">
+        <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
         <field label="Tahun Ajaran">
-            <control :options="listTahunAjaran" v-model="tahunajaran" :isdisable="valu"/>
+            <control :options="listTahunAjaran" v-model="tahunajaran" />
         </field>
         </div>
 
@@ -105,7 +111,8 @@ export default {
     const proses = ref('All')
     const agama = ref('All')
     const tahunajaran = ref('All')
-    const { getList, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2 } = useFilter()
+    const tingkat = ref('All')
+    const { getList, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
 
     onBeforeMount(getList)
 
@@ -182,7 +189,8 @@ export default {
             departemen: departemen.value,
             proses: proses.value,
             agama: agama.value,
-            tahunajaran: tahunajaran.value
+            tahunajaran: tahunajaran.value,
+            tingkat: tingkat.value
         }
 
         emit('clickedFilter', filterData)
@@ -196,6 +204,7 @@ export default {
       listagamav2,
       listproses,
       listTahunAjaran,
+      listTingkat,
       changeProses,
       changeTahunajaran,
       clickedFilter,
@@ -203,6 +212,7 @@ export default {
       departemen,
       proses,
       agama,
+      tingkat,
       valu
     }
   }

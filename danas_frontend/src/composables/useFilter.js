@@ -9,6 +9,7 @@ export default function useFilter() {
     const listdepartemenv2 = ref([])
     const listTahunAjaran = ref([])
     const listagamav2 = ref([])
+    const listTingkat = ref([])
 
     const filterData = ref([])
     // const dataset = ref([])
@@ -35,6 +36,7 @@ export default function useFilter() {
                 listdepartemenv2.value = listsiswa.data.list_dp
                 listTahunAjaran.value = listsiswa.data.list_tahunajaran
                 listagamav2.value = listsiswa.data.list_ag
+                listTingkat.value = listsiswa.data.list_tingkat
             })
             .catch(error => {
                 alert(error.message)
@@ -82,7 +84,8 @@ export default function useFilter() {
         listproses.value,
         listdepartemenv2.value,
         listTahunAjaran.value,
-        listagamav2.value
+        listagamav2.value,
+        listTingkat.value
     })
 
     return {
@@ -92,6 +95,7 @@ export default function useFilter() {
         listTahunAjaran,
         listdepartemen,
         listagamav2,
+        listTingkat,
         filterData,
         filters,
         getList
