@@ -255,10 +255,14 @@ class CalonSiswaController extends Controller
         $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
         $condition = ($filter_departemen && $filter_proses) ? " and " : "";
 
-        $condition2 = (($filter_departemen && $filter_agama && $filter_proses) && ($filter_proses != "")) ? " and ".$filter_agama: $filter_agama;
+        if($request->agama != "") { 
+            $condition2 = ($filter_departemen == "" && $filter_proses == "") ? "" : " and ";
+        } 
+
+        $query_filter = (isset($condition2)) ? $filter_departemen.$condition.$filter_proses.$condition2.$filter_agama : $filter_departemen.$condition.$filter_proses;
 
         // where clause trendcs
-        $clause_agama = ($filter_departemen || $filter_proses || $filter_agama) ? "where ".$filter_departemen.$condition.$filter_proses.$condition2 : "";
+        $clause_agama = ($filter_departemen || $filter_proses ) ? "where ".$query_filter : "";
 
         $main_query = "select count(cs.replid) as total, (CASE WHEN ag.agama is null THEN 'NULL' ELSE ag.agama END) as agama from jbsakad.calonsiswa as cs inner join jbsakad.prosespenerimaansiswa as pps on cs.idproses = pps.replid left join jbsumum.agama as ag on cs.agama = ag.agama $clause_agama group by ag.agama";
 

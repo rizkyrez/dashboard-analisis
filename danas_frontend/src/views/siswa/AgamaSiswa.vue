@@ -123,11 +123,11 @@ export default defineComponent({
             series: [
                 {
                     type: "pie",
-                    radius: "75%",
+                    radius: "70%",
                     label: {
                         position: 'outer',
                         alignTo: 'labelLine',
-                        minMargin: 4,
+                        minMargin: 3,
                         distanceToLabelLine: 5,
                         formatter: '{b}\n {d}%',
                         bleedMargin: 6
@@ -144,7 +144,7 @@ export default defineComponent({
                         shadowColor: 'rgba(0, 0, 0, 0.5)'
                         }
                     },
-                    top: 105
+                    top: 95
                 },
 
             ]
@@ -211,6 +211,7 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
+  height: 360px;
   min-height: 360px;
   max-height: 100%;
 }

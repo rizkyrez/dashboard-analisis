@@ -8,7 +8,7 @@
 
         <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-3 sm:w-1/3 md:w-full ">
             <card-component title="Statistik" :icon="mdiChartBar">
-                <chart-trend-siswa/>
+                <chart-trend-siswa :options="trendOption"/>
             </card-component>
         </div>
 
@@ -26,7 +26,7 @@
 <script>
 /* eslint-disable */
 import axios from 'axios'
-import { computed, ref, onBeforeMount, reactive } from 'vue'
+import { computed, ref, onBeforeMount, reactive, watchEffect, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
 import { mdiTableBorder, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
@@ -79,13 +79,14 @@ export default {
             .then(res => {
                 dataset.value = res.data.dataset
                 datatable.value = res.data.data_table
-                sum.value = res.data.sum_pros
-                // header.value = res.data.header
+                sum.value = res.data.sum_ta
+                header.value = res.data.header
             })
             .catch(error =>{
                 console.log(JSON.stringify(error))
                 alert(error.message)
             })
+
     }
 
     return {

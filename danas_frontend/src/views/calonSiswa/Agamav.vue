@@ -129,13 +129,13 @@ export default defineComponent({
             legend: {
                 orient: 'horizontal',
                 left: 'center',
-                top: 60
+                top: 45
             },
 
             series: [
                 {
                     type: "pie",
-                    radius: "75%",
+                    radius: "70%",
                     label: {
                         position: 'outer',
                         alignTo: 'labelLine',
@@ -156,7 +156,7 @@ export default defineComponent({
                         shadowColor: 'rgba(0, 0, 0, 0.5)'
                         }
                     },
-                    top: 100
+                    top: 95
                 },
 
             ]
@@ -224,6 +224,7 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
+  height: 360px;
   min-height: 350px;
   max-height: 100%;
 }

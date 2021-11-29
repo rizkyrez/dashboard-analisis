@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable -->
   <hero-bar>Trend Jumlah Calon Siswa</hero-bar>
-  <filter-bar category="calons" @clicked-filter="filters"/>
+  <filter-bar category="calons" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -83,39 +83,36 @@ export default defineComponent({
     const store = useStore()
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const { dataset, trendcs, datatable, sum, header, grdtotal } = useTrendCs()
-    const { filters, filterData } = useFilter()
-
-    console.log(filterData.value)
 
 
-    // const filter = async (e) => {
-    //     if(e.proses == 'All' || e.proses == null || e.proses == '') {
-    //         e.proses = ''
-    //     }
+    const filter = async (e) => {
+        if(e.proses == 'All' || e.proses == null || e.proses == '') {
+            e.proses = ''
+        }
 
-    //     if(e.departemen == 'All') {
-    //         e.departemen = ''
-    //         e.proses = ''
-    //     }
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.proses = ''
+        }
 
-    //     const fil = {
-    //         departmen: e.departemen,
-    //         proses: e.proses
-    //     }
+        const fil = {
+            departmen: e.departemen,
+            proses: e.proses
+        }
 
-    //     await axios
-    //         .post("/api/v1/calons/filter/", fil)
-    //         .then(res => {
-    //             dataset.value = res.data.dataset
-    //             datatable.value = res.data.data_table
-    //             sum.value = res.data.sum_pros
-    //             header.value = res.data.header
-    //         })
-    //         .catch(error =>{
-    //             console.log(JSON.stringify(error))
-    //             alert(error.message)
-    //         })
-    // }
+        await axios
+            .post("/api/v1/calons/filter/", fil)
+            .then(res => {
+                dataset.value = res.data.dataset
+                datatable.value = res.data.data_table
+                sum.value = res.data.sum_pros
+                header.value = res.data.header
+            })
+            .catch(error =>{
+                console.log(JSON.stringify(error))
+                alert(error.message)
+            })
+    }
 
 
     return {
@@ -129,8 +126,7 @@ export default defineComponent({
       grdtotal,
       dataset,
       trendcs,
-      filterData,
-      filters
+      filter
     }
   },
 

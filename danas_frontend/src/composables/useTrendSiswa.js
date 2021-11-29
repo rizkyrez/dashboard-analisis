@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { ref, reactive, watchEffect, computed, onBeforeMount, onMounted} from 'vue'
+import { ref, reactive, watchEffect, computed, onBeforeMount, onMounted, watch} from 'vue'
 import _ from 'lodash'
 import axios from 'axios'
 
@@ -7,6 +7,7 @@ export default function useTrendSiswa(){
     const dataset = ref([])
     const datatable = ref([])
     const sum = ref([])
+    const header = ref([])
 
     const getData = async () => {
         await axios
@@ -15,6 +16,7 @@ export default function useTrendSiswa(){
                 dataset.value = res.data.dataset
                 datatable.value = res.data.data_table
                 sum.value = res.data.sum_pros
+                header.value = res.data.header
             })
             .catch(error => {
                 console.log(JSON.stringify(error))
@@ -62,13 +64,14 @@ export default function useTrendSiswa(){
         }
     })
 
-    const header = computed(() => {
-        const arrobj = dataset.value
+    // const header = computed(() => {
+    //     const arrobj = dataset.value
+    //     const arrs = []
 
-        let arr = arrobj.map(p => p.name)
+    //     let arr = arrobj.map(p => p.name)
 
-        return arr
-    })
+    //     return arr
+    // })
 
     const grdtotal = computed(() => {
         const prosTotal = sum.value
@@ -116,10 +119,11 @@ export default function useTrendSiswa(){
     })
 
     watchEffect(() => {
+        getData,
         dataset.value,
         datatable.value,
         sum.value,
-        header,
+        header.value,
         tooltip,
         legendat,
         xaxis,
