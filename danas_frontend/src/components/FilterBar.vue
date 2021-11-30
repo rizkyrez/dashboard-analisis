@@ -31,9 +31,15 @@
         </field>
         </div>
 
-        <div v-if="category == 'calons'" class="px-3">
+        <div v-if="category == 'calons' && menutp != 'achie'" class="px-3">
         <field label="Proses">
             <control :options="listproses" v-model="proses" :isdisable="valu"/>
+        </field>
+        </div>
+
+        <div v-if="category == 'calons' && menutp == 'achie'" class="px-3">
+        <field label="Proses">
+            <control :options="listop" v-model="proses" />
         </field>
         </div>
 
@@ -100,7 +106,10 @@ export default {
       type: Array,
       default: () => []
     },
-
+    listop: {
+        type: Array,
+        default: () => 'All'
+    },
     menutp: String,
     category: String
   },

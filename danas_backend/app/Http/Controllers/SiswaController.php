@@ -418,6 +418,7 @@ class SiswaController extends Controller
         $arraydata = [];
         $total_by_tahunajaran = [];
         $total_by_tingkat = [];
+        $arr_headertat = [];
 
         foreach($array_group as $key => $arrth) {
             $array_detail = [];
@@ -438,6 +439,7 @@ class SiswaController extends Controller
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;
         }
+
 
         // array for table
         foreach ($tingkat as $tnkt) {
@@ -464,6 +466,16 @@ class SiswaController extends Controller
         ],200);
     } 
 
+    // public function classOccupancy() {
+    //     $akad = DB::connection('mysqlakad');
+
+    //     $main_query = "s";
+
+    //     $class_occ = $akad->select($main_query);
+
+    //     $class_acc = $this->changeToArr($class_occ);
+    // }
+
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
             if ($val[$field] === $value) {
@@ -480,5 +492,9 @@ class SiswaController extends Controller
         }, $arr);
 
         return $rconvert;
+    }
+
+    protected function looping($arr) {
+
     }
 }

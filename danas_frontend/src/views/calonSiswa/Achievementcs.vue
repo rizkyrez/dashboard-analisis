@@ -2,7 +2,7 @@
 <template>
 
   <hero-bar>Achievement</hero-bar>
-  <filter-bar/>
+  <filter-bar category="calons" menutp="achie" :listop="header"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -19,7 +19,7 @@
 
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
         <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-          <achievement-table/>
+          <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="valu"/>
         </card-component>
       </div>
 
@@ -32,6 +32,7 @@
 
 <script>
 /* eslint-disable */
+import axios from 'axios'
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { GaugeChart } from 'echarts/charts';
@@ -40,7 +41,7 @@ import {
   TooltipComponent,
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, reactive, computed, watch, watchEffect, onBeforeMount, onMounted } from 'vue'
 import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
@@ -75,73 +76,115 @@ export default defineComponent({
   },
   setup () {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const achievement = ref({
-      title: {
-        text: "Speedometer",
-        left: "center",
-      },
-      tooltip: {
-        formatter: '{b} : {c}%',
-      },
-      series: [
-          {
-            type: 'gauge',
-            radius: '100%',
-            center: ["50%","70%"],
-            startAngle: 180,
-            endAngle: 0,
-            splitNumber: 10,
-            axisLine: {
-                lineStyle: {
-                width: 7,
-                color: [
-                    [0.25, '#FF5e6f'],
-                    [0.5, '#f9ee55'],
-                    [1, '#58EC90'],
-                ]
-                }
-            },
-            pointer: {
-                width: 5,
-                itemStyle: {
-                color: 'auto'
-                }
-            },
-            axisTick: {
-                length: 5,
-                lineStyle: {
-                color: 'auto',
-                width: 1
-                }
-            },
-            splitLine: {
-                length: 10,
-                lineStyle: {
-                color: 'auto',
-                width: 2
-                }
-            },
-            axisLabel: {
-                color: 'auto',
-                fontSize: 12,
-                distance: 10,
-            },
-            title: {
-                fontSize: 15
-            },
-            detail: {
-                fontSize: 17,
-                valueAnimation: true,
-                formatter: '{d}%'
-            },
-            data: [
-                {
-                value: 83.7,
-                name: 'Achievement'
-                }
-            ],
-        }
-      ]
+    const datatable = ref([])
+    const header = ref([])
+    const grdtotal = ref()
+    const valu = ref()
+
+    // const percentage = computed(() => {
+    //     const arrobj = datatable.value
+
+    //     let arrdata = arrobj.map(p => p.array_data)
+
+    //     let result = arrdata.reduce((a, v) => {
+    //         return a += v
+    //     },0)
+
+    //     return result
+    // })
+
+    const achievement = reactive({
+        title: {
+            text: "Speedometer",
+            left: "center",
+        },
+        tooltip: {
+            formatter: '{b} : {c}%',
+        },
+        series: [
+            {
+                type: 'gauge',
+                radius: '100%',
+                center: ["50%","70%"],
+                startAngle: 180,
+                endAngle: 0,
+                min: 0,
+                max: 200,
+                splitNumber: 10,
+                axisLine: {
+                    lineStyle: {
+                        width: 7,
+                        color: [
+                            [0.25, '#ee4c5d'],
+                            [0.5, '#ecef55'],
+                            [1, '#55db80'],
+                        ]
+                    }
+                },
+                pointer: {
+                    width: 5,
+                    itemStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisTick: {
+                    length: 5,
+                    lineStyle: {
+                        color: 'auto',
+                        width: 1
+                    }
+                },
+                splitLine: {
+                    length: 10,
+                    lineStyle: {
+                    color: 'auto',
+                    width: 2
+                    }
+                },
+                axisLabel: {
+                    color: 'auto',
+                    fontSize: 12,
+                    distance: 10,
+                },
+                title: {
+                    fontSize: 15
+                },
+                detail: {
+                    fontSize: 17,
+                    valueAnimation: true,
+                    formatter: '{value}%'
+                },
+                data: [
+                    {
+                    value: valu,
+                    name: 'Achievement'
+                    }
+                ],
+            }
+        ]
+    })
+
+    onMounted(async () => {
+        await axios
+            .get('/api/v1/calons/achievement')
+            .then(res => {
+                datatable.value = res.data.data_table
+                header.value = res.data.header
+                grdtotal.value = res.data.grdtotal
+                valu.value = res.data.percentage
+            })
+            .catch(error => {
+                alert(error.message)
+                console.log(JSON.stringify(error))
+            })
+    })
+
+    watchEffect(() => {
+        datatable.value,
+        header.value,
+        grdtotal.value,
+        valu.value,
+        achievement
     })
 
     return {
@@ -150,58 +193,14 @@ export default defineComponent({
       mdiTableOff,
       mdiChartBar,
       mdiTableMultiple,
+      datatable,
+      valu,
+      datatable,
+      grdtotal,
+      header,
       achievement
     }
   },
-  // data () {
-
-  //   let data = []
-  //   for (let i = 0; i <= 360; i++) {
-  //       let t = i / 180 * Math.PI
-  //       let r = Math.sin(2 * t) * Math.cos(2 * t)
-  //       data.push([r, i])
-  //   }
-
-  //   return {
-  //     initOptions: {
-  //       renderer: 'canvas'
-  //     },
-  //     polar: {
-  //       title: {
-  //         text: '极坐标双数值轴'
-  //       },
-  //       legend: {
-  //         data: ['line']
-  //       },
-  //       polar: {
-  //         center: ['50%', '54%']
-  //       },
-  //       tooltip: {
-  //         trigger: 'axis',
-  //         axisPointer: {
-  //           type: 'cross'
-  //         }
-  //       },
-  //       angleAxis: {
-  //         type: 'value',
-  //         startAngle: 0
-  //       },
-  //       radiusAxis: {
-  //         min: 0
-  //       },
-  //       series: [
-  //         {
-  //           coordinateSystem: 'polar',
-  //           name: 'line',
-  //           type: 'line',
-  //           showSymbol: false,
-  //           data: data
-  //         }
-  //       ],
-  //       animationDuration: 2000
-  //     }
-  //   }
-  // }
 });
 </script>
 <style>

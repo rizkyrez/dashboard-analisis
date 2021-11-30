@@ -355,6 +355,58 @@ class CalonSiswaController extends Controller
         ]);
     }
 
+    public function achievement() {
+        $akad = DB::connection('mysqlakad');
+
+        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid where pps.aktif = 1 group by pps.replid, pps.departemen";
+
+        $active_proses = $akad->select($query_active_proses);
+        $active_proses = $this->changeToArr($active_proses);
+
+        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid where cs.idproses = pps.replid and pps.aktif != 1 group by pps.replid, pps.departemen order by pps.replid desc limit 3";
+        
+        $last_proses = $akad->select($query_last_proses);
+        $last_proses = $this->changeToArr($last_proses);
+
+        $count_active = [];
+        $count_last = [];
+
+        foreach ($active_proses as $key => $item) {
+            $proses_active = $item['proses'];
+            $count_active[] = $item['total'];
+        }
+        foreach ($last_proses as $key => $item) {
+            $proses_last = $item['proses'];
+            $count_last[] = $item['total'];
+        } 
+
+        $total_active = array_sum($count_active);
+        $total_last = array_sum($count_last);
+
+        $percentage = $total_active/$total_last;
+        $result = number_format($percentage * 100, 2);
+
+        $arraydata = array($total_last, $total_active);
+        $arrayproses = array($proses_last, $proses_active);
+
+        $grdtotal = $total_last + $total_active;
+        
+        return response()->json([
+            'data_table' => $arraydata,
+            'header' => $arrayproses,
+            'grdtotal' => $grdtotal,
+            'percentage' => $result
+        ],200);
+    }
+
+    // public function filterAchv() {
+    //     $akad = DB::connection('mysqlakad');
+
+    //     $filter_proses = 
+    //     $filter_departemen =
+    //     $
+    // }
+
     public function ListFilter() {
         $akad = DB::connection('mysqlakad');
         $umum = DB::connection('mysqlumum');  

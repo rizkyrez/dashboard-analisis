@@ -3,18 +3,18 @@
   <table class="border border-collapse border-green-400 text-xs">
     <thead>
     <tr class="bg-green-300">
-      <th class="font-semibold">Gelombang TA 2021/2022</th>
-      <th class="font-semibold">Gelombang TA 2022/2023</th>
+      <th v-for="title in header" :key="title" class="font-semibold">{{title}}</th>
+      <!-- <th class="font-semibold">Gelombang TA 2022/2023</th> -->
       <th class="font-semibold">Grand Total</th>
       <th class="font-semibold">Achievement %</th>
     </tr>
     </thead>
     <tbody>
-      <tr >
-          <td>104</td>
-          <td>87</td>
-          <td>191</td>
-          <td>83,65%</td>
+      <tr>
+          <td v-for="dat in datatable" :key="dat">{{dat}}</td>
+          <!-- <td>87</td> -->
+          <td>{{grdtotal}}</td>
+          <td>{{percentage}}%</td>
       </tr>
     </tbody>
   </table>
@@ -33,7 +33,11 @@ export default {
     Level,
   },
   props: {
-    checkable: Boolean
+    checkable: Boolean,
+    datatable: Array,
+    header: Array,
+    percentage: Number,
+    grdtotal: Number
   },
   setup () {
     const store = useStore()
