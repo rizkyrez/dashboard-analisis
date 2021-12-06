@@ -11,7 +11,6 @@
             <figure>
               <v-chart
                 :option="asalSekolah"
-                ref="assekolah"
               />
             </figure>
           </card-component>
@@ -121,18 +120,6 @@ export default defineComponent({
         return dataset
     })
 
-    const changepros = async (event) => {
-        await axios
-            .post("/api/v1/calons/change/", {departmen: event})
-            .then(res => {
-                listProp.value = res.data.list_proses
-            })
-            .catch(error =>{
-                    console.log('something wrong')
-                    console.log(JSON.stringify(error))
-            })
-    }
-
     onMounted(async() => {
         await axios
             .get('/api/v1/calons/asalsekolah/')
@@ -200,6 +187,18 @@ export default defineComponent({
         asalSekolah
     });
 
+    const changepros = async (event) => {
+        await axios
+            .post("/api/v1/calons/change/", {departmen: event})
+            .then(res => {
+                listProp.value = res.data.list_proses
+            })
+            .catch(error =>{
+                    console.log('something wrong')
+                    console.log(JSON.stringify(error))
+            })
+    }
+
     const filter = (e) => {
         if(e.proses == 'All' || e.proses == null || e.proses == '') {
             e.proses = ''
@@ -229,6 +228,7 @@ export default defineComponent({
                 console.log(JSON.stringify(error))
             })
     }
+
 
     provide('dataTable', sumva)
     provide('list_departemen', listDep)

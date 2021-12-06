@@ -200,9 +200,6 @@ export default defineComponent({
             e.proses2 = ''
         }
 
-        console.log(e.proses2)
-        console.log(e.departemen)
-
         const fil = {
             departmen: e.departemen,
             proses: e.proses2,

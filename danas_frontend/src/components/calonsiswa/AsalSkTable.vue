@@ -17,7 +17,7 @@
                 </tr>
                 <tr class="flex w-full">
                     <td class="font-semibold w-full">
-                        Total Calon Siswa
+                        Total
                     </td>
                     <td class="text-center font-bold w-1/3">{{grandtotal}}</td>
                 </tr>

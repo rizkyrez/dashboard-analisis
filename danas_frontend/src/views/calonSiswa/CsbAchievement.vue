@@ -41,7 +41,7 @@ import {
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
 import { ref, defineComponent, reactive, computed, watch, watchEffect, onBeforeMount, onMounted } from 'vue'
-import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
+import { mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
 import AchievementTable from '@/components/calonsiswa/AchievementTable'
@@ -213,18 +213,18 @@ export default defineComponent({
         }
 
         return {
-        titleStack,
-        mdiTableBorder,
-        mdiTableOff,
-        mdiChartBar,
-        mdiTableMultiple,
-        datatable,
-        percentase,
-        datatable,
-        grdtotal,
-        header,
-        csbachievement,
-        filter
+            titleStack,
+            mdiTableBorder,
+            mdiTableOff,
+            mdiChartBar,
+            mdiTableMultiple,
+            datatable,
+            percentase,
+            datatable,
+            grdtotal,
+            header,
+            csbachievement,
+            filter
         }
     },
 });

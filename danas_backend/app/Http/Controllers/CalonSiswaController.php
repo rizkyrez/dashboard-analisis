@@ -440,7 +440,7 @@ class CalonSiswaController extends Controller
     public function CsbAchievement() {
         $akad = DB::connection('mysqlakad');
 
-        $csbsibling = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid LEFT JOIN siswa AS s ON s.kk_no = cs.kk_no WHERE cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' group by pps.departemen");
+        $csbsibling = $akad->select("SELECT COUNT(s.replid) AS total, dp.departemen FROM siswa AS s INNER JOIN kelas AS k ON s.idkelas = k.replid INNER JOIN tahunajaran as ta ON k.idtahunajaran = ta.replid INNER JOIN tingkat AS tk ON k.idtingkat = tk.replid INNER JOIN departemen AS dp ON ta.departemen = dp.departemen LEFT JOIN calonsiswa AS cs ON cs.kk_no = s.kk_no JOIN (SELECT MAX(t.tingkat) AS last_tingkat,t.departemen as dpq FROM `tingkat` as t INNER JOIN departemen as dp ON t.departemen = dp.departemen GROUP BY dp.departemen) as q2 WHERE dp.departemen = q2.dpq AND tk.tingkat = q2.last_tingkat AND cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' GROUP BY q2.dpq");
 
         $csbsibling = $this->changeToArr($csbsibling);
 
