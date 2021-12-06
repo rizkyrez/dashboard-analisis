@@ -32,12 +32,14 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/agama', 'CalonSiswaController@agama');
         Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
         Route::get('/achievement', 'CalonSiswaController@achievement');
+        Route::get('/csbpotensial', 'CalonSiswaController@CsbAchievement');
         Route::get('/listfilter', 'CalonSiswaController@ListFilter');
         Route::post('/change', 'CalonSiswaController@change');
         Route::post('/filter', 'CalonSiswaController@filter');
         Route::post('/filterag', 'CalonSiswaController@filterag');
         Route::post('/filterask', 'CalonSiswaController@filterask');
         Route::post('/filterach', 'CalonSiswaController@filterAch');
+        Route::post('/csbpotensial', 'CalonSiswaController@filterCsb');
     });
 
     Route::group(['prefix' => 'siswa'], function() {

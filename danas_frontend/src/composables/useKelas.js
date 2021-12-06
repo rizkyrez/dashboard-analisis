@@ -7,6 +7,7 @@ export default function useKelas(){
     const dataset = ref([])
     const datatable = ref([])
     const sum = ref([])
+    const header = ref([])
 
     const getData = async () => {
         await axios
@@ -15,6 +16,7 @@ export default function useKelas(){
                 dataset.value = res.data.dataset
                 datatable.value = res.data.data_table
                 sum.value = res.data.sum_thj
+                header.value = res.data.header
             })
             .catch(error => {
                 console.log(JSON.stringify(error))
@@ -63,14 +65,6 @@ export default function useKelas(){
 
     })
 
-    const header = computed(() => {
-        const arrobj = dataset.value
-
-        let arr = arrobj.map(p => p.name)
-
-        return arr
-    })
-
     const grdtotal = computed(() => {
         const thjTotal = sum.value
 
@@ -80,8 +74,6 @@ export default function useKelas(){
 
         return sumthj
     })
-
-    onBeforeMount(getData)
 
     const kelasOption = reactive({
         notMerge:  true,
@@ -124,19 +116,19 @@ export default function useKelas(){
         return tess
     })
 
-    console.log(tes)
-
     watchEffect(() => {
         dataset.value,
         datatable.value,
         sum.value,
-        header,
+        header.value,
         tooltip,
         legendat,
         yaxis,
         grdtotal,
         kelasOption
     })
+
+    onBeforeMount(getData)
 
     return {
         kelasOption,

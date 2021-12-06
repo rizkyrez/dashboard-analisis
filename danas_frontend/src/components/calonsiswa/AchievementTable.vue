@@ -5,7 +5,7 @@
     <tr class="bg-green-300">
       <th v-for="title in header" :key="title" class="font-semibold">{{title}}</th>
       <!-- <th class="font-semibold">Gelombang TA 2022/2023</th> -->
-      <th class="font-semibold">Grand Total</th>
+      <th class="font-semibold">Total Calon Siswa</th>
       <th class="font-semibold">Achievement %</th>
     </tr>
     </thead>

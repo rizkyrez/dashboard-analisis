@@ -37,9 +37,9 @@
         </field>
         </div>
 
-        <div v-if="category == 'calons' && menutp == 'achie'" class="px-3">
+        <div v-else-if="category == 'calons' && menutp == 'achie'" class="px-3">
         <field label="Proses">
-            <control :options="listop" v-model="proses" />
+            <control :options="listprosachie" v-model="proses2"/>
         </field>
         </div>
 
@@ -106,10 +106,6 @@ export default {
       type: Array,
       default: () => []
     },
-    listop: {
-        type: Array,
-        default: () => 'All'
-    },
     menutp: String,
     category: String
   },
@@ -118,10 +114,22 @@ export default {
   setup (props,{emit}) {
     const departemen = ref('All')
     const proses = ref('All')
+    const proses2 = ref('All')
     const agama = ref('All')
     const tahunajaran = ref('All')
     const tingkat = ref('All')
-    const { getList, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
+    const { getList, listprosachie, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
+
+    watchEffect(() => {
+        departemen.value,
+        proses.value,
+        proses2.value,
+        agama.value,
+        tahunajaran.value
+        if (proses.value == '' || proses.value == null || departemen.value == 'All' ) {
+            proses.value = 'All'
+        }
+    })
 
     onBeforeMount(getList)
 
@@ -142,16 +150,6 @@ export default {
         { id: 5, label: 'Kosambi Baru' },
         { id: 6, label: 'Green Village' },
     ]
-
-    watchEffect(() => {
-        departemen.value,
-        proses.value,
-        agama.value,
-        tahunajaran.value
-        if (proses.value == '' || proses.value == null || departemen.value == 'All' ) {
-            proses.value = 'All'
-        }
-    })
 
     const changeProses = async () => {
         const fildat = {
@@ -197,6 +195,7 @@ export default {
         const filterData = {
             departemen: departemen.value,
             proses: proses.value,
+            proses2: proses2.value,
             agama: agama.value,
             tahunajaran: tahunajaran.value,
             tingkat: tingkat.value
@@ -214,12 +213,14 @@ export default {
       listproses,
       listTahunAjaran,
       listTingkat,
+      listprosachie,
       changeProses,
       changeTahunajaran,
       clickedFilter,
       tahunajaran,
       departemen,
       proses,
+      proses2,
       agama,
       tingkat,
       valu

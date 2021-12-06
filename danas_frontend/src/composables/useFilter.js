@@ -10,6 +10,7 @@ export default function useFilter() {
     const listTahunAjaran = ref([])
     const listagamav2 = ref([])
     const listTingkat = ref([])
+    const listprosachie = ref([])
 
     const filterData = ref([])
     // const dataset = ref([])
@@ -25,13 +26,19 @@ export default function useFilter() {
             return await axios.get('/api/v1/siswa/listfiltersiswa');
         }
 
-        Promise.all([getListFilterCalons(), getListFilterSiswa()])
+        const getListProsAchie = async () => {
+            return await axios.get('/api/v1/calons/achievement')
+        }
+
+        Promise.all([getListFilterCalons(), getListFilterSiswa(), getListProsAchie()])
             .then(function(results) {
                 const listcalons = results[0];
                 const listsiswa  = results[1];
+                const listachie = results[2];
 
                 listdepartemen.value = listcalons.data.list_departemen
                 listproses.value = listcalons.data.list_proses
+                listprosachie.value = listachie.data.header
                 listagama.value = listcalons.data.list_agama
                 listdepartemenv2.value = listsiswa.data.list_dp
                 listTahunAjaran.value = listsiswa.data.list_tahunajaran
@@ -85,7 +92,8 @@ export default function useFilter() {
         listdepartemenv2.value,
         listTahunAjaran.value,
         listagamav2.value,
-        listTingkat.value
+        listTingkat.value,
+        listprosachie.value
     })
 
     return {
@@ -96,9 +104,10 @@ export default function useFilter() {
         listdepartemen,
         listagamav2,
         listTingkat,
+        listprosachie,
         filterData,
         filters,
-        getList
+        getList,
         // dataset,
         // header,
         // datatable,

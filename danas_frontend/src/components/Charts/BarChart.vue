@@ -1,5 +1,6 @@
 <template>
     <v-chart
+    :class="cheight"
     :option="option"
     />
 </template>
@@ -32,7 +33,8 @@ export default {
         VChart
     },
     props: {
-        option: Object
+        option: Object,
+        cheight: String
     }
 }
 </script>

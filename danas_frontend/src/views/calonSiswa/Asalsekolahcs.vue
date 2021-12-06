@@ -11,6 +11,7 @@
             <figure>
               <v-chart
                 :option="asalSekolah"
+                ref="assekolah"
               />
             </figure>
           </card-component>
@@ -40,10 +41,10 @@ import {
   GridComponent,
   LegendComponent
 } from 'echarts/components';
-import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, defineComponent, computed, watchEffect, onBeforeUpdate, onBeforeMount, onMounted, provide, nextTick } from 'vue'
+import VChart from 'vue-echarts';
+import { ref, defineComponent, computed, watchEffect, onBeforeUpdate, onBeforeMount, onMounted, provide, nextTick, reactive } from 'vue'
 import axios from 'axios'
-import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
+import {  mdiTableBorder, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
 import AsalSekolahTable from '@/components/calonsiswa/AsalSkTable'
@@ -77,7 +78,6 @@ export default defineComponent({
     BottomOtherPagesSection,
     AsalSekolahTable,
     VChart
-
   },
   setup (props) {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
@@ -98,19 +98,19 @@ export default defineComponent({
     const sumva = computed(() => {
         let arrobj = askdata.value
 
-        let result = arrobj.filter(({name}) => name !== 'Narada School')
+        let result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
                             .reduce((acc, v) =>{
                                 return acc += v.value
                             },0)
 
-        let result2 = arrobj.filter(({name}) => name === 'Narada School')
+        let result2 = arrobj.filter(({name}) => name.toLowerCase().includes(('Narada').toLowerCase()))
                             .reduce((a, v) => {
                                 return a += v.value
                             },0)
 
         const dataset = [];
         dataset.push({
-                name: 'Narada School',
+                name: 'Internal',
                 value: result2
             },
             {
@@ -243,7 +243,7 @@ export default defineComponent({
       askdata,
       asalSekolah,
       filter,
-      changepros
+      changepros,
     }
   },
   // data () {

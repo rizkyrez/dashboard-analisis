@@ -6,6 +6,7 @@ import agama from '../views/calonSiswa/Agamav'
 import area from '../views/calonSiswa/Areav'
 import inexask from '../views/calonSiswa/Asalsekolahcs'
 import achievement from '../views/calonSiswa/Achievementcs'
+import csbachievement from '../views/calonSiswa/CsbAchievement'
 
 import trendsiswa from '../views/siswa/TrendSiswa'
 import agamasiswa from '../views/siswa/AgamaSiswa'
@@ -53,7 +54,7 @@ const routes = [
       title: 'Dashboard - Calon Siswa - Internal VS External',
       requireLogin: true
     },
-    path: '/calon-siswa/inex',
+    path: '/calon-siswa/internal-vs-external',
     name: 'Asalsekolah',
     component: inexask
   },
@@ -65,6 +66,15 @@ const routes = [
     path: '/calon-siswa/achievement',
     name: 'Achievement',
     component: achievement
+  },
+  {
+    meta: {
+      title: 'Dashboard - Calon Siswa - CSB Potensial VS Achievement',
+      requireLogin: true
+    },
+    path: '/calon-siswa/csb-potensial-vs-achievement',
+    name: 'CsbAchievement',
+    component: csbachievement
   },
   {
     meta: {

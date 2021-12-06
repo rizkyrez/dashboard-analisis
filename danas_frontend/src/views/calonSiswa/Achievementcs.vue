@@ -1,8 +1,8 @@
 
 <template>
-
+    <!-- eslint-disable -->
   <hero-bar>Achievement</hero-bar>
-  <filter-bar category="calons" menutp="achie" :listop="header"/>
+  <filter-bar category="calons" menutp="achie" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -19,7 +19,7 @@
 
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
         <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-          <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="valu"/>
+          <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/>
         </card-component>
       </div>
 
@@ -76,22 +76,26 @@ export default defineComponent({
   },
   setup () {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const datatable = ref([])
-    const header = ref([])
-    const grdtotal = ref()
-    const valu = ref()
+    const datatable = ref([0,0])
+    const header = ref(['',''])
 
-    // const percentage = computed(() => {
-    //     const arrobj = datatable.value
+    const percentase = computed(() => {
+        const arrobj = datatable.value
 
-    //     let arrdata = arrobj.map(p => p.array_data)
+        let result = ((arrobj[1] / arrobj[0]) * 100 || 0).toFixed(2)
 
-    //     let result = arrdata.reduce((a, v) => {
-    //         return a += v
-    //     },0)
+        return result
+    })
 
-    //     return result
-    // })
+    const grdtotal = computed(() => {
+        const arrobj = datatable.value
+
+        let result = arrobj.reduce((a,v) => {
+            return a += v
+        },0)
+
+        return result
+    })
 
     const achievement = reactive({
         title: {
@@ -156,7 +160,7 @@ export default defineComponent({
                 },
                 data: [
                     {
-                    value: valu,
+                    value: percentase,
                     name: 'Achievement'
                     }
                 ],
@@ -170,8 +174,6 @@ export default defineComponent({
             .then(res => {
                 datatable.value = res.data.data_table
                 header.value = res.data.header
-                grdtotal.value = res.data.grdtotal
-                valu.value = res.data.percentage
             })
             .catch(error => {
                 alert(error.message)
@@ -180,12 +182,42 @@ export default defineComponent({
     })
 
     watchEffect(() => {
-        datatable.value,
-        header.value,
-        grdtotal.value,
-        valu.value,
+        datatable.value = datatable.value
+        header.value = header.value
+        grdtotal,
+        percentase,
         achievement
     })
+
+    const filter = async (e) => {
+        if(e.proses2 == 'All' || e.proses2 == null || e.proses2 == '') {
+            e.proses2 = ''
+        }
+
+
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.proses2 = ''
+        }
+
+        console.log(e.proses2)
+        console.log(e.departemen)
+
+        const fil = {
+            departmen: e.departemen,
+            proses: e.proses2,
+        }
+
+        await axios
+            .post("/api/v1/calons/filterach/", fil)
+            .then(res => {
+                arraydata.value = res.data.data_table
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error))
+            })
+    }
 
     return {
       titleStack,
@@ -194,11 +226,12 @@ export default defineComponent({
       mdiChartBar,
       mdiTableMultiple,
       datatable,
-      valu,
+      percentase,
       datatable,
       grdtotal,
       header,
-      achievement
+      achievement,
+      filter
     }
   },
 });

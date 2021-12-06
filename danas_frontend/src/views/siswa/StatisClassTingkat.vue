@@ -57,7 +57,6 @@ export default {
         const store = useStore()
         const titleStack = ref(['Dashboard', 'Siswa'])
         const changetb = ref('on')
-        const hd = ref([])
         const { kelasOption, dataset, datatable, sum, header, grdtotal } = useKelas()
 
         const filter = async (e) => {
@@ -65,8 +64,8 @@ export default {
                 e.tahunajaran = ''
             }
 
-            if(e.departemen == 'All') {
-                e.departemen = ''
+            if(e.tingkat == 'All') {
+                e.tingkat = ''
                 e.tahunajaran = ''
             }
 
@@ -81,7 +80,7 @@ export default {
                     dataset.value = res.data.dataset
                     datatable.value = res.data.data_table
                     sum.value = res.data.sum_thj
-                    hd.value = res.data.header
+                    header.value = res.data.header
                 })
                 .catch(error =>{
                     console.log(JSON.stringify(error))
@@ -89,8 +88,6 @@ export default {
                 })
 
                 await nextTick()
-                    const hdr = header.value
-                    hdr.push(hd.value)
                     changetb.value = ''
         }
 

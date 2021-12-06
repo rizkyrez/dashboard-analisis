@@ -166,6 +166,7 @@ class SiswaController extends Controller
         $arraydata = [];
         $total_by_tahunajaran = [];
         $total_by_tingkat = [];
+        $arr_headerta = [];
 
         foreach($array_group as $key => $arrth) {
             $array_detail = [];
@@ -182,6 +183,8 @@ class SiswaController extends Controller
             }
             $sum = array_sum($arr_total);
             $total_by_tahunajaran[] = $sum;
+
+            $arr_headerta[] = $key; 
             
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;
@@ -208,7 +211,7 @@ class SiswaController extends Controller
             'data_table' => $array_table,
             'dataset' => $arraydata,
             'sum_thj' => $total_by_tahunajaran,
-            // 'header' => $arr_headerta
+            'header' => $arr_headerta
         ],200);
     }
 
@@ -395,7 +398,7 @@ class SiswaController extends Controller
         $clause_tingkat_kelas = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat.$condition.$filter_tahunajaran : "";
 
         // main query
-        $main_query = "select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid $clause_tingkat_kelas group by ta.replid, t.tingkat";
+        $main_query = "select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.    idtahunajaran = ta.replid $clause_tingkat_kelas group by ta.replid, t.tingkat";
 
         $jml_tkt_kelas = $akad->select($main_query);
 
@@ -418,7 +421,7 @@ class SiswaController extends Controller
         $arraydata = [];
         $total_by_tahunajaran = [];
         $total_by_tingkat = [];
-        $arr_headertat = [];
+        $arr_headerta = [];
 
         foreach($array_group as $key => $arrth) {
             $array_detail = [];
@@ -435,6 +438,8 @@ class SiswaController extends Controller
             }
             $sum = array_sum($arr_total);
             $total_by_tahunajaran[] = $sum;
+
+            $arr_headerta[] = $key;
             
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;
@@ -462,7 +467,7 @@ class SiswaController extends Controller
             'data_table' => $array_table,
             'dataset' => $arraydata,
             'sum_thj' => $total_by_tahunajaran,
-            // 'header' => $arr_headerta
+            'header' => $arr_headerta
         ],200);
     } 
 
@@ -497,4 +502,5 @@ class SiswaController extends Controller
     protected function looping($arr) {
 
     }
+
 }

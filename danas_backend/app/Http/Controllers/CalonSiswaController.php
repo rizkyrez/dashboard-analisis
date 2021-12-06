@@ -358,12 +358,12 @@ class CalonSiswaController extends Controller
     public function achievement() {
         $akad = DB::connection('mysqlakad');
 
-        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid where pps.aktif = 1 group by pps.replid, pps.departemen";
+        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where pps.aktif = 1 group by pps.replid, pps.departemen";
 
         $active_proses = $akad->select($query_active_proses);
         $active_proses = $this->changeToArr($active_proses);
 
-        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid where cs.idproses = pps.replid and pps.aktif != 1 group by pps.replid, pps.departemen order by pps.replid desc limit 3";
+        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where pps.aktif != 1 and ta.aktif = 1 and ta.departemen = pps.departemen group by pps.replid, pps.departemen order by pps.replid desc";
         
         $last_proses = $akad->select($query_last_proses);
         $last_proses = $this->changeToArr($last_proses);
@@ -383,29 +383,108 @@ class CalonSiswaController extends Controller
         $total_active = array_sum($count_active);
         $total_last = array_sum($count_last);
 
-        $percentage = $total_active/$total_last;
-        $result = number_format($percentage * 100, 2);
-
         $arraydata = array($total_last, $total_active);
         $arrayproses = array($proses_last, $proses_active);
-
-        $grdtotal = $total_last + $total_active;
         
         return response()->json([
             'data_table' => $arraydata,
             'header' => $arrayproses,
-            'grdtotal' => $grdtotal,
-            'percentage' => $result
         ],200);
     }
 
-    // public function filterAchv() {
-    //     $akad = DB::connection('mysqlakad');
+    public function filterAchv(Request $request) {
+        $akad = DB::connection('mysqlakad');
 
-    //     $filter_proses = 
-    //     $filter_departemen =
-    //     $
-    // }
+        // fetch request
+        $filter_departemen = ($request->departmen) ? "pps.departemen ='".$request->departmen."'" : "";
+        $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
+        $condition = ($filter_departemen && $filter_proses) ? " and " : "";
+
+        // where clause trendcs
+        $clause_achievement = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen.$condition.$filter_proses : "";
+
+        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid $clause_achievement group by pps.replid, pps.departemen";
+
+        $active_proses = $akad->select($query_active_proses);
+        $active_proses = $this->changeToArr($active_proses);
+
+        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid $clause_achievement and ta.departemen = pps.departemen group by pps.replid, pps.departemen order by pps.replid desc";
+        
+        $last_proses = $akad->select($query_last_proses);
+        $last_proses = $this->changeToArr($last_proses);
+
+        $count_active = [];
+        $count_last = [];
+
+        foreach ($active_proses as $item) {
+            $proses_active = $item['proses'];
+            $count_active[] = $item['total'];
+        }
+        foreach ($last_proses as $item) {
+            $proses_last = $item['proses'];
+            $count_last[] = $item['total'];
+        } 
+
+        $total_active = array_sum($count_active);
+        $total_last = array_sum($count_last);
+
+        $arraydata = array($total_last, $total_active);
+        $arrayproses = array($proses_last, $proses_active);
+        
+        return response()->json([
+            'data_table' => $arraydata,
+            'header' => $arrayproses,
+        ],200);
+    }
+
+    public function CsbAchievement() {
+        $akad = DB::connection('mysqlakad');
+
+        $csbsibling = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid LEFT JOIN siswa AS s ON s.kk_no = cs.kk_no WHERE cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' group by pps.departemen");
+
+        $csbsibling = $this->changeToArr($csbsibling);
+
+        $achievement = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid WHERE cs.asalsekolah LIKE '%narada%' GROUP BY pps.departemen");
+
+        $achievement = $this->changeToArr($achievement);
+
+        $arr_csb_sibling = [];
+        $arr_achievement_internal = [];
+
+        foreach ($csbsibling as $item) {
+            $arr_csb_sibling[] = $item['total'];
+            $dep = $item['departemen'];
+        }
+        foreach ($achievement as $item) {
+            $arr_achievement_internal[] = $item['total'];
+            $dept = $item['departemen'];
+        } 
+
+        $total_csbpot = array_sum($arr_csb_sibling);
+        $total_ach = array_sum($arr_achievement_internal);
+
+        $arraydata = array($total_csbpot,$total_ach);
+
+        return response()->json([
+            'data_table' => $arraydata
+        ],200);
+    }
+
+
+    public function FilterCsb(Request $request) {
+        $akad = DB::connection('mysqlakad');
+
+        $filter_departemen = ($request->departmen) ? "pps.departemen = '".$request->departemen."'" : "" ;
+        $filter_proses = ($request->proses) ? "pps.proses = '".$request->proses."'" : "";
+
+        $condition = ($filter_departemen && $filter_proses) ? " and " : "";
+
+        $clause_csbpot = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen.$condition.$filter_proses : "";
+
+        return response()->json([
+
+        ]);
+    }
 
     public function ListFilter() {
         $akad = DB::connection('mysqlakad');
@@ -441,6 +520,17 @@ class CalonSiswaController extends Controller
             'list_proses' => $array_proses
         ]);
     }
+
+    // public function FilterCsbAch() {
+    //     $akad = DB::connection('mysqlakad');
+
+    //     $filter_tingkat = ;
+    //     $filter_departemen = ;
+
+    //     return response()->json([
+            
+    //     ])
+    // } 
 
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {

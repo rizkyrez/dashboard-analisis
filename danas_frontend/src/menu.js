@@ -32,7 +32,7 @@ export default [
           label: 'Area',
         },
         {
-          to: '/calon-siswa/inex',
+          to: '/calon-siswa/internal-vs-external',
           label: 'Internal vs External',
         },
         {
@@ -40,7 +40,7 @@ export default [
           label: 'Achievement-LIVE',
         },
         {
-          to: '/calon-siswa/tarpon',
+          to: '/calon-siswa/csb-potensial-vs-achievement',
           label: 'Target Potensial CSB vs Achievement',
         },
       ]
