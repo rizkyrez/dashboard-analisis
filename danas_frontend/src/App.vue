@@ -10,7 +10,7 @@
 <script>
 /* eslint-disable */
 // @ is an alias to /src
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import menu from '@/menu.js'

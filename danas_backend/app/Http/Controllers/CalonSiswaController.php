@@ -453,11 +453,9 @@ class CalonSiswaController extends Controller
 
         foreach ($csbsibling as $item) {
             $arr_csb_sibling[] = $item['total'];
-            $dep = $item['departemen'];
         }
         foreach ($achievement as $item) {
             $arr_achievement_internal[] = $item['total'];
-            $dept = $item['departemen'];
         } 
 
         $total_csbpot = array_sum($arr_csb_sibling);
@@ -476,13 +474,24 @@ class CalonSiswaController extends Controller
 
         $filter_departemen = ($request->departmen) ? "pps.departemen = '".$request->departemen."'" : "" ;
         $filter_proses = ($request->proses) ? "pps.proses = '".$request->proses."'" : "";
+        $filter_sibling = ($request->sibling != 0) ? "LEFT JOIN calonsiswa AS cs ON cs.kk_no = s.kk_no" : "";
 
         $condition = ($filter_departemen && $filter_proses) ? " and " : "";
 
         $clause_csbpot = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen.$condition.$filter_proses : "";
 
-        return response()->json([
+        $csbsibling = $akad->select("SELECT COUNT(s.replid) AS total, dp.departemen FROM siswa AS s INNER JOIN kelas AS k ON s.idkelas = k.replid INNER JOIN tahunajaran as ta ON k.idtahunajaran = ta.replid INNER JOIN tingkat AS tk ON k.idtingkat = tk.replid INNER JOIN departemen AS dp ON ta.departemen = dp.departemen $filter_sibling JOIN (SELECT MAX(t.tingkat) AS last_tingkat,t.departemen as dpq FROM `tingkat` as t INNER JOIN departemen as dp ON t.departemen = dp.departemen GROUP BY dp.departemen) as q2 WHERE dp.departemen = q2.dpq AND tk.tingkat = q2.last_tingkat AND cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' GROUP BY q2.dpq");
 
+        $csbsibling = $this->changeToArr($csbsibling);
+
+        $achievement = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid WHERE cs.asalsekolah LIKE '%narada%' GROUP BY pps.departemen");
+
+        $achievement = $this->changeToArr($achievement);
+
+        $arraydata = [];
+
+        return response()->json([
+            'data_table' => $arraydata
         ]);
     }
 

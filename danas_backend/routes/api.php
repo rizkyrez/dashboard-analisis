@@ -39,7 +39,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/filterag', 'CalonSiswaController@filterag');
         Route::post('/filterask', 'CalonSiswaController@filterask');
         Route::post('/filterach', 'CalonSiswaController@filterAch');
-        Route::post('/csbpotensial', 'CalonSiswaController@filterCsb');
+        Route::post('/filtercsb', 'CalonSiswaController@filterCsb');
     });
 
     Route::group(['prefix' => 'siswa'], function() {
