@@ -61,6 +61,12 @@
         </field>
         </div>
 
+         <div v-else-if="category == 'calons' && menutp == 'csbachie'" class="px-3">
+        <field label="Sibling">
+            <control :options="opsiSibling" v-model="sibling"/>
+        </field>
+        </div>
+
         <div v-if="menutp === 'area'" class="px-3">
         <field label="Area">
             <control :options="opsiArea" v-model="area" />
@@ -118,6 +124,7 @@ export default {
     const agama = ref('All')
     const tahunajaran = ref('All')
     const tingkat = ref('All')
+    const sibling = ref(1)
     const { getList, listprosachie, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
 
     watchEffect(() => {
@@ -141,6 +148,8 @@ export default {
     //     })
     //     return match
     // })
+
+    const opsiSibling = [0,1]
 
     const opsiArea = [
         { id: 1, label: 'Kosambi' },
@@ -198,9 +207,9 @@ export default {
             proses2: proses2.value,
             agama: agama.value,
             tahunajaran: tahunajaran.value,
-            tingkat: tingkat.value
+            tingkat: tingkat.value,
+            sibling: sibling.value
         }
-
         emit('clickedFilter', filterData)
     };
 
@@ -214,6 +223,7 @@ export default {
       listTahunAjaran,
       listTingkat,
       listprosachie,
+      opsiSibling,
       changeProses,
       changeTahunajaran,
       clickedFilter,
@@ -223,6 +233,7 @@ export default {
       proses2,
       agama,
       tingkat,
+      sibling,
       valu
     }
   }

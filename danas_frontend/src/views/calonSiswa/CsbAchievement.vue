@@ -1,7 +1,7 @@
 <template>
     <!-- eslint-disable -->
-    <hero-bar>Achievement</hero-bar>
-    <filter-bar category="calons" menutp="achie" @clicked-filter="filter"/>
+    <hero-bar>CSB Potensial vs Achievement Internal</hero-bar>
+    <filter-bar category="calons" menutp="csbachie" @clicked-filter="filter"/>
     <main-section>
 
         <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -70,7 +70,6 @@ export default defineComponent({
         BottomOtherPagesSection,
         AchievementTable,
         VChart
-
     },
     setup () {
         const titleStack = ref(['Dashboard', 'Calon Siswa'])
@@ -166,7 +165,7 @@ export default defineComponent({
             ]
         })
 
-         watchEffect(() => {
+        watchEffect(() => {
             datatable.value = datatable.value
             header,
             percentase,
@@ -185,11 +184,11 @@ export default defineComponent({
                 })
         })
 
+
         const filter = async (e) => {
             if(e.proses2 == 'All' || e.proses2 == null || e.proses2 == '') {
                 e.proses2 = ''
             }
-
 
             if(e.departemen == 'All') {
                 e.departemen = ''
@@ -199,10 +198,11 @@ export default defineComponent({
             const fil = {
                 departmen: e.departemen,
                 proses: e.proses2,
+                sibling: e.sibling
             }
 
             await axios
-                .post("/api/v1/calons/filterach/", fil)
+                .post("/api/v1/calons/filtercsb/", fil)
                 .then(res => {
                     arraydata.value = res.data.data_table
                 })

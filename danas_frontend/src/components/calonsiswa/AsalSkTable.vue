@@ -1,7 +1,7 @@
 <template>
     <!-- eslint-disable -->
-  <div>
-      <table class="border border-collapse border-green-400 text-xs w-full">
+    <div>
+        <table class="border border-collapse border-green-400 text-xs w-full">
             <thead class="flex w-full">
                 <tr class="bg-green-300 flex w-full">
                     <th class="font-semibold text-center w-full">Asal Sekolah</th>
@@ -23,7 +23,7 @@
                 </tr>
             </tbody>
         </table>
-  </div>
+    </div>
 
 </template>
 
