@@ -169,7 +169,7 @@ export default defineComponent({
                 }
             ],
             xAxis: { show:false },
-            yAxis: { show:false},
+            yAxis: { show:false },
             series: {
                     type: "pie",
                     radius: "55%",
