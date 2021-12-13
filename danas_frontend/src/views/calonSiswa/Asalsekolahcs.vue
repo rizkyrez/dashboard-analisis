@@ -299,12 +299,6 @@ export default defineComponent({
 
                 let result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
 
-                // var colors = []
-                // for(var i = 0; i < result.length; i++ ) {
-                //     colors.push(color)
-                // }
-                console.log(datas.value)
-
                 asalSekolah.value = {
                     tooltip: {
                         trigger: 'axis',
@@ -330,7 +324,7 @@ export default defineComponent({
                         }
                     },
                     yAxis: {
-                        show:true,
+                        show: true,
                         type: 'value'
                     },
                     dataZoom: [
@@ -383,8 +377,6 @@ export default defineComponent({
                         }
                     ]
                 }
-
-                console.log(asalSekolah.value)
             }
         }
 
@@ -416,6 +408,6 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
-  height: 400px;
+  height: 450px;
 }
 </style>
