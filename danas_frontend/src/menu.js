@@ -3,6 +3,7 @@ import {
   mdiAccountCircle,
   mdiAccountGroup,
   mdiAccountMultiple,
+  mdiAccountTie,
   mdiDesktopMac,
   mdiAlertCircle,
   mdiMonitorClean,
@@ -94,7 +95,7 @@ export default [
       to: '/tables',
       label: 'Guru',
       subLabel: 'Guru',
-      icon: mdiTable,
+      icon: mdiAccountTie,
       updateMark: true,
       menu: [
         {
@@ -110,7 +111,7 @@ export default [
           label: 'Teachers Occupancy',
         },
         {
-          to: '/Administrative',
+          to: '/administrative',
           label: 'Administrativ Monitoring',
         },
       ]
