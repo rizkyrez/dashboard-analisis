@@ -97,18 +97,6 @@ export default defineComponent({
         const listProp = ref([])
         const listAsk = ref([])
 
-        // const expands = (e) => {
-        //     const data = e.series
-
-        //     const arr = data.map(p => p.data)
-
-        //     const ext = arr.filter(({name}) => name.toLowerCase().includes(('External').toLowerCase()))
-
-        //     console.log(expands)
-        // }
-        // const dom = document.getElementById('char')
-        // const chart = initChart(dom)
-
         const sumva = computed(() => {
             let arrobj = askdata.value
 
@@ -223,7 +211,9 @@ export default defineComponent({
             listAsk.value,
             askdata.value,
             seriesdata.value,
-            asalSekolah.value
+            asalSekolah.value,
+            color,
+            expands
         })
 
         const changepros = async (event) => {
@@ -271,33 +261,38 @@ export default defineComponent({
                 })
         }
 
-        const datas = computed(() => {
+        const color = computed(() => {
             var arrobj = askdata.value
             var result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
             var letters = '0123456789ABCDEF'.split('');
             var colors = [];
-            var arrdata = result.map(p => p.value)
             for (var o = 0; o < result.length; o++){
                 var color = '#';
                 for (var i = 0; i < 6; i++ ) {
                     color += letters[Math.floor(Math.random() * 16)];
                 }
-                colors.push({
-                    value: arrdata[o],
-                    itemStyle: {
-                        color: color
-                    }
-                })
+                colors.push(color)
             }
 
             return colors
         })
 
-        const expands = (e) => {
+        const expands = async (e) => {
             if(e.name == 'External') {
                 const arrobj = askdata.value
 
-                let result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
+                var result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
+                var arrvalue = result.map(p => p.value)
+                var datas = []
+
+                for(var i = 0; i < result.length; i++) {
+                     datas.push({
+                        value: arrvalue[i],
+                        itemStyle: {
+                            color: color.value[i]
+                        }
+                    })
+                }
 
                 asalSekolah.value = {
                     tooltip: {
@@ -353,7 +348,7 @@ export default defineComponent({
                         type: 'bar',
                         radius: 'auto',
                         id: 'external',
-                        data: datas.value,
+                        data: datas,
                         top: 10,
                         bottom: 0,
                         large:true,
