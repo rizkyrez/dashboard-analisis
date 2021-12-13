@@ -33,7 +33,7 @@ export default function useFilter() {
         Promise.all([getListFilterCalons(), getListFilterSiswa(), getListProsAchie()])
             .then(function(results) {
                 const listcalons = results[0];
-                const listsiswa  = results[1];
+                const listsiswa = results[1];
                 const listachie = results[2];
 
                 listdepartemen.value = listcalons.data.list_departemen
@@ -53,7 +53,6 @@ export default function useFilter() {
     }
 
     const filters = async (e) => {
-
         if(e.proses == 'All' || e.proses == null || e.proses == '') {
             e.proses = ''
         }

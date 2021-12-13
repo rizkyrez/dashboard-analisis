@@ -104,8 +104,6 @@ export default function useTrendCs(){
         series: dataset
     })
 
-    onBeforeMount(trendcs, dataset)
-
     watchEffect(() => {
         dataset.value,
         header.value,
@@ -129,4 +127,4 @@ export default function useTrendCs(){
         xaxis,
         trendcs
     }
-  };
+};

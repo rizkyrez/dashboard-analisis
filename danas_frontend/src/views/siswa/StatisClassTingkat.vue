@@ -53,7 +53,7 @@ export default {
         TrendTable,
         ChartKelasTingkat
     },
-     setup () {
+    setup () {
         const store = useStore()
         const titleStack = ref(['Dashboard', 'Siswa'])
         const changetb = ref('on')
@@ -74,6 +74,7 @@ export default {
                 tingkat: e.tingkat
             }
 
+
             await axios
                 .post("/api/v1/siswa/filtertkt/", fil)
                 .then(res => {
@@ -90,7 +91,7 @@ export default {
                 await nextTick()
                     changetb.value = ''
         }
-
+        //
         return {
             titleStack,
             mdiTableBorder,

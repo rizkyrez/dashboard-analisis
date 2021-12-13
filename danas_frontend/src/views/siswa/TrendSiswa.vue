@@ -86,7 +86,6 @@ export default {
                 console.log(JSON.stringify(error))
                 alert(error.message)
             })
-
     }
 
     return {
@@ -105,6 +104,7 @@ export default {
 
 };
 </script>
+
 <style lang="postcss">
 html {
     scroll-behavior: smooth;

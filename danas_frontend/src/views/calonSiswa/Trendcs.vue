@@ -84,7 +84,6 @@ export default defineComponent({
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const { dataset, trendcs, datatable, sum, header, grdtotal } = useTrendCs()
 
-
     const filter = async (e) => {
         if(e.proses == 'All' || e.proses == null || e.proses == '') {
             e.proses = ''
@@ -114,19 +113,18 @@ export default defineComponent({
             })
     }
 
-
     return {
-      titleStack,
-      mdiTableBorder,
-      mdiChartBar,
-      mdiTableMultiple,
-      datatable,
-      header,
-      sum,
-      grdtotal,
-      dataset,
-      trendcs,
-      filter
+        titleStack,
+        mdiTableBorder,
+        mdiChartBar,
+        mdiTableMultiple,
+        datatable,
+        header,
+        sum,
+        grdtotal,
+        dataset,
+        trendcs,
+        filter
     }
   },
 

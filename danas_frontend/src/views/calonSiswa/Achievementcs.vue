@@ -42,7 +42,7 @@ import {
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
 import { ref, defineComponent, reactive, computed, watch, watchEffect, onBeforeMount, onMounted } from 'vue'
-import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple  } from '@mdi/js'
+import {  mdiTableBorder, mdiTableOff, mdiChartBar, mdiTableMultiple, mdiTeamviewer  } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import Notification from '@/components/Notification'
 import AchievementTable from '@/components/calonsiswa/AchievementTable'
@@ -59,7 +59,6 @@ use([
   TooltipComponent,
 ]);
 
-
 export default defineComponent({
   name: 'Achievement',
   components: {
@@ -72,8 +71,8 @@ export default defineComponent({
     BottomOtherPagesSection,
     AchievementTable,
     VChart
-
   },
+
   setup () {
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const datatable = ref([0,0])
@@ -90,11 +89,9 @@ export default defineComponent({
     const grdtotal = computed(() => {
         const arrobj = datatable.value
 
-        let result = arrobj.reduce((a,v) => {
+        return arrobj.reduce((a,v) => {
             return a += v
         },0)
-
-        return result
     })
 
     const achievement = reactive({
@@ -104,6 +101,7 @@ export default defineComponent({
         },
         tooltip: {
             formatter: '{b} : {c}%',
+            trigger: 'axis',
         },
         series: [
             {
@@ -181,6 +179,12 @@ export default defineComponent({
             })
     })
 
+    watch(datatable, (nw, pv) => {
+        if(datatable.value == pv) {
+            datatable.value = nw
+        }
+    })
+
     watchEffect(() => {
         datatable.value = datatable.value
         header.value = header.value
@@ -193,7 +197,6 @@ export default defineComponent({
         if(e.proses2 == 'All' || e.proses2 == null || e.proses2 == '') {
             e.proses2 = ''
         }
-
 
         if(e.departemen == 'All') {
             e.departemen = ''
@@ -236,7 +239,6 @@ export default defineComponent({
 <style>
 /**
  * The default size is 600px×400px, for responsive charts
- * you may need to set percentage values as follows (also
  * don't forget to provide a size for the container).
  */
 .echarts {
