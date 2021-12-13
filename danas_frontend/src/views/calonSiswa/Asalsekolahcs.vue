@@ -1,8 +1,5 @@
 <template>
     <!-- eslint-disable -->
-    <!-- <div id="popup " class="">
-        <v-chart :option="chartsbar"/>
-    </div> -->
   <hero-bar>Agama</hero-bar>
   <filter-bar category="calons" @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
@@ -12,7 +9,7 @@
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-3 sm:max-w-full sm:w-full ">
           <card-component title="Statistik" :icon="mdiChartBar">
             <figure>
-              <v-chart id="char" ref="piechart"
+              <v-chart ref="piechart"
                 :option="asalSekolah"
                 @click="expands"
               />
@@ -43,7 +40,9 @@ import {
   DatasetComponent,
   TooltipComponent,
   GridComponent,
-  LegendComponent
+  LegendComponent,
+  GraphicComponent,
+  DataZoomComponent
 } from 'echarts/components';
 import VChart from 'vue-echarts';
 import { ref, defineComponent, computed, watchEffect, onBeforeUpdate, onBeforeMount, onMounted, provide, nextTick, reactive, h} from 'vue'
@@ -57,6 +56,7 @@ import FilterBar from '@/components/FilterBar'
 import HeroBar from '@/components/HeroBar'
 import BottomOtherPagesSection from '@/components/BottomOtherPagesSection'
 import TitleSubBar from '@/components/TitleSubBar'
+import PopupChart from '@/components/Charts/PopupChart'
 
 use([
   CanvasRenderer,
@@ -67,7 +67,9 @@ use([
   DatasetComponent,
   TooltipComponent,
   GridComponent,
-  LegendComponent
+  LegendComponent,
+   GraphicComponent,
+   DataZoomComponent
 ]);
 
 export default defineComponent({
@@ -81,6 +83,7 @@ export default defineComponent({
         Notification,
         BottomOtherPagesSection,
         AsalSekolahTable,
+        PopupChart,
         VChart
     },
     setup (props) {
@@ -89,43 +92,11 @@ export default defineComponent({
         const store =  useStore()
         const asalSekolah = ref()
         const askdata = ref([])
+        const seriesdata = ref([])
         const listDep = ref([])
         const listProp = ref([])
         const listAsk = ref([])
         const piechart = ref()
-
-        // const chartexterbar = reactive({
-        //     notMerge:  true,
-        //     tooltip: tooltip,
-        //     grid: {
-        //         left: '6%',
-        //         right: '6%',
-        //         bottom: '20%',
-        //         top:30,
-        //         z: 4
-        //     },
-        //     legend: {
-        //         orient: 'horizontal',
-        //         left: 'center',
-        //         bottom: 'bottom',
-        //         itemGap: 12,
-        //         padding: 8,
-        //         data: legendat,
-        //         // selectedMode: selectmode,
-        //         // selected: selected,
-        //         // top: 'center'
-        //     },
-        //     xAxis: {
-        //         type: 'category',
-        //         boundaryGap: true,
-        //         data: xaxis,
-        //         axisTick: {
-        //             alignWithLabel: true
-        //         }
-        //     },
-        //     yAxis: { type: 'value' },
-        //     series: dataset
-        // })
 
         // const expands = (e) => {
         //     const data = e.series
@@ -138,23 +109,6 @@ export default defineComponent({
         // }
         // const dom = document.getElementById('char')
         // const chart = initChart(dom)
-
-        // chart.on('click', { seriesIndex: 0,  name: 'External' }, function() {
-        //     renderf
-        //     return (
-        //         h('v-chart', {
-        //             options: chartsBar
-        //         },
-        //       )
-        //     )
-        // })
-
-        const legendat = computed(() => {
-            let arobj = askdata.value
-            let prop = arobj.map(p => p.name)
-
-            return prop
-        })
 
         const sumva = computed(() => {
             let arrobj = askdata.value
@@ -185,11 +139,71 @@ export default defineComponent({
             return dataset
         })
 
+
+        const option1 = ref({
+            title: {
+                text: "Total Asal Sekolah",
+                left: "center",
+            },
+            tooltip: {
+                trigger: "item",
+                formatter: "{b} : {c} ({d}%)"
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'horizontal',
+                right: 10,
+                bottom: -5,
+                itemHeight: 12,
+                height: 100
+            },
+            animationDurationUpdate: 500,
+            dataZoom:[
+                {
+                    show: false,
+                },
+                {
+                    type: 'inside',
+                },
+                {
+                    show: false,
+                }
+            ],
+            xAxis: { show:false },
+            yAxis: { show:false},
+            series: {
+                    type: "pie",
+                    radius: "55%",
+                    id:'external',
+                    label: {
+                        position: 'outer',
+                        alignTo: 'labelLine',
+                        bleedMargin: 6
+                    },
+                    data: sumva,
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 15,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 5, 0, 0.9)'
+                        }
+                    },
+                    top: 30,
+                    bottom: 20
+            },
+            universalTransition: {
+                enabled: true,
+                divideShape: 'clone'
+            }
+
+        })
+
         onMounted(async() => {
             await axios
                 .get('/api/v1/calons/asalsekolah/')
                 .then(res => {
                     askdata.value = res.data.askdata
+                    seriesdata.value = res.data.dataseries
                     listDep.value = res.data.list_departemen
                     listProp.value = res.data.list_proses
                     listAsk.value = res.data.list_asalsekolah
@@ -201,56 +215,18 @@ export default defineComponent({
                     }
                 })
 
-            asalSekolah.value = {
-                title: {
-                    text: "Total Asal Sekolah",
-                    left: "center",
-                },
-                tooltip: {
-                    trigger: "item",
-                    formatter: "{b} : {c} ({d}%)"
-                },
-                legend: {
-                    type: 'scroll',
-                    orient: 'horizontal',
-                    right: 10,
-                    bottom: -5,
-                    itemHeight: 12,
-                    height: 100
-                },
-                series: [
-                    {
-                        type: "pie",
-                        radius: "55%",
-                        label: {
-                            position: 'outer',
-                            alignTo: 'labelLine',
-                            bleedMargin: 6
-                        },
-                        data: sumva,
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 15,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 5, 0, 0.9)'
-                            }
-                        },
-                        top: 30,
-                        bottom: 20
-                    },
-                ]
-            }
+            asalSekolah.value = option1.value
         })
 
         watchEffect(() => {
             listDep.value,
             listProp.value,
             listAsk.value,
-            askdata.value,
-            legendat,
-            asalSekolah,
+            console.log(askdata.value),
+            seriesdata.value,
+            asalSekolah.value,
             piechart
-        });
+        })
 
         const changepros = async (event) => {
             await axios
@@ -297,21 +273,81 @@ export default defineComponent({
                 })
         }
 
-        // const expands = (e) => {
-        //     const init = initChart(e.datatable)
-        //     var option = e.option.series[0].data.name
-        //     if(option == 'Eksternal') {
-        //         fa
-        //     }
+        const expands = (e) => {
+            if(e.name == 'External') {
+                const arrobj = askdata.value
 
-        //     return {
-        //         render(){
-        //             h('div',{
-        //                 option: bar.value
-        //             })
-        //         }
-        //     }
-        // }
+                let result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
+
+                asalSekolah.value = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer:{
+                            type: 'shadow',
+                            label: {
+                                show: true,
+                            },
+                        },
+                        formatter: "{b} : {c}"
+                    },
+                    xAxis: {
+                        show:true,
+                        type: 'category',
+                        boundaryGap: true,
+                        data: result.map(p => p.name),
+                    },
+                    yAxis: {
+                        show:true,
+                        type: 'value'
+                    },
+                    dataZoom: [
+                        {
+                            show: true,
+                            start: 0,
+                            end: 100,
+                            height: 20
+                        },
+                        {
+                            type: 'inside',
+                            start: 100,
+                            end: 100
+                        },
+                        {
+                            show: true,
+                            yAxisIndex: 0,
+                            filterMode: 'empty',
+                            width: 15,
+                            height: '70%',
+                            showDataShadow: false,
+                            left: '93%'
+                        }
+                    ],
+                    series: {
+                        type: 'bar',
+                        id: 'external',
+                        data: result.map(p => p.value),
+                        universalTransition: {
+                        enabled: true,
+                        divideShape: 'clone'
+                        }
+                    },
+                    graphic: [
+                        {
+                        type: 'text',
+                        left: 50,
+                        top: 20,
+                        style: {
+                            text: 'Back',
+                            fontSize: 18
+                        },
+                            onclick: function () {
+                                asalSekolah.value = option1.value;
+                            }
+                        }
+                    ]
+                }
+            }
+        }
 
         provide('dataTable', sumva)
         provide('list_departemen', listDep)
@@ -324,62 +360,14 @@ export default defineComponent({
             mdiChartBar,
             mdiTableMultiple,
             askdata,
+            seriesdata,
             asalSekolah,
             filter,
             changepros,
-            // expands,
-            // piechart
+            expands,
+            piechart
         }
     },
-  // data () {
-
-  //   let data = []
-  //   for (let i = 0; i <= 360; i++) {
-  //       let t = i / 180 * Math.PI
-  //       let r = Math.sin(2 * t) * Math.cos(2 * t)
-  //       data.push([r, i])
-  //   }
-
-  //   return {
-  //     initOptions: {
-  //       renderer: 'canvas'
-  //     },
-  //     polar: {
-  //       title: {
-  //         text: '极坐标双数值轴'
-  //       },
-  //       legend: {
-  //         data: ['line']
-  //       },
-  //       polar: {
-  //         center: ['50%', '54%']
-  //       },
-  //       tooltip: {
-  //         trigger: 'axis',
-  //         axisPointer: {
-  //           type: 'cross'
-  //         }
-  //       },
-  //       angleAxis: {
-  //         type: 'value',
-  //         startAngle: 0
-  //       },
-  //       radiusAxis: {
-  //         min: 0
-  //       },
-  //       series: [
-  //         {
-  //           coordinateSystem: 'polar',
-  //           name: 'line',
-  //           type: 'line',
-  //           showSymbol: false,
-  //           data: data
-  //         }
-  //       ],
-  //       animationDuration: 2000
-  //     }
-  //   }
-  // }
 });
 </script>
 <style>

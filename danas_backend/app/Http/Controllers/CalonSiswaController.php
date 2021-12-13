@@ -315,12 +315,15 @@ class CalonSiswaController extends Controller
         }
 
         $arraskdata = [];
+        $arrdataseries = [];
         foreach ($asalsekolah as $ask) {
             $arraskdata[] = array('value' => $ask['total'], 'name' => $ask['sekolah']);
+            $arrdataseries[] = array('name' => $ask['sekolah'], 'type' => 'bar', 'data' => $ask['total']);
         }
 
         return response()->json([
             'askdata' => $arraskdata,
+            'dataseries' => $arrdataseries,
             'list_proses' => $array_proses,
             'list_departemen' => $array_departemen,
             'list_asalsekolah' => $array_asalsekolah
