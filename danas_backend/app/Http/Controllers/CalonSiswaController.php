@@ -371,6 +371,7 @@ class CalonSiswaController extends Controller
         $count_active = [];
         $count_last = [];
         $proses_last = '';
+        $proses_active = '';
 
         foreach ($active_proses as $key => $item) {
             $proses_active = $item['proses'];
@@ -416,6 +417,7 @@ class CalonSiswaController extends Controller
 
         $count_active = [];
         $count_last = [];
+        $proses_active = '';
         $proses_last = '';
 
         foreach ($active_proses as $item) {
