@@ -9,7 +9,7 @@
       leave-to-class="opacity-0"
     >
       <div
-        class="absolute inset-0 bg-gradient-to-tr from-gray-700 via-gray-900 to-gray-700 opacity-90"
+        class="absolute inset-0 bg-gradient-to-tr from-gray-50 via-gray-50 to-gray-50 opacity-0"
         @click="overlayClick"
       ></div>
     </transition>

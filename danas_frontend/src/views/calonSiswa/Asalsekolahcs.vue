@@ -9,7 +9,7 @@
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-3 sm:max-w-full sm:w-full ">
           <card-component title="Statistik" :icon="mdiChartBar">
             <figure>
-              <v-chart ref="piechart"
+              <v-chart
                 :option="asalSekolah"
                 @click="expands"
               />
@@ -96,7 +96,6 @@ export default defineComponent({
         const listDep = ref([])
         const listProp = ref([])
         const listAsk = ref([])
-        const piechart = ref()
 
         // const expands = (e) => {
         //     const data = e.series
@@ -222,10 +221,9 @@ export default defineComponent({
             listDep.value,
             listProp.value,
             listAsk.value,
-            console.log(askdata.value),
+            askdata.value,
             seriesdata.value,
-            asalSekolah.value,
-            piechart
+            asalSekolah.value
         })
 
         const changepros = async (event) => {
@@ -273,11 +271,39 @@ export default defineComponent({
                 })
         }
 
+        const datas = computed(() => {
+            var arrobj = askdata.value
+            var result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
+            var letters = '0123456789ABCDEF'.split('');
+            var colors = [];
+            var arrdata = result.map(p => p.value)
+            for (var o = 0; o < result.length; o++){
+                var color = '#';
+                for (var i = 0; i < 6; i++ ) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                colors.push({
+                    value: arrdata[o],
+                    itemStyle: {
+                        color: color
+                    }
+                })
+            }
+
+            return colors
+        })
+
         const expands = (e) => {
             if(e.name == 'External') {
                 const arrobj = askdata.value
 
                 let result = arrobj.filter(({name}) => !name.toLowerCase().includes(('Narada').toLowerCase()))
+
+                // var colors = []
+                // for(var i = 0; i < result.length; i++ ) {
+                //     colors.push(color)
+                // }
+                console.log(datas.value)
 
                 asalSekolah.value = {
                     tooltip: {
@@ -295,6 +321,13 @@ export default defineComponent({
                         type: 'category',
                         boundaryGap: true,
                         data: result.map(p => p.name),
+                        axisLabel: {
+                            interfaval: 'auto',
+                            rotate: 30,
+                            fontsize: 10,
+                            showMinLabel: 12,
+                            showMaxLabel: 12
+                        }
                     },
                     yAxis: {
                         show:true,
@@ -313,7 +346,7 @@ export default defineComponent({
                             end: 100
                         },
                         {
-                            show: true,
+                            show: false,
                             yAxisIndex: 0,
                             filterMode: 'empty',
                             width: 15,
@@ -324,11 +357,15 @@ export default defineComponent({
                     ],
                     series: {
                         type: 'bar',
+                        radius: 'auto',
                         id: 'external',
-                        data: result.map(p => p.value),
+                        data: datas.value,
+                        top: 10,
+                        bottom: 0,
+                        large:true,
                         universalTransition: {
-                        enabled: true,
-                        divideShape: 'clone'
+                            enabled: true,
+                            divideShape: 'clone'
                         }
                     },
                     graphic: [
@@ -346,6 +383,8 @@ export default defineComponent({
                         }
                     ]
                 }
+
+                console.log(asalSekolah.value)
             }
         }
 
@@ -364,8 +403,7 @@ export default defineComponent({
             asalSekolah,
             filter,
             changepros,
-            expands,
-            piechart
+            expands
         }
     },
 });
@@ -378,7 +416,6 @@ export default defineComponent({
  */
 .echarts {
   width: 100%;
-  min-height: 550px;
-  max-height: 100%;
+  height: 400px;
 }
 </style>
