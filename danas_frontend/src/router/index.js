@@ -9,6 +9,7 @@ import achievement from '../views/calonSiswa/Achievementcs'
 import csbachievement from '../views/calonSiswa/CsbAchievement'
 
 import trendsiswa from '../views/siswa/TrendSiswa'
+import classoccupancy from '../views/siswa/ClassOccupancy'
 import agamasiswa from '../views/siswa/AgamaSiswa'
 import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 /* eslint-disable */
@@ -84,6 +85,15 @@ const routes = [
     path: '/siswa/trends',
     name: 'TrendSiswa',
     component: trendsiswa
+  },
+  {
+    meta: {
+      title: 'Dashboard - Siswa - Class Occupancy',
+      requireLogin: true
+    },
+    path: '/siswa/class-occupancy',
+    name: 'ClassOccupancy',
+    component: classoccupancy
   },
   {
     meta: {

@@ -58,7 +58,7 @@ export default [
           label: 'Trend Jumlah Siswa',
         },
         {
-          to: '/siswa/kelas',
+          to: '/siswa/class-occupancy',
           label: 'Class Occupancy',
         },
         {

@@ -44,9 +44,11 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::group(['prefix' => 'siswa'], function() {
         Route::get('/trend', 'SiswaController@trendsiswa');
+        Route::get('/class', 'SiswaController@classocp');
         Route::get('/agama', 'SiswaController@agama');
         Route::get('/listfiltersiswa', 'SiswaController@ListFilterSiswa');
         Route::get('/jmlkelastingkat', 'SiswaController@JmlKelasTingkat');
+        Route::get('/siblings', 'SiswaController@siblings');
         Route::post('/change', 'SiswaController@change');
         Route::post('/filtertrend', 'SiswaController@FilterTrend');
         Route::post('/filterag', 'SiswaController@FilterAg');
