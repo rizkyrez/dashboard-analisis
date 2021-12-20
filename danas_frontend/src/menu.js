@@ -152,6 +152,6 @@ export default [
         to: '/oustanding-ar',
         label: 'Oustanding AR',
         icon: mdiViewList
-    }
+    },
   ]
 ]

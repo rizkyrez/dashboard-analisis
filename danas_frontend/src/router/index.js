@@ -12,6 +12,7 @@ import trendsiswa from '../views/siswa/TrendSiswa'
 import classoccupancy from '../views/siswa/ClassOccupancy'
 import agamasiswa from '../views/siswa/AgamaSiswa'
 import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
+import sibling from '../views/siswa/SiblingSiswa'
 /* eslint-disable */
 const routes = [
   {
@@ -112,6 +113,15 @@ const routes = [
     path: '/siswa/agama',
     name: 'AgamaSiswa',
     component: agamasiswa
+  },
+  {
+    meta: {
+      title: 'Dashboard - Siswa - Siblings',
+      requireLogin: true
+    },
+    path: '/siswa/sibling',
+    name: 'SiblingSiswa',
+    component: sibling
   },
 //   {
 //     meta: {

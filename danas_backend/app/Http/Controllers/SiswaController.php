@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class SiswaController extends Controller
 {
@@ -126,6 +127,67 @@ class SiswaController extends Controller
         ]);
     }
 
+    public function ClassOcp() {
+        $akad = DB::connection('mysqlakad');
+
+        $main_query = "select count(s.replid) as total, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.replid";
+
+        $class_occ = $akad->select($main_query);
+
+        $class_occ = $this->changeToArr($class_occ);
+
+        // query main departemen
+        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
+     
+        // change to array  
+        $departemen = $this->changeToArr($departemen);
+
+        $array_group = [];
+        foreach ($class_occ as $key => $item) {
+            $array_group[$item['kelas']][$key] = $item;
+        }  
+
+        // print_r($tingkat);die;
+        // print_r('<br>');
+        // print_r($array_group);die;f
+
+        $arr_series = [];
+        foreach($array_group as $key => $class) { 
+            $arr_departemen = [];
+            $arr_data = [];
+            
+            foreach($departemen as $dpt) {
+                $src_data = $this->searchArrId('departemen', $dpt['departemen'], $class);
+                $total2 = (int) $src_data['total'];
+                if ($src_data != null) {
+                    $dept = null;
+                    if ($src_data['departemen'] == 'TK') { 
+                        $dept = 0;
+                    } else if ($src_data['departemen'] == 'SD') {
+                        $dept = 1;
+                    } else if ($src_data['departemen'] == 'SMP') {
+                        $dept = 2;
+                    } else if ($src_data['departemen'] == 'SMA') {
+                        $dept = 3;
+                    }
+                    $arr_data[] = array($dept,$total2);
+                }
+                $arr_departemen[] = $dpt['departemen'];
+            }
+
+            foreach ($class as $cso) {
+                $stack_data = $cso['tingkat'];
+            }
+            
+            $arr_series[] = array('name' => $key, 'id' => $key, 'type' => 'bar', 'stack' => $stack_data, 'data' => $arr_data);
+        }
+
+        return response()->json([
+            'arraydata' => $arr_series,
+            'departemen' => $arr_departemen
+        ]); 
+    }
+
     public function agama() {
         $akad = DB::connection('mysqlakad');
 
@@ -138,7 +200,7 @@ class SiswaController extends Controller
         foreach ($agama as $agd) {
             $arraydata[] = array('value' => $agd['total'], 'name' => $agd['agama']);
         }
-
+        
         return response()->json([
             'dataset' => $arraydata
         ]);
@@ -163,10 +225,10 @@ class SiswaController extends Controller
         $tingkat = $this->changeToArr($tingkat);
 
         $array_table = [];
-        $arraydata = [];
+        $arraydata = [];    
         $total_by_tahunajaran = [];
         $total_by_tingkat = [];
-        $arr_headerta = [];
+        $arr_headerta = []; 
 
         foreach($array_group as $key => $arrth) {
             $array_detail = [];
@@ -188,6 +250,7 @@ class SiswaController extends Controller
             
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;
+
         }
 
         // array for table
@@ -213,6 +276,36 @@ class SiswaController extends Controller
             'sum_thj' => $total_by_tahunajaran,
             'header' => $arr_headerta
         ],200);
+    }
+
+    public function siblings() {
+        $akad = DB::connection('mysqlakad');
+
+        $main_query = "select coutn(ss.replid) from siswa_saudara as ss inner join siswa on  inner join tahunajaran as ta on inner join departemen as dp on ta.departemen = dp.departemen";
+
+        $siblings = $akad->select($main_query);
+
+        $siblings =  $this->changeToArr($siblings);
+
+        $arrdata = [];
+        $arrdatable = [];   
+
+        foreach($siblings as $ssb) {
+            $kelas = $ssb['departemen'];
+            $east = $ssb['total'];
+
+            $arrdata[] = array('total' => $east,  'kelas' => $kelas);
+        }
+
+        // print_r($siblings);
+        // print_r($east);
+        // var_dump($arrdata);
+        // print_r("<br>");die;
+
+        return response()->json([
+            'dataseries' => $arrdata,
+            'data_table' => $arrdatable
+        ]);
     }
 
     public function change(Request $request) {
@@ -342,7 +435,7 @@ class SiswaController extends Controller
             $array_table[] = array('departemen' => $prodep['departemen'], 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
             // print_r($total_by_departemen);
         }
-        
+      
         // print_r($total_by_departemen);die;
 
         return response()->json([
@@ -408,6 +501,7 @@ class SiswaController extends Controller
         foreach ($jml_tkt_kelas as $key => $item) {
             $array_group[$item['tahunajaran']][$key] =$item;
         }
+
         
         //  where clause departemen 
         $clause_tingkat = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat : "";
@@ -434,8 +528,8 @@ class SiswaController extends Controller
                 }
                 $array_detail[] = $total;
                 $arr_total[]  = $total;
-            
             }
+
             $sum = array_sum($arr_total);
             $total_by_tahunajaran[] = $sum;
 
@@ -443,8 +537,8 @@ class SiswaController extends Controller
             
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;
-        }
 
+        }
 
         // array for table
         foreach ($tingkat as $tnkt) {
@@ -471,14 +565,32 @@ class SiswaController extends Controller
         ],200);
     } 
 
-    // public function classOccupancy() {
+    // public function filterSiblings(Request $request) {
     //     $akad = DB::connection('mysqlakad');
 
-    //     $main_query = "s";
+    //     $departemen = ($request->departmen) ? "ta.departemen = '".$request->departmen."'" : "";
+    //     $tahunajaran = ($request->tahunajaran)  ? "ta.tahunajaran = '" .$request->tahunajaran."'" : "";
 
-    //     $class_occ = $akad->select($main_query);
+    //     $main_query = "select coutn(ss.sibling) from sibling as ss inner join siswa as s on";
 
-    //     $class_acc = $this->changeToArr($class_occ);
+    //     $sibling = $akad->select($main_query);
+
+    //     $siblings = $this->changeToArr($sibling);
+
+    //     $siblings[$siblings] = $siblings['tingkat'];
+
+    //     foreach($siblings as $sbg) {
+    //         $total = $sbg['total'];
+    //         $tingkat = $sbg['tingkat'];
+    //     }
+
+    //     print_r($total,$tingkat);
+    //     print_r("<br>");
+        
+
+    //     return response()->json([
+    //         ''
+    //     ]);
     // }
 
     protected function searchArrId($field, $value, $array) {
@@ -498,9 +610,4 @@ class SiswaController extends Controller
 
         return $rconvert;
     }
-
-    protected function looping($arr) {
-
-    }
-
 }

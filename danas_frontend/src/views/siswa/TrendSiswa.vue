@@ -88,6 +88,7 @@ export default {
             })
     }
 
+
     return {
       titleStack,
       mdiTableBorder,

@@ -6,21 +6,21 @@
 
         <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
 
-        <div class="sm:col-span-1 md:col-span-2 xl:col-span-3 sm:max-w-full sm:w-full ">
-            <card-component title="Statistik" :icon="mdiChartBar">
-                <figure>
-                <v-chart
-                    :option="csbachievement"
-                />
-                </figure>
-            </card-component>
-        </div>
+            <div class="sm:col-span-1 md:col-span-2 xl:col-span-3 sm:max-w-full sm:w-full ">
+                <card-component title="Statistik" :icon="mdiChartBar">
+                    <figure>
+                    <v-chart
+                        :option="csbachievement"
+                    />
+                    </figure>
+                </card-component>
+            </div>
 
-        <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
-            <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-            <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/>
-            </card-component>
-        </div>
+            <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
+                <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
+                <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/>
+                </card-component>
+            </div>
 
         </div>
 
