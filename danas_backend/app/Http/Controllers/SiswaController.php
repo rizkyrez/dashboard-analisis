@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DeepCopy\f001\A;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -260,7 +261,7 @@ class SiswaController extends Controller
                 $src_data = $this->searchArrId('tingkat', $tnkt['tingkat'], $value);
                 $total2 = $src_data['total'];
                 if ($src_data == null) {
-                    $total2 = 0;
+                    $total2 = 0;    
                 }
                 $array_detail_table[] = $total2;
             }
@@ -280,37 +281,72 @@ class SiswaController extends Controller
 
     public function siblings() {
         $akad = DB::connection('mysqlakad');
+        
+        $main_query = "SELECT COUNT(s.replid) as total, s.kk_no as kk_no, k.kelas as kelas,t.tingkat as tingkat, ta.departemen as departemen FROM siswa_saudara AS ss INNER JOIN siswa AS s ON ss.siswa_id = s.replid INNER JOIN kelas AS k ON k.replid = s.idkelas INNER JOIN tahunajaran AS ta ON ta.replid = k.idtahunajaran INNER JOIN tingkat as t ON k.idtingkat = t.replid WHERE (s.kk_no!='' OR s.kk_no!=null) AND s.alumni = 0 AND ta.aktif = 1 GROUP BY s.kk_no ORDER BY s.kk_no ASC";
 
-        $main_query = "select coutn(ss.replid) from siswa_saudara as ss inner join siswa on  inner join tahunajaran as ta on inner join departemen as dp on ta.departemen = dp.departemen";
-
-        $siblings = $akad->select($main_query);
-
+        $siblings = $akad->select($main_query); 
         $siblings =  $this->changeToArr($siblings);
+ 
+        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
+        
+        $departemen = $this->changeToArr($departemen);
 
+        $arrgroup = [];
+        foreach($siblings as $key => $sib) {
+            $arrgroup[$sib['kk_no']][$key] = $sib;
+        } 
+
+        $arrsum = [];
+        $arrdep = [];
         $arrdata = [];
-        $arrdatable = [];   
+        foreach($arrgroup as $key => $ssb) {
+            $arrdetail = [];
+            foreach($departemen as $dpt) {
+                $src_data = $this->searchArrId('departemen', $dpt['departemen'], $ssb);
+                if($src_data == null) {
+                    $src_data['total'] = 0;
+                }
+                $arrdetail[] = $src_data['total'];
+            }   
+           
+            foreach($ssb as $sb) {
+                $kk = $sb['kk_no'];
+                $tingkat = $sb['tingkat'];
+                $kelas = $sb['kelas'];
+                $depart = $sb['departemen'];
+            }
+            $sumk = array_sum($arrdetail); 
+            // $total_kk[] = $sumk;
 
-        foreach($siblings as $ssb) {
-            $kelas = $ssb['departemen'];
-            $east = $ssb['total'];
-
-            $arrdata[] = array('total' => $east,  'kelas' => $kelas);
+            $arrdata[] = array('kk_no' => $kk, 'total' => $arrdetail, 'tingkat' => $tingkat, 'kelas' => $kelas, 'departemen' => $depart, 'grandtotal' => $sumk);
         }
 
-        // print_r($siblings);
-        // print_r($east);
-        // var_dump($arrdata);
-        // print_r("<br>");die;
-
+        foreach($departemen as $dpt) {
+            $array_detail_table = [];
+            foreach($arrgroup as $key => $ssb) {
+                $src_data = $this->searchArrId('departemen', $dpt['departemen'], $ssb);
+                $total2 = $src_data['total'];
+                if ($src_data == null) {
+                    $total2 = 0;    
+                }
+                $array_detail_table[] = $total2;
+            }  
+            $arrdep[] = $dpt['departemen'];
+            
+            $total = array_sum($array_detail_table);
+            $arrsum[] = array($dpt['departemen'] => $total);        
+        }
+            
         return response()->json([
             'dataseries' => $arrdata,
-            'data_table' => $arrdatable
+            'header' => $arrdep,
+            'sum' => $arrsum
         ]);
     }
 
     public function change(Request $request) {
-        $akad =  DB::connection('mysqlakad');
-
+        $akad = DB::connection('mysqlakad');
+        
         // fetch request
         $filter_tahunajaran = ($request->departmen) ? "where ta.departemen ='".$request->departmen."'" : "";
 
@@ -318,6 +354,7 @@ class SiswaController extends Controller
         $tahunajaran = $akad->select("select distinct ta.tahunajaran as tahunajaran from tahunajaran as ta inner join kelas as k on k.idtahunajaran = ta.replid inner join siswa as s on s.idkelas = k.replid $filter_tahunajaran group by ta.replid,ta.departemen");
 
         $array_tahunajaran = ['All'];
+
         foreach($tahunajaran as $thj) {
             $array_tahunajaran[] = $thj->tahunajaran;
         }
@@ -392,9 +429,7 @@ class SiswaController extends Controller
                $array_detail[] = array($dep['departemen'],$total);
 
                $arr_x[] = $dep['departemen'];
-        
             }
-
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
             $arraydata[] = $array_series;   
         }
@@ -436,8 +471,7 @@ class SiswaController extends Controller
             // print_r($total_by_departemen);
         }
       
-        // print_r($total_by_departemen);die;
-
+        // print_r($total_by_departemen);die;   
         return response()->json([
             'data_table' => $array_table,
             'dataset' => $arraydata, 
