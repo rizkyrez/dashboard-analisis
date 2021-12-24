@@ -305,6 +305,14 @@ export default defineComponent({
                         },
                         formatter: "{b} : {c}"
                     },
+                    // legend: {
+                    //     show: true,
+                    //     type: 'scroll',
+                    //     orient: 'horizontal',
+                    //     right: 10,
+                    //     top: 40,
+                    //     data: result.map(p => p.name),
+                    // },
                     xAxis: {
                         show:true,
                         type: 'category',

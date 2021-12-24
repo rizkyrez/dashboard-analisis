@@ -25,7 +25,7 @@
         </field>
         </div>
 
-        <div v-if="menutp === 'tingkat'" class="px-3">
+        <div v-if="menutp === 'tingkat' || menutp == 'sibling'" class="px-3">
         <field label="Tingkat">
             <control :options="listTingkat" v-model="tingkat" />
         </field>
@@ -61,9 +61,15 @@
         </field>
         </div>
 
-         <div v-else-if="category == 'calons' && menutp == 'csbachie'" class="px-3">
+        <div v-else-if="category == 'calons' && menutp == 'csbachie'" class="px-3">
         <field label="Sibling">
             <control :options="opsiSibling" v-model="sibling"/>
+        </field>
+        </div>
+
+        <div v-else-if="menutp == 'sibling'" class="px-3">
+        <field label="aktif">
+            <control :options="opsiAktif" v-model="aktifta"/>
         </field>
         </div>
 
@@ -124,6 +130,7 @@ export default {
     const agama = ref('All')
     const tahunajaran = ref('All')
     const tingkat = ref('All')
+    const aktifta = ref(1)
     const sibling = ref(1)
     const { getList, listprosachie, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
 
@@ -150,6 +157,7 @@ export default {
     // })
 
     const opsiSibling = [0,1]
+    const opsiAktif = [0,1]
 
     const opsiArea = [
         { id: 1, label: 'Kosambi' },
@@ -208,7 +216,8 @@ export default {
             agama: agama.value,
             tahunajaran: tahunajaran.value,
             tingkat: tingkat.value,
-            sibling: sibling.value
+            sibling: sibling.value,
+            aktifta: aktifta.value
         }
         emit('clickedFilter', filterData)
     };
@@ -224,6 +233,7 @@ export default {
       listTingkat,
       listprosachie,
       opsiSibling,
+      opsiAktif,
       changeProses,
       changeTahunajaran,
       clickedFilter,
@@ -234,6 +244,7 @@ export default {
       agama,
       tingkat,
       sibling,
+      aktifta,
       valu
     }
   }

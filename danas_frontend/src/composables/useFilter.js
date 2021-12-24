@@ -13,10 +13,6 @@ export default function useFilter() {
     const listprosachie = ref([])
 
     const filterData = ref([])
-    // const dataset = ref([])
-    // const datatable = ref([])
-    // const header = ref([])
-    // const sum = ref([])
 
     const getList = async () => {
         const getListFilterCalons = async () => {
@@ -25,7 +21,6 @@ export default function useFilter() {
         const getListFilterSiswa = async () => {
             return await axios.get('/api/v1/siswa/listfiltersiswa');
         }
-
         const getListProsAchie = async () => {
             return await axios.get('/api/v1/calons/achievement')
         }

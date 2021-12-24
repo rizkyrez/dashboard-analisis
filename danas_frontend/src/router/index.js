@@ -119,7 +119,7 @@ const routes = [
       title: 'Dashboard - Siswa - Siblings',
       requireLogin: true
     },
-    path: '/siswa/sibling',
+    path: '/siswa/siblings',
     name: 'SiblingSiswa',
     component: sibling
   },
