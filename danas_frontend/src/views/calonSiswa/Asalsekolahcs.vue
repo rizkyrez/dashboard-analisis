@@ -56,7 +56,6 @@ import FilterBar from '@/components/FilterBar'
 import HeroBar from '@/components/HeroBar'
 import BottomOtherPagesSection from '@/components/BottomOtherPagesSection'
 import TitleSubBar from '@/components/TitleSubBar'
-import PopupChart from '@/components/Charts/PopupChart'
 
 use([
   CanvasRenderer,
@@ -83,7 +82,6 @@ export default defineComponent({
         Notification,
         BottomOtherPagesSection,
         AsalSekolahTable,
-        PopupChart,
         VChart
     },
     setup (props) {
