@@ -599,32 +599,71 @@ class SiswaController extends Controller
         ],200);
     } 
 
-    // public function filterSiblings(Request $request) {
+    // public function filterSibling(Request $request) {
     //     $akad = DB::connection('mysqlakad');
 
-    //     $departemen = ($request->departmen) ? "ta.departemen = '".$request->departmen."'" : "";
-    //     $tahunajaran = ($request->tahunajaran)  ? "ta.tahunajaran = '" .$request->tahunajaran."'" : "";
+    //     $tingkat = ($request->tingkat) ? "t.tingkat = '".$request->tingkat."' AND" : "";
+    //     $aktif = ($request->aktifta)  ? "AND ta.aktif = ".$request->tahunajaran." : "";
 
-    //     $main_query = "select coutn(ss.sibling) from sibling as ss inner join siswa as s on";
+        // $main_query = "SELECT COUNT(s.replid) as total, s.kk_no as kk_no, k.kelas as kelas,t.tingkat as tingkat, ta.departemen as departemen FROM siswa_saudara AS ss INNER JOIN siswa AS s ON ss.siswa_id = s.replid INNER JOIN kelas AS k ON k.replid = s.idkelas INNER JOIN tahunajaran AS ta ON ta.replid = k.idtahunajaran INNER JOIN tingkat as t ON k.idtingkat = t.replid WHERE $tingkat (s.kk_no!='' OR s.kk_no!=null) AND s.alumni = 0 $aktif GROUP BY s.kk_no ORDER BY s.kk_no ASC";
 
-    //     $sibling = $akad->select($main_query);
-
-    //     $siblings = $this->changeToArr($sibling);
-
-    //     $siblings[$siblings] = $siblings['tingkat'];
-
-    //     foreach($siblings as $sbg) {
-    //         $total = $sbg['total'];
-    //         $tingkat = $sbg['tingkat'];
-    //     }
-
-    //     print_r($total,$tingkat);
-    //     print_r("<br>");
+        // $siblings = $akad->select($main_query); 
+        // $siblings =  $this->changeToArr($siblings);
+ 
+        // $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
         
+        // $departemen = $this->changeToArr($departemen);
 
-    //     return response()->json([
-    //         ''
-    //     ]);
+        // $arrgroup = [];
+        // foreach($siblings as $key => $sib) {
+        //     $arrgroup[$sib['kk_no']][$key] = $sib;
+        // } 
+
+        // $arrsum = [];
+        // $arrdep = [];
+        // $arrdata = [];
+        // foreach($arrgroup as $key => $ssb) {
+        //     $arrdetail = [];
+        //     foreach($departemen as $dpt) {
+        //         $src_data = $this->searchArrId('departemen', $dpt['departemen'], $ssb);
+        //         if($src_data == null) {
+        //             $src_data['total'] = 0;
+        //         }
+        //         $arrdetail[] = $src_data['total'];
+        //     }   
+           
+        //     foreach($ssb as $sb) {
+        //         $kk = $sb['kk_no'];
+        //         $tingkat = $sb['tingkat'];
+        //         $kelas = $sb['kelas'];
+        //         $depart = $sb['departemen'];
+        //     }
+        //     $sumk = array_sum($arrdetail); 
+        //     // $total_kk[] = $sumk;
+
+        //     $arrdata[] = array('kk_no' => $kk, 'total' => $arrdetail, 'tingkat' => $tingkat, 'kelas' => $kelas, 'departemen' => $depart, 'grandtotal' => $sumk);
+        // }
+
+        // foreach($departemen as $dpt) {
+        //     $array_detail_table = [];
+        //     foreach($arrgroup as $key => $ssb) {
+        //         $src_data = $this->searchArrId('departemen', $dpt['departemen'], $ssb);
+        //         $total2 = $src_data['total'];
+        //         if ($src_data == null) {
+        //             $total2 = 0;    
+        //         }
+        //         $array_detail_table[] = $total2;
+        //     }  
+        //     $arrdep[] = $dpt['departemen'];
+            
+        //     $total = array_sum($array_detail_table);
+        //     $arrsum[] = array($dpt['departemen'] => $total);        
+        // }
+            
+        // return response()->json([
+        //     'dataseries' => $arrdata,
+        //     'sum' => $arrsum
+        // ]);
     // }
 
     protected function searchArrId($field, $value, $array) {

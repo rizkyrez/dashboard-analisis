@@ -11,6 +11,9 @@ export default function useFilter() {
     const listagamav2 = ref([])
     const listTingkat = ref([])
     const listprosachie = ref([])
+    const listbagian = ref([])
+    const listTahunAjaran2 = ref([])
+    const listdepartemen3 = ref([])
 
     const filterData = ref([])
 
@@ -25,11 +28,16 @@ export default function useFilter() {
             return await axios.get('/api/v1/calons/achievement')
         }
 
-        Promise.all([getListFilterCalons(), getListFilterSiswa(), getListProsAchie()])
+        const getListPegawai = async () => {
+            return await axios.get('/api/v1/kepegawaian/listfilterpegawai')
+        }
+
+        Promise.all([getListFilterCalons(), getListFilterSiswa(), getListProsAchie(),getListPegawai()])
             .then(function(results) {
                 const listcalons = results[0];
                 const listsiswa = results[1];
                 const listachie = results[2];
+                const listpegawai = results[3]
 
                 listdepartemen.value = listcalons.data.list_departemen
                 listproses.value = listcalons.data.list_proses
@@ -39,6 +47,10 @@ export default function useFilter() {
                 listTahunAjaran.value = listsiswa.data.list_tahunajaran
                 listagamav2.value = listsiswa.data.list_ag
                 listTingkat.value = listsiswa.data.list_tingkat
+                listbagian.value = listpegawai.data.list_bg
+                listTahunAjaran2.value = listpegawai.data.list_tahunajaran
+                listdepartemen3.value = listpegawai.data.list_dp
+
             })
             .catch(error => {
                 alert(error.message)
@@ -87,7 +99,11 @@ export default function useFilter() {
         listTahunAjaran.value,
         listagamav2.value,
         listTingkat.value,
-        listprosachie.value
+        listprosachie.value,
+        listbagian.value,
+        listTahunAjaran2.value,
+        listdepartemen3.value,
+        getList()
     })
 
     return {
@@ -95,7 +111,10 @@ export default function useFilter() {
         listdepartemenv2,
         listproses,
         listTahunAjaran,
+        listTahunAjaran2,
         listdepartemen,
+        listdepartemen3,
+        listbagian,
         listagamav2,
         listTingkat,
         listprosachie,

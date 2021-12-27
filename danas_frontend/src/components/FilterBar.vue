@@ -19,7 +19,19 @@
         </field>
         </div>
 
-        <div v-if="category == 'siswa'" class="px-3">
+        <div v-else-if="category == 'pegawai'" class="px-3">
+        <field label="Bagian">
+            <control :options="listbagian" v-model="bagian"/>
+        </field>
+        </div>
+
+        <div v-if="category == 'pegawai'" class="px-3">
+        <field label="Departemen">
+            <control :options="listdepartemen3" v-model="departemen" />
+        </field>
+        </div>
+
+        <div v-else-if="category == 'siswa'" class="px-3">
         <field label="Departemen">
             <control :options="listdepartemenv2" v-model="departemen" @change="changeTahunajaran()" />
         </field>
@@ -49,13 +61,19 @@
         </field>
         </div>
 
+        <div v-if="category == 'pegawai' && bagian == 'akademik'" class="px-3">
+        <field label="Tahun Ajaran">
+            <control :options="listTahunAjaran2" v-model="tahunajaran" />
+        </field>
+        </div>
+
         <div v-if="menutp == 'agama' && category == 'calons'" class="px-3">
         <field label="Agama">
             <control :options="listagama" v-model="agama" />
         </field>
         </div>
 
-        <div v-if="menutp == 'agama' && category == 'siswa'" class="px-3">
+        <div v-if="menutp == 'agama' && (category == 'siswa' || category == 'pegawai')" class="px-3">
         <field label="Agama">
             <control :options="listagamav2" v-model="agama" />
         </field>
@@ -130,16 +148,18 @@ export default {
     const agama = ref('All')
     const tahunajaran = ref('All')
     const tingkat = ref('All')
+    const bagian = ref('Semua Bagian')
     const aktifta = ref(1)
     const sibling = ref(1)
-    const { getList, listprosachie, listdepartemenv2, listdepartemen, listproses, listTahunAjaran, listagama, listagamav2, listTingkat } = useFilter()
+    const { getList, listprosachie, listbagian, listdepartemenv2, listdepartemen, listdepartemen3, listproses, listTahunAjaran, listTahunAjaran2, listagama, listagamav2, listTingkat } = useFilter()
 
     watchEffect(() => {
         departemen.value,
         proses.value,
         proses2.value,
         agama.value,
-        tahunajaran.value
+        tahunajaran.value,
+        bagian.value
         if (proses.value == '' || proses.value == null || departemen.value == 'All' ) {
             proses.value = 'All'
         }
@@ -217,7 +237,8 @@ export default {
             tahunajaran: tahunajaran.value,
             tingkat: tingkat.value,
             sibling: sibling.value,
-            aktifta: aktifta.value
+            aktifta: aktifta.value,
+            bagian: bagian.value
         }
         emit('clickedFilter', filterData)
     };
@@ -226,12 +247,15 @@ export default {
       getList,
       listdepartemenv2,
       listdepartemen,
+      listdepartemen3,
       listagama,
       listagamav2,
       listproses,
       listTahunAjaran,
+      listTahunAjaran2,
       listTingkat,
       listprosachie,
+      listbagian,
       opsiSibling,
       opsiAktif,
       changeProses,
@@ -239,6 +263,7 @@ export default {
       clickedFilter,
       tahunajaran,
       departemen,
+      bagian,
       proses,
       proses2,
       agama,

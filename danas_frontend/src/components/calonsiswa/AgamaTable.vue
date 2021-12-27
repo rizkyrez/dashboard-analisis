@@ -5,6 +5,7 @@
     <tr class="bg-green-300">
       <th class="font-semibold">Agama</th>
       <th v-if="cat == 'siswa'" class="font-semibold">Total Siswa</th>
+      <th v-else-if="cat == 'pegawai'" class="font-semibold">Total Pegawai</th>
       <th v-else class="font-semibold">Total Calon Siswa</th>
     </tr>
     </thead>
@@ -18,6 +19,9 @@
       <tr>
           <td v-if="cat == 'siswa'" class="font-semibold" >
             Total Siswa
+          </td>
+          <td v-else-if="cat == 'pegawai'" class="font-semibold" >
+            Total Pegawai
           </td>
           <td v-else class="font-semibold" >
             Total Calon Siswa

@@ -120,27 +120,27 @@ export default [
   'KEPEGAWAIAN',
   [
     {
-        to: '/agama',
+        to: '/kepegawaian/agama',
         label: 'Agama',
         icon: mdiViewList
     },
     {
-        to: '/area',
+        to: '/kepegawaian/area',
         label: 'Area',
         icon: mdiViewList
     },
     {
-        to: '/pendidikan',
+        to: '/kepegawaian/pendidikan',
         label: 'Pendidikan',
         icon: mdiViewList
     },
     {
-        to: '/masa-kerja',
+        to: '/kepegawaian/masa-kerja',
         label: 'Masa Kerja',
         icon: mdiViewList
     },
     {
-        to: '/punishment',
+        to: '/kepegawaian/punishment',
         label: 'Punishment',
         icon: mdiViewList
     },

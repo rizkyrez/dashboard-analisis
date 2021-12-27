@@ -13,6 +13,12 @@ import classoccupancy from '../views/siswa/ClassOccupancy'
 import agamasiswa from '../views/siswa/AgamaSiswa'
 import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 import sibling from '../views/siswa/SiblingSiswa'
+
+// import trendsiswa from '../views/siswa/TrendSiswa'
+// import classoccupancy from '../views/siswa/ClassOccupancy'
+import agamapegawai from '../views/pegawai/AgamaPegawai'
+// import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
+// import sibling from '../views/siswa/SiblingSiswa'
 /* eslint-disable */
 const routes = [
   {
@@ -123,15 +129,15 @@ const routes = [
     name: 'SiblingSiswa',
     component: sibling
   },
-//   {
-//     meta: {
-//       title: 'Dashboard - Siswa - Agama',
-//       requireLogin: true
-//     },
-//     path: '/siswa/agama',
-//     name: 'Agama',
-//     component: agama
-//   },
+  {
+    meta: {
+      title: 'Dashboard - Kepegawaian - Agama',
+      requireLogin: true
+    },
+    path: '/kepegawaian/agama',
+    name: 'AgamaPegawai',
+    component: agamapegawai
+  },
 //   {
 //     meta: {
 //       title: 'Dashboard - Siswa - Area',
