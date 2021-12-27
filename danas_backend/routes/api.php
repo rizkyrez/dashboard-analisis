@@ -58,6 +58,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'kepegawaian'], function() {
         Route::get('/agama', 'KepegawaianController@AgamaPegawai');
         Route::get('/listfilterpegawai', 'KepegawaianController@ListFilterPegawai');
+        Route::get('/pendidikan', 'KepegawaianController@PendidikanPegawai');
         // Route::get('/jmlkelastingkat', 'SiswaController@JmlKelasTingkat');
         // Route::get('/siblings', 'SiswaController@siblings');
         // Route::post('/change', 'SiswaController@change');

@@ -29,6 +29,26 @@ class KepegawaianController extends Controller
     }
 
 
+    public function PendidikanPegawai() {
+        $sdm = DB::connection('mysqlsdm');
+
+        // main query
+        $pendidikan = $sdm->select("select count(p.replid) as total, (CASE WHEN ps.tingkat is null OR ps.tingkat = '' THEN 'NULL' ELSE ps.tingkat END) as tingkat from jbssdm.pegawai as p inner join jbssdm.pegsekolah as ps on p.nip = ps.nip inner join jbsumum.tingkatpendidikan as pd on ps.tingkat = pd.pendidikan group by ps.tingkat");
+
+        $pendidikan = $this->changeToArr($pendidikan);
+
+        $arraydata = [];
+        foreach ($pendidikan as $pdk) {
+        $arraydata[] = array('value' => $pdk['total'], 'name' => $pdk['tingkat']);
+        }
+        
+        return response()->json([
+            'dataset' => $arraydata
+        ]);
+
+    }
+
+
     public function ListFilterPegawai() {
         $akad = DB::connection('mysqlakad');
         $umum = DB::connection('mysqlumum');  

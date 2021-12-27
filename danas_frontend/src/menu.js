@@ -4,6 +4,8 @@ import {
   mdiAccountGroup,
   mdiAccountMultiple,
   mdiAccountTie,
+  mdiSchool,
+  mdiAccountBox,
   mdiDesktopMac,
   mdiAlertCircle,
   mdiMonitorClean,
@@ -122,7 +124,7 @@ export default [
     {
         to: '/kepegawaian/agama',
         label: 'Agama',
-        icon: mdiViewList
+        icon: mdiAccountBox
     },
     {
         to: '/kepegawaian/area',
@@ -132,7 +134,7 @@ export default [
     {
         to: '/kepegawaian/pendidikan',
         label: 'Pendidikan',
-        icon: mdiViewList
+        icon: mdiSchool
     },
     {
         to: '/kepegawaian/masa-kerja',

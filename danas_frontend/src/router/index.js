@@ -14,9 +14,8 @@ import agamasiswa from '../views/siswa/AgamaSiswa'
 import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 import sibling from '../views/siswa/SiblingSiswa'
 
-// import trendsiswa from '../views/siswa/TrendSiswa'
-// import classoccupancy from '../views/siswa/ClassOccupancy'
 import agamapegawai from '../views/pegawai/AgamaPegawai'
+import pendidikanpg from '../views/pegawai/PendidikanPegawai'
 // import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 // import sibling from '../views/siswa/SiblingSiswa'
 /* eslint-disable */
@@ -137,6 +136,15 @@ const routes = [
     path: '/kepegawaian/agama',
     name: 'AgamaPegawai',
     component: agamapegawai
+  },
+  {
+    meta: {
+      title: 'Dashboard - Kepegawaian - Pendidikan',
+      requireLogin: true
+    },
+    path: '/kepegawaian/pendidikan',
+    name: 'PendidikanPegawai',
+    component: pendidikanpg
   },
 //   {
 //     meta: {
