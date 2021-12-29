@@ -16,6 +16,8 @@ import sibling from '../views/siswa/SiblingSiswa'
 
 import agamapegawai from '../views/pegawai/AgamaPegawai'
 import pendidikanpg from '../views/pegawai/PendidikanPegawai'
+import masakerja from '../views/pegawai/MasaKerja'
+import anakpegawai from '../views/pegawai/AnakKaryawan'
 // import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 // import sibling from '../views/siswa/SiblingSiswa'
 /* eslint-disable */
@@ -163,6 +165,24 @@ const routes = [
     path: '/kepegawaian/pendidikan',
     name: 'PendidikanPegawai',
     component: pendidikanpg
+  },
+  {
+    meta: {
+      title: 'Dashboard - Kepegawaian - Masa Kerja Pegawai',
+      requireLogin: true
+    },
+    path: '/kepegawaian/masa-kerja',
+    name: 'MasaKerjaPegawai',
+    component: masakerja
+  },
+  {
+    meta: {
+      title: 'Dashboard - Kepegawaian - Anak Guru/Karyawan',
+      requireLogin: true
+    },
+    path: '/kepegawaian/anak-pegawai',
+    name: 'AnakKaryawan',
+    component: anakpegawai
   },
 //   {
 //     meta: {

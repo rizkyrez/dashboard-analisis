@@ -6,9 +6,9 @@ import {
   mdiAccountTie,
   mdiSchool,
   mdiAccountBox,
-  mdiDesktopMac,
+  mdiCalendarClock,
+  mdiAccountSupervisor,
   mdiAlertCircle,
-  mdiMonitorClean,
   mdiSquareEditOutline,
   mdiTable,
   mdiViewList,
@@ -137,9 +137,14 @@ export default [
         icon: mdiSchool
     },
     {
+        to: '/kepegawaian/anak-pegawai',
+        label: 'Anak Guru/Karyawan',
+        icon: mdiAccountSupervisor
+    },
+    {
         to: '/kepegawaian/masa-kerja',
         label: 'Masa Kerja',
-        icon: mdiViewList
+        icon: mdiCalendarClock
     },
     {
         to: '/kepegawaian/punishment',
