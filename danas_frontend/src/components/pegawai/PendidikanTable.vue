@@ -3,7 +3,7 @@
   <table class="border border-collapse  overflow-auto w-max-full border-green-400 text-xs">
     <thead class="flex w-full">
     <tr class="bg-green-300 flex w-full">
-      <th v-if="cat == 'maker'" class="font-semibold flex w-full">Masa Kerja (Year)</th>
+      <th v-if="cat == 'maker'" class="font-semibold flex w-full">Masa Kerja (Tahun)</th>
       <th v-else-if="cat == 'karyawan'" class="font-semibold flex w-full">Pegawai</th>
       <th v-else class="font-semibold flex w-full">Pendidikan</th>
       <th v-if="cat == 'karyawan'" class="flex w-full">Total Anak</th>

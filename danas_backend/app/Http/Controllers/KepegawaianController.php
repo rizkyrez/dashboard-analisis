@@ -69,13 +69,23 @@ class KepegawaianController extends Controller
         $sdm = DB::connection('mysqlsdm');  
 
         // main query
-        $masa_kerja = $sdm->select("select count(pkg.replid) as total, p.nip as nip, pkg.nama as nama, pkg.hubungan as hubungan from pegkeluarga as pkg inner join pegawai as p on pkg.nip = p.nip where p.aktif = 1 and pkg.hubungan = 'Orang Tua' group by p.nip");
+        $masa_kerja = $sdm->select("select count(pkg.replid) as total, p.nip as nip, pkg.hubungan as hubungan, (CASE WHEN p.bagian is null OR p.bagian = '' THEN 'NULL' ELSE bp.bagian END) as bagian from pegkeluarga as pkg inner join pegawai as p on pkg.nip = p.nip inner join bagianpegawai as bp on p.bagian = bp.bagian where p.aktif = 1 and pkg.hubungan = 'Orang Tua' group by p.bagian");
 
         $masa_kerja = $this->changeToArr($masa_kerja);
 
         $arraydata = [];
         foreach ($masa_kerja as $msk) {
-            $arraydata[] = array('value' => $msk['total'], 'name' => $msk['nama']);
+            $jenpeg = "";
+            if(($msk['bagian'] == "akademik" ) || ($msk['bagian'] == "Akademik"))  {
+                $jenpeg = "Guru";
+            }
+            else if($msk['bagian'] == "non akademik") {
+                $jenpeg = "Karyawan";
+            }
+            else if($msk['bagian'] == "NULL") {
+                $jenpeg = "NULL";
+            }
+            $arraydata[] = array('value' => $msk['total'], 'name' => $jenpeg);
         }
         
         return response()->json([

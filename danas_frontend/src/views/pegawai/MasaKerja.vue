@@ -119,7 +119,7 @@ export default defineComponent({
             padding: 8,
         },
         xAxis: {
-            name: 'Year',
+            name: 'Tahun',
             type: 'category',
             data: [],
             boundaryGap: true,
