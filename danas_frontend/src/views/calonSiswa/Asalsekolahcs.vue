@@ -229,7 +229,7 @@ export default defineComponent({
                 listProp.value = listProp.value
         }
 
-        const filter = (e) => {
+        const filter = async (e) => {
             if(e.proses == 'All' || e.proses == null || e.proses == '') {
                 e.proses = ''
             }
@@ -248,10 +248,11 @@ export default defineComponent({
                 proses: e.proses,
             }
 
-            axios
+            await axios
                 .post("/api/v1/calons/filterask/", fil)
                 .then(res => {
                     askdata.value = res.data.askdata
+                    seriesdata.value = res.data.dataseries
                 })
                 .catch(error =>{
                     console.log('something wrong')

@@ -303,7 +303,7 @@ class CalonSiswaController extends Controller
         $akad = DB::connection('mysqlakad');
 
         // fetch request
-        $filter_departemen = ($request->departmen) ? "pps.departemen ='".$request->departmen."'" : "";
+        $filter_departemen = ($request->departmen) ? "ak.departemen ='".$request->departmen."'" : "";
         $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
         $condition = ($filter_departemen && $filter_proses) ? " and " : "";
 
@@ -311,18 +311,22 @@ class CalonSiswaController extends Controller
         $clause_asalsekolah = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen.$condition.$filter_proses : "";
 
         // main query
-        $main_query = "select count(cs.replid) as total, ak.sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join asalsekolah as ak on cs.asalsekolah = ak.sekolah $clause_asalsekolah group by ak.sekolah";
+        $main_query = "select count(cs.replid) as total, (CASE WHEN cs.asalsekolah is null THEN 'NULL' ELSE ak.sekolah END) as sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid left join asalsekolah as ak on cs.asalsekolah = ak.sekolah $clause_asalsekolah group by ak.sekolah";
+        
         $asalsekolah = $akad->select($main_query);
 
         $asalsekolah = $this->changeToArr($asalsekolah);
 
         $arraskdata = [];
+        $arrdataseries = [];
         foreach ($asalsekolah as $ask) {
             $arraskdata[] = array('value' => $ask['total'], 'name' => $ask['sekolah']);
+            $arrdataseries[] = array('name' => $ask['sekolah'], 'type' => 'bar', 'data' => $ask['total']);
         }
 
         return response()->json([
             'askdata' => $arraskdata,
+            'dataseries' => $arrdataseries,
         ]);
     }
 
