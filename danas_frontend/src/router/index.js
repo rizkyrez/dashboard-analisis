@@ -22,6 +22,24 @@ import pendidikanpg from '../views/pegawai/PendidikanPegawai'
 const routes = [
   {
     meta: {
+      title: 'Analytical Code',
+      requireLogin: false
+    },
+    path: '/analytical-code',
+    name: 'analyticalCode',
+    component: () => import(/* webpackChunkName: "login" */ '../views/analyticalCode/Index')
+  },
+  {
+    meta: {
+      title: 'Analytical Code',
+      requireLogin: false
+    },
+    path: '/analytical-code/create',
+    name: 'analyticalCodeCreate',
+    component: () => import(/* webpackChunkName: "login" */ '../views/analyticalCode/analyticalCodeForm')
+  },
+  {
+    meta: {
       title: 'Dashboard',
       requireLogin: true
     },
@@ -200,7 +218,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
-    next({ name: 'Login', query: {to: to.path } });
+    //next({ name: 'Login', query: {to: to.path } });
   } else {
     next()
   }
