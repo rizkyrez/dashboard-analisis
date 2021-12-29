@@ -49,13 +49,15 @@ class KepegawaianController extends Controller
         $sdm = DB::connection('mysqlsdm');  
 
         // main query
-        $masa_kerja = $sdm->select("select count(p.replid) as total, (CASE WHEN  p.mulaikerja = '0000-00-00' THEN 'NULL' ELSE TIMESTAMPDIFF(YEAR,p.mulaikerja,CURRENT_DATE()) END) as lama_kerja from jbssdm.pegawai as p where p.aktif = 1 group by lama_kerja order by lama_kerja desc");
+        $masa_kerja = $sdm->select("select (CASE WHEN  p.mulaikerja = '0000-00-00' THEN 'NULL' ELSE TIMESTAMPDIFF(YEAR,p.mulaikerja,CURRENT_DATE()) END) as lama_kerja, count(p.replid) as total from jbssdm.pegawai as p where p.aktif = 1 group by lama_kerja order by lama_kerja desc");
 
         $masa_kerja = $this->changeToArr($masa_kerja);
 
+        asort($masa_kerja);
+
         $arraydata = [];
         foreach ($masa_kerja as $msk) {
-            $arraydata[] = array('value' => $msk['total'], 'masa_kerja' => $msk['lama_kerja']);
+            $arraydata[] = array('masa_kerja' => $msk['lama_kerja'], 'value' => $msk['total']);
         }
         
         return response()->json([

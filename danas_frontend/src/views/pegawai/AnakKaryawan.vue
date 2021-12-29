@@ -64,7 +64,6 @@ use([
   LegendComponent
 ]);
 
-
 export default defineComponent({
   name: 'AnakKaryawan',
   components: {

@@ -64,7 +64,6 @@ use([
   LegendComponent
 ]);
 
-
 export default defineComponent({
   name: 'PendidikanPegawai',
   components: {
@@ -77,14 +76,13 @@ export default defineComponent({
     BottomOtherPagesSection,
     PendidikanTable,
     VChart
-
   },
   setup (props) {
     const titleStack = ref(['Dashboard', 'Pegawai'])
     const pendidikan = ref()
     const pddata = ref([])
 
-     const legendat = computed(() => {
+    const legendat = computed(() => {
         let arobj = pddata.value
 
         let prop = arobj.map(p => p.name)
