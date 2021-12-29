@@ -54,7 +54,7 @@ class CalonSiswaController extends Controller
 
             $arr_headpros[] = $key;
             
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
+            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail, 'animationDurationUpdate' => 500, 'universalTransition' => array('enabled' =>  true, 'divideShape' =>'clone'));
             $arraydata[] = $array_series;   
         }
         // print_r($total_by_proses);
@@ -136,19 +136,6 @@ class CalonSiswaController extends Controller
 
         //  where clause departemen 
         $clause_departemen = ($filter_departemen || $filter_proses) ? "where ".$filter_departemen : "";
-
-        $second_query = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid $clause_departemen group by pps.replid, pps.departemen";
-
-        $trendcs2ds = $akad->select($second_query);
-
-        // change to array 
-        $trendcs2ds = $this->changeToArr($trendcs2ds);
-        
-        // grouping by proses
-        $array_group2 = [];
-        foreach ($trendcs2ds as $key => $item) {
-            $array_group2[$item['proses']][$key] =$item;
-        }
      
         // query main departemen
         $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen $clause_departemen order by urutan asc");
@@ -161,29 +148,8 @@ class CalonSiswaController extends Controller
         $total_by_proses = [];
         $total_by_departemen = [];
 
-        // array for series chart
-        foreach ($array_group2 as $key => $arr_proses) {
-            $array_detail = array();
-            $arr_total = [];
-            foreach ($departemen as $dep) {
-               $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_proses);
-               $total = $src_data['total'];
-               if ($src_data == null) {
-                    $total = 0;
-               }
-               $array_detail[] = array($dep['departemen'],$total);
-
-               $arr_x[] = $dep['departemen'];
-        
-            }
-
-            
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
-            $arraydata[] = $array_series;   
-        }
-
         $arr_headpros = [];
-        // array total
+        // array series chart
         foreach ($array_group as $key => $arr_proses) {
             $array_detail = array();
             $arr_total = [];
@@ -193,6 +159,7 @@ class CalonSiswaController extends Controller
                if ($src_data == null) {
                     $total = 0;
                }
+               $array_detail[] = array($dep['departemen'],$total);
                
                $arr_total[]  = $total;
         
@@ -200,6 +167,7 @@ class CalonSiswaController extends Controller
             $sum = array_sum($arr_total);
             $total_by_proses[] = $sum;
             $arr_headpros[] = $key;
+            $arraydata[] = array('name' => $key, 'type' => 'bar','data' => $array_detail, 'animationDurationUpdate' => 500, 'universalTransition' => array('enabled' =>  true, 'divideShape' =>'clone')); 
         }
 
         // array for table

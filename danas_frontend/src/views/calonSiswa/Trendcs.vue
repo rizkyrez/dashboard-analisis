@@ -30,8 +30,9 @@
 <script>
 /* eslint-disable */
 import axios from 'axios'
-import { ref, defineComponent, provide, onUpdated, nextTick} from 'vue'
+import { ref, defineComponent, provide, onUpdated, nextTick, reactive, computed, watchEffect, onMounted, watch, onBeforeUpdate} from 'vue'
 import { use } from 'echarts/core';
+import { UniversalTransition } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
 import {
@@ -62,7 +63,8 @@ use([
   DatasetComponent,
   TooltipComponent,
   GridComponent,
-  LegendComponent
+  LegendComponent,
+  UniversalTransition
 ]);
 
 
@@ -82,7 +84,77 @@ export default defineComponent({
   setup () {
     const store = useStore()
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
-    const { dataset, trendcs, datatable, sum, header, grdtotal } = useTrendCs()
+    const { dataset, datatable, sum, header, grdtotal } = useTrendCs()
+    const trendcs = ref()
+
+    const legendat = computed(() => {
+        const arrobj = dataset.value
+
+        return arrobj.map(p => p.name)
+    })
+
+    const xaxis = computed(() => {
+        const arrobj = datatable.value
+
+        return arrobj.map(p => p.departemen)
+    })
+
+    const option = ref({
+        replaceMerge: ['xAxis', 'yAxis', 'series'],
+        tooltip: {
+            trigger: 'axis',
+            axisPointer:{
+                type: 'shadow',
+                    label: {
+                        show: true
+                    }
+            },
+        },
+        grid: {
+            left: '6%',
+            right: '6%',
+            bottom: '15%',
+            top:30,
+            z: 4
+        },
+        legend: {
+            type: 'scroll',
+            orient: 'horizontal',
+            left: 'center',
+            right: '20%',
+            align: 'auto',
+            bottom: 0,
+            itemGap: 15,
+            padding: 6,
+            data: legendat,
+            // selectedMode: selectmode,
+            // selected: selected,
+            // top: 'center'
+        },
+
+        xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: xaxis,
+            axisTick: {
+                alignWithLabel: true
+            }
+        },
+        yAxis: {type: 'value'},
+        series: dataset
+    })
+
+     watchEffect(() => {
+        trendcs.value,
+        dataset.value,
+        header.value,
+        datatable.value,
+        sum.value
+    })
+
+    onMounted(() => {
+        trendcs.value = option.value
+    })
 
     const filter = async (e) => {
         if(e.proses == 'All' || e.proses == null || e.proses == '') {
@@ -111,7 +183,53 @@ export default defineComponent({
                 console.log(JSON.stringify(error))
                 alert(error.message)
             })
+
+        const arrobj = dataset.value
+        const arrobj2 = datatable.value
+
+        const dlegend = arrobj.map(p => p.name)
+        const dxaxis = arrobj2.map(p => p.departemen)
+
+        trendcs.value = {
+            replaceMerge: ['xAxis', 'yAxis', 'series'],
+            tooltip: {
+                trigger: 'item',
+            },
+            grid: {
+                left: '6%',
+                right: '6%',
+                bottom: '15%',
+                top:30,
+                z: 4
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'horizontal',
+                left: 'center',
+                align: 'auto',
+                bottom: 0,
+                itemGap: 15,
+                padding: 6,
+                data: dlegend,
+                // selectedMode: selectmode,
+                // selected: selected,
+                // top: 'center'
+            },
+
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: dxaxis,
+                axisTick: {
+                    alignWithLabel: true
+                }
+            },
+            yAxis: {type: 'value'},
+            series: dataset.value,
+        }
     }
+
+    console.log(trendcs)
 
     return {
         titleStack,
@@ -134,9 +252,8 @@ export default defineComponent({
 html {
     scroll-behavior: smooth;
 }
-
 .echarts {
   width: 100%;
-  height: 400px;
+  height: 390px;
 }
 </style>

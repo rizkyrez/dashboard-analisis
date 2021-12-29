@@ -119,7 +119,6 @@ export default function useTrendSiswa(){
     })
 
     watchEffect(() => {
-        getData,
         dataset.value,
         datatable.value,
         sum.value,

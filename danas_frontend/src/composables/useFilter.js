@@ -102,8 +102,7 @@ export default function useFilter() {
         listprosachie.value,
         listbagian.value,
         listTahunAjaran2.value,
-        listdepartemen3.value,
-        getList()
+        listdepartemen3.value
     })
 
     return {
