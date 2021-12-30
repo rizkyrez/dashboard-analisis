@@ -12,7 +12,7 @@ class SiswaController extends Controller
     public function trendsiswa() {
         $akad = DB::connection('mysqlakad');
 
-        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by ta.replid, ta.departemen');
+        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, ta.departemen');
         
         // change to array 
         $trend_siswa = $this->changeToArr($trend_siswa);
@@ -131,61 +131,63 @@ class SiswaController extends Controller
     public function ClassOcp() {
         $akad = DB::connection('mysqlakad');
 
-        $main_query = "select count(s.replid) as total, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.replid";
+        $main_query = "select count(s.replid) as total, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.tingkat order by k.replid asc";
 
         $class_occ = $akad->select($main_query);
 
         $class_occ = $this->changeToArr($class_occ);
 
         // query main departemen
-        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
+        $tingkat = $akad->select("select distinct t.tingkat from tingkat as t inner join kelas as k on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid order by t.urutan asc");
      
         // change to array  
-        $departemen = $this->changeToArr($departemen);
+        $tingkat = $this->changeToArr($tingkat);
 
-        $array_group = [];
-        foreach ($class_occ as $key => $item) {
-            $array_group[$item['kelas']][$key] = $item;
-        }  
+        $second_query = "select k.kapasitas, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.tingkat order by k.replid asc";
+
+        $class_capacity = $akad->select($second_query);
+
+        $class_capacity = $this->changeToArr($class_capacity);
+
+        // $array_group = [];
+        // $array_group2 = [];
+        // foreach ($class_occ as $key => $item) {
+        //     $array_group[$item['kelas']][$key] = $item;
+        // }  
+
+        // foreach ($class_capacity as $key => $item) {
+        //     $array_group2[$item['kelas']][$key] = $item;
+        // }  
 
         // print_r($tingkat);die;
         // print_r('<br>');
-        // print_r($array_group);die;f
+        // print_r($array_group);d
 
-        $arr_series = [];
-        foreach($array_group as $key => $class) { 
-            $arr_departemen = [];
-            $arr_data = [];
+        $arr_data = [];
+        $arr_data_cpt = [];
+        foreach($class_occ as $class) { 
+            $arr_tingkat = [];
             
-            foreach($departemen as $dpt) {
-                $src_data = $this->searchArrId('departemen', $dpt['departemen'], $class);
-                $total2 = (int) $src_data['total'];
-                if ($src_data != null) {
-                    $dept = null;
-                    if ($src_data['departemen'] == 'TK') { 
-                        $dept = 0;
-                    } else if ($src_data['departemen'] == 'SD') {
-                        $dept = 1;
-                    } else if ($src_data['departemen'] == 'SMP') {
-                        $dept = 2;
-                    } else if ($src_data['departemen'] == 'SMA') {
-                        $dept = 3;
-                    }
-                    $arr_data[] = array($dept,$total2);
-                }
-                $arr_departemen[] = $dpt['departemen'];
+            foreach ($tingkat as $tkt) {
+                $arr_tingkat[] = $tkt['tingkat'];
             }
 
-            foreach ($class as $cso) {
-                $stack_data = $cso['tingkat'];
-            }
-            
-            $arr_series[] = array('name' => $key, 'id' => $key, 'type' => 'bar', 'stack' => $stack_data, 'data' => $arr_data);
+            $arr_data[] = $class['total'];
         }
+
+        $arr_series[] =  array('name' => 'Terisi','type' => 'bar','data' => $arr_data, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside'), 'itemStyle' => array('color' => '#008f00'));
+
+        $dat_kelas = [];
+        foreach($class_capacity as $capacity) { 
+            $arr_data_cpt[] = $capacity['kapasitas'];
+            $dat_kelas[] = $capacity['kelas'];
+        }
+
+        $arr_series[] =  array('name' => 'Kapasitas','type' => 'bar','data' => $arr_data_cpt, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => -90, 'position' => 'top','align' =>  'center',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{b}  {c}", 'distance' => '32'), 'itemStyle' => array('color' => '#77aa77','opacity' => 0.5));
 
         return response()->json([
             'arraydata' => $arr_series,
-            'departemen' => $arr_departemen
+            'tingkat' => $dat_kelas
         ]); 
     }
 

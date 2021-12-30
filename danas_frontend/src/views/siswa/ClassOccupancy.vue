@@ -7,7 +7,7 @@
 
             <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-5 sm:w-1/3 md:w-full ">
                 <card-component title="Statistik" :icon="mdiChartBar">
-                    <v-chart :option="ClassOccOption" />
+                    <v-chart :option="ClassOccOption" autoresize/>
                 </card-component>
             </div>
 
@@ -80,12 +80,17 @@ export default {
         const titleStack = ref(['Dashboard', 'Siswa'])
         const changetb = ref('on')
         const seriesdata = ref([])
-        const datadep = ref([])
+        const datatkt = ref([])
 
-        // const { kelasOption, dataset, datatable, sum, header, grdtotal } = useKelas()
         const ClassOccOption = reactive({
             tooltip: {
-                trigger: 'item',
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                    label: {
+                        show: true,
+                    }
+                }
             },
             grid: {
                 left: '3%',
@@ -95,15 +100,20 @@ export default {
             },
             xAxis: [{
                 type: 'category',
-                axisLine: { onZero: true },
-                splitLine: { show: false },
-                splitArea: { show: false },
-                data: datadep
+                boundaryGap: true,
+                axisLabel: {
+                    interval: 'auto',
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    showMinLabel: 16,
+                    showMaxLabel: 26
+                },
+                data: []
             }],
             yAxis: {
                 type: 'value'
             },
-            series: seriesdata
+            series: []
         })
 
         // const color = () => {
@@ -121,36 +131,10 @@ export default {
         //     return colors
         // }
 
-        const series = computed(() => {
-            const datases = seriesdata.value
-            var dtFilterTk = datases.filter(({data}) => { return data[0].includes(0) })
-            var dtFilterSd = datases.filter(({data}) => { return data[0].includes(1) })
-
-            for (var i = 0; i < datases.length; i++) {
-                datases[i].barWidth = '4%';
-                datases[i].xAxisIndex = 0;
-                datases[i].emphasis = {
-                    focus: 'series',
-                    blurScope: 'coordinateSystem'
-                }
-            }
-
-            for(var x = 0; x < dtFilterTk.length; x++) {
-                dtFilterTk[x].barWidth = '6%';
-                dtFilterTk[x].barCategoryGap = '1%';
-            }
-
-            for(var x = 0; x < dtFilterSd.length; x++) {
-                dtFilterSd[x].barWidth = '5%';
-                dtFilterSd[x].barCategoryGap = '1%';
-            }
-
-            return datases
-        })
-
         watchEffect(() => {
-            ClassOccOption.series = series.value
-            ClassOccOption.xAxis.map(p => p.data).push(datadep.value)
+            console.log(seriesdata.value)
+            ClassOccOption.series = seriesdata.value,
+            ClassOccOption.xAxis[0].data = datatkt.value
         })
 
         onMounted(async() => {
@@ -158,7 +142,7 @@ export default {
                 .get('/api/v1/siswa/class/')
                 .then(res => {
                     seriesdata.value = res.data.arraydata
-                    datadep.value = res.data.departemen
+                    datatkt.value = res.data.tingkat
                 })
                 .catch(error => {
                     alert(error.message)
