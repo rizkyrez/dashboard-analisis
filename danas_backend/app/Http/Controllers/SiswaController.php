@@ -149,20 +149,6 @@ class SiswaController extends Controller
 
         $class_capacity = $this->changeToArr($class_capacity);
 
-        // $array_group = [];
-        // $array_group2 = [];
-        // foreach ($class_occ as $key => $item) {
-        //     $array_group[$item['kelas']][$key] = $item;
-        // }  
-
-        // foreach ($class_capacity as $key => $item) {
-        //     $array_group2[$item['kelas']][$key] = $item;
-        // }  
-
-        // print_r($tingkat);die;
-        // print_r('<br>');
-        // print_r($array_group);d
-
         $arr_data = [];
         $arr_data_cpt = [];
         foreach($class_occ as $class) { 
@@ -175,7 +161,7 @@ class SiswaController extends Controller
             $arr_data[] = $class['total'];
         }
 
-        $arr_series[] =  array('name' => 'Terisi','type' => 'bar','data' => $arr_data, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside'), 'itemStyle' => array('color' => '#008f00'));
+        $arr_series[] =  array('name' => 'Terisi','zlevel' => 0,'z' => 3,'type' => 'bar','data' => $arr_data, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside','fontSize' => '11'), 'itemStyle' => array('color' => '#005a00'));
 
         $dat_kelas = [];
         foreach($class_capacity as $capacity) { 
@@ -183,7 +169,7 @@ class SiswaController extends Controller
             $dat_kelas[] = $capacity['kelas'];
         }
 
-        $arr_series[] =  array('name' => 'Kapasitas','type' => 'bar','data' => $arr_data_cpt, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => -90, 'position' => 'top','align' =>  'center',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{b}  {c}", 'distance' => '32'), 'itemStyle' => array('color' => '#77aa77','opacity' => 0.5));
+        $arr_series[] =  array('name' => 'Kapasitas','zlevel' => 0,'z' => 0,'type' => 'bar','data' => $arr_data_cpt, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => 90, 'padding' => 8,'position' => 'top','align' =>  'left',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{c}  {b}", 'distance' => '-5'), 'itemStyle' => array('color' => '#30aa20','opacity' => 0.5));
 
         return response()->json([
             'arraydata' => $arr_series,
