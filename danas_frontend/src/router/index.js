@@ -36,9 +36,27 @@ const routes = [
       title: 'Analytical Code',
       requireLogin: false
     },
-    path: '/analytical-code/create',
-    name: 'analyticalCodeCreate',
+    path: '/analytical-code/edit/:id',
+    name: 'analyticalCodeEdit',
     component: () => import(/* webpackChunkName: "login" */ '../views/analyticalCode/analyticalCodeForm')
+  },
+  {
+    meta: {
+      title: 'Analytical Code',
+      requireLogin: false
+    },
+    path: '/analytical-code/create',
+    name: 'analyticalCodeAdd',
+    component: () => import(/* webpackChunkName: "login" */ '../views/analyticalCode/analyticalCodeForm')
+  },
+  {
+    meta: {
+      title: 'Analytical Code',
+      requireLogin: false
+    },
+    path: '/analytical-code/show/:id',
+    name: 'analyticalCodeShow',
+    component: () => import(/* webpackChunkName: "login" */ '../views/analyticalCode/analyticalCodeShow')
   },
   {
     meta: {

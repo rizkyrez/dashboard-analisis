@@ -15,5 +15,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'eslint-disable-next-line': 'off',
 	  'indent': 'off',
+    'vue/no-unused-components': 'off'
   }
 }

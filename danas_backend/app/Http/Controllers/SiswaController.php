@@ -12,7 +12,7 @@ class SiswaController extends Controller
     public function trendsiswa() {
         $akad = DB::connection('mysqlakad');
 
-        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by ta.replid, ta.departemen');
+        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, ta.departemen');
         
         // change to array 
         $trend_siswa = $this->changeToArr($trend_siswa);

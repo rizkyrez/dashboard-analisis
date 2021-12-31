@@ -2,7 +2,7 @@
   <hero-bar>Forms</hero-bar>
   <main-section>
     <card-component title="Analytical Code Form" :icon="mdiBallot" @submit.prevent="submit" form>
-
+        <control type="hidden" v-model="form.id" id="id"/>
       <field label="Name">
         <control type="text" v-model="form.name" />
       </field>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { mdiBallot, mdiBallotOutline, mdiAccount, mdiMail, mdiCheck } from '@mdi/js'
 import MainSection from '@/components/MainSection'
 import CardComponent from '@/components/CardComponent'
@@ -37,6 +37,7 @@ import JbButton from '@/components/JbButton'
 import JbButtons from '@/components/JbButtons'
 import BottomOtherPagesSection from '@/components/BottomOtherPagesSection'
 import axios from 'axios'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   name: 'Forms',
@@ -55,18 +56,52 @@ export default {
     const titleStack = ref(['Admin', 'Forms'])
 
     const form = reactive({
-      name: '',
-      description: ''
+        id: '',
+        name: '',
+        description: ''
     })
 
     const errors = ref()
 
-    const submit = async () => {
-        await axios
-            .post('/api/v1/analytical-code', form)
+    const route = useRoute()
+    const router = useRouter()
+
+    const id = route.params.id
+
+    const loadData = async () => {
+        if (id) {
+            await axios
+            .get('/api/v1/analytical-code/' + id)
             .then(response => {
                 if (response.data.success) {
-                    console.log(response)
+                    console.log(response.data.data)
+                    Object.assign(form, response.data.data)
+                }
+                // console.log(errors.value)
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(error.response.data)
+                    console.log(JSON.stringify(error.request))
+                } else if (error.message) {
+                    console.log(error.message)
+                    console.log(JSON.stringify(error.message))
+                }
+            })
+        }
+    }
+
+    const submit = async () => {
+        const url = id ? '/api/v1/analytical-code/' + form.id : '/api/v1/analytical-code'
+        const method = id ? 'PUT' : 'POST'
+        await axios({
+                method,
+                url,
+                params: form
+            })
+            .then(response => {
+                if (response.data.success) {
+                    console.log(response.data)
                 } else {
                     errors.value = response.data.errorValidations
                 }
@@ -83,6 +118,11 @@ export default {
             })
     }
 
+    onMounted(() => {
+        // get API from Laravel Backend
+        loadData()
+    })
+
     return {
       titleStack,
       form,
@@ -91,7 +131,8 @@ export default {
       mdiBallotOutline,
       mdiAccount,
       mdiMail,
-      mdiCheck
+      mdiCheck,
+      router
     }
   }
 }

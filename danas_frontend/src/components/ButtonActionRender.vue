@@ -31,7 +31,7 @@ export default {
     methods: {
         showDetail (event) {
             // the grid component can now be accessed via this.params.context.componentParent
-            this.params.context.componentParent.detailData(event, this.params.data)
+            this.params.context.componentParent.showData(event, this.params.data)
         },
         editClass (event) {
             // the grid component can now be accessed via this.params.context.componentParent

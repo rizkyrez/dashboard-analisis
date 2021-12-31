@@ -85,6 +85,6 @@ Route::group(['prefix' => 'v1'], function () {
     // });
 
     Route::resource('/analytical-code', AnalyticalCodeController::class);
-
-
+    Route::resource('/analytical-code-field', AnalyticalCodeFieldController::class);    
 });
+

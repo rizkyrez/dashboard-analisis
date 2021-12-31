@@ -118,8 +118,8 @@ class AnalyticalCodeController extends Controller
 		$updated = date("Y-m-d H:i:s A");
 
         $kelas = DB::connection('mysqlakad')->table('analytical_code_table')->where('id', '=', $request->id)->update([
-            'id' => $request->id,
             'name' => $request->name,
+            'description' => $request->description,
         ]);
 
         if($kelas) {
@@ -133,7 +133,7 @@ class AnalyticalCodeController extends Controller
         };
             return response()->json([
                 'success' => false,
-                'message' => 'Class Not Found',
+                'message' => 'Class Not Found => '.$kelas,
             ], 404);
     }
 
