@@ -7,10 +7,10 @@
 
             <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-5 sm:w-1/3 md:w-full ">
                 <card-component title="Statistik" :icon="mdiChartBar">
-                    <v-chart :option="ClassOccOption" autoresize/>
+                    <v-chart :option="ClassOccOption"/>
                 </card-component>
             </div>
-
+            <button-toggle-table color="success"></button-toggle-table>
             <div class="sm:col-span-1 md:col-span-2 xl:col-span-0 sm:max-w-full sm:w-full pr-1">
                 <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
                     <!-- <trend-table cat="kelas" typedata="kelas" :header="header" :sum="sum" :datatable="datatable" :grdtotal="grdtotal" :hgtable="changetb"/> -->
@@ -45,6 +45,7 @@ import TrendTable from '@/components/calonsiswa/TrendTable'
 import ChartKelasTingkat from '@/components/siswa/ChartKelasTingkat'
 import CardComponent from '@/components/CardComponent'
 import FilterBar from '@/components/FilterBar'
+import ButtonToggleTable from '@/components/ButtonToggleTable'
 import HeroBar from '@/components/HeroBar'
 import BottomOtherPagesSection from '@/components/BottomOtherPagesSection'
 import TitleSubBar from '@/components/TitleSubBar'
@@ -73,6 +74,7 @@ export default {
         BottomOtherPagesSection,
         TrendTable,
         ChartKelasTingkat,
+        ButtonToggleTable,
         VChart
     },
     setup(props) {
@@ -105,8 +107,6 @@ export default {
                     interval: 'auto',
                     fontSize: 11,
                     fontWeight: 'bold',
-                    showMinLabel: 16,
-                    showMaxLabel: 26
                 },
                 data: []
             }],
@@ -116,23 +116,7 @@ export default {
             series: []
         })
 
-        // const color = () => {
-        //     var arrobj = seriesdata.value
-        //     var letters = '0123456789ABCDEF'.split('');
-        //     var colors = [];
-        //     for (var o = 0; o < arrobj.length; o++){
-        //         var color = '#';
-        //         for (var i = 0; i < 6; i++ ) {
-        //             color += letters[Math.floor(Math.random() * 16)];
-        //         }
-        //         colors.push(color)
-        //     }
-
-        //     return colors
-        // }
-
         watchEffect(() => {
-            console.log(seriesdata.value)
             ClassOccOption.series = seriesdata.value,
             ClassOccOption.xAxis[0].data = datatkt.value
         })
@@ -205,7 +189,7 @@ export default {
 <style lang="postcss">
 .echarts {
     width: 100%;
-    height: 360px;
+    height: 450px;
 }
 
 </style>
