@@ -24,7 +24,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('login', 'Auth\AuthController@login');
         Route::get('refresh', 'Auth\AuthController@refresh');
         Route::get('user', 'Auth\AuthController@user')->middleware('jwt.verify');
-        Route::post('logout', 'AuthController@logout')->middleware('jwt.verify');  
+        Route::post('logout', 'Auth\AuthController@logout')->middleware('jwt.verify');  
     });
 
     Route::group(['prefix' => 'calons'], function() {
@@ -84,5 +84,7 @@ Route::group(['prefix' => 'v1'], function () {
     //     Route::post('/filtersibling', 'SiswaController@filtersibling');
     // });
 
-
+    Route::resource('/analytical-code', AnalyticalCodeController::class);
+    Route::resource('/analytical-code-field', AnalyticalCodeFieldController::class);    
 });
+

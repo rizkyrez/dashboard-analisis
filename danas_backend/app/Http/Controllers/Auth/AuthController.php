@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -18,22 +19,31 @@ class AuthController extends Controller
 
     public function login(Request $request) {
 
-        $this->validate($request, [
-            'username' => 'required',
-            'password' => 'required'
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255',
+            'password' => 'required|string|min:6',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()], 400);
+        }
+
         $username_int = $request->username;
         $pass_int = md5($request->password);
-        $user = User::where(['login' => $username_int, 'password' => $pass_int, 'aktif' => true])->first();   
-        // $credentials = ['login' => $usernamev, 'password' => $passwordv];
-        try {
-            if (!$token = $this->guard()->login( $user )) {
-                return response()->json(['status' => 'error', 'message' => 'Username or Password are invalid OR user not active']); 
-            }
-         
-        } catch(JWTException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Cannot create Token']);
+        $user = User::where(['login' => $username_int, 'password' => $pass_int, 'aktif' => true])->first();
+        
+        if(is_null($user)){
+            return response()->json(['status' => false, 'message' => ['error' => ['Username or Password Not Found']]], 400); 
         }
+
+        try {
+            if (!$token = $this->guard('api')->login( $user )) {
+                return response()->json(['status' => false, 'message' => ['error' => ['Username or Password are invalid OR user not active']]], 400); 
+            }
+        } catch(JWTException $e) {
+            return response()->json(['status' => false, 'message' => ['error' => ['Cannot create Token']]], 400);
+        }
+        
         return $this->respondWhToken($token, $user);   
     }
 

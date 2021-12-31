@@ -2,7 +2,9 @@
 
   <full-screen-section bg="login" v-slot="{ cardClass, cardRounded }">
     <card-component title="Login" :class="cardClass" :rounded="cardRounded" @submit.prevent="submit" form>
-
+      <notification  color="danger" :icon="mdiAlertCircleOutline"  v-for="(error, index) in errors" :key="index" ref="childComponentRef" >
+         {{ error[0] }}
+      </notification>
       <field label="Username" help="Please enter your login">
         <control v-model="username" :icon="mdiAccount" type="text" name="username" autocomplete="username"/>
       </field>
@@ -27,7 +29,7 @@
 
 <script>
 /* eslint-disable */
-import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import { mdiAccount, mdiAsterisk, mdiAlertCircleOutline } from '@mdi/js'
 import axios from 'axios'
 import FullScreenSection from '@/components/FullScreenSection'
 import CardComponent from '@/components/CardComponent'
@@ -36,7 +38,7 @@ import Control from '@/components/Control'
 import Divider from '@/components/Divider.vue'
 import JbButton from '@/components/JbButton'
 import JbButtons from '@/components/JbButtons'
-
+import Notification from '@/components/Notification'
 export default {
   name: 'Login',
   components: {
@@ -46,13 +48,14 @@ export default {
     Control,
     Divider,
     JbButton,
-    JbButtons
+    JbButtons,
+    Notification
   },
   setup () {
-
     return {
       mdiAccount,
-      mdiAsterisk
+      mdiAsterisk,
+      mdiAlertCircleOutline
     }
   },
   data () {
@@ -102,13 +105,8 @@ export default {
                 this.$router.push(toPath)
             })
             .catch(error => {
-                if (error.response) {
-                    alert(error.response.data)
-                    console.log(JSON.stringify(error.request))
-                } else if (error.message) {
-                    alert(error.message)
-                    console.log(JSON.stringify(error.message))
-                }
+                this.errors = error.response.data.message
+                console.log(JSON.stringify(error.response.data.message))
             })
       }
   }
