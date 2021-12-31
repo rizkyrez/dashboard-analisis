@@ -219,7 +219,7 @@ class CalonSiswaController extends Controller
 
         // fetch request
         $filter_departemen = ($request->departmen) ? "pps.departemen ='".$request->departmen."'" : "";
-        $filter_agama =    ($request->agama) ? "ag.agama ='".$request->agama."'" : "";
+        $filter_agama =     ($request->agama) ? "ag.agama ='".$request->agama."'" : "";
         $filter_proses = ($request->proses) ? "pps.proses ='".$request->proses."'" : "";
         $condition = ($filter_departemen && $filter_proses) ? " and " : "";
 
@@ -312,7 +312,7 @@ class CalonSiswaController extends Controller
 
         // main query
         $main_query = "select count(cs.replid) as total, (CASE WHEN cs.asalsekolah is null THEN 'NULL' ELSE ak.sekolah END) as sekolah, ak.departemen from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid left join asalsekolah as ak on cs.asalsekolah = ak.sekolah $clause_asalsekolah group by ak.sekolah";
-        
+
         $asalsekolah = $akad->select($main_query);
 
         $asalsekolah = $this->changeToArr($asalsekolah);
@@ -333,12 +333,12 @@ class CalonSiswaController extends Controller
     public function achievement() {
         $akad = DB::connection('mysqlakad');
 
-        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where pps.aktif = 1 group by pps.replid, pps.departemen";
+        $query_active_proses = "select count(cs.replid) as total, pps.departemen, pps.proses, ta.tglmulai from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where ta.aktif = 1 group by pps.replid";
 
         $active_proses = $akad->select($query_active_proses);
         $active_proses = $this->changeToArr($active_proses);
 
-        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where pps.aktif != 1 and ta.aktif = 1 and ta.departemen = pps.departemen group by pps.replid, pps.departemen order by pps.replid desc";
+        $query_last_proses = "select count(cs.replid) as total, pps.departemen, pps.proses, ta.tahunajaran, ta.tglmulai from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid inner join tahunajaran as ta on pps.idtahunajaran = ta.replid where ta.tglmulai < any (select ta.tglmulai from tahunajaran as ta inner join prosespenerimaansiswa as pps on pps.idtahunajaran = ta.replid where ta.aktif = 1) group by pps.replid order by pps.replid desc limit 4";
         
         $last_proses = $akad->select($query_last_proses);
         $last_proses = $this->changeToArr($last_proses);
