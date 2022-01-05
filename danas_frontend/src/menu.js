@@ -8,6 +8,7 @@ import {
   mdiAccountBox,
   mdiCalendarClock,
   mdiAccountSupervisor,
+  mdiClipboardAlert,
   mdiAlertCircle,
   mdiSquareEditOutline,
   mdiTable,
@@ -149,7 +150,7 @@ export default [
     {
         to: '/kepegawaian/punishment',
         label: 'Punishment',
-        icon: mdiViewList
+        icon: mdiClipboardAlert
     },
 
   ],

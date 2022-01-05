@@ -93,6 +93,23 @@ class KepegawaianController extends Controller
         ]); 
     }
 
+    public function SumPunishment() {
+        $sdm = DB::connection('mysqlsdm'); 
+
+        $sum_punish = $sdm->select("SELECT COUNT(trp.id) as total, stk.satker as satker, dp.departemen as dep FROM tr_punishment AS trp INNER JOIN master_violation AS mv ON mv.id=trp.violation_id INNER JOIN master_punishment AS mp ON mp.punishment_id=trp.punishment_id INNER JOIN pegawai AS p ON p.nip=trp.nip inner join jbsakad.departemen as dp on p.departement = dp.departemen inner join satker as stk on p.satker_id = stk.replid where CURRENT_DATE <= trp.expired_date group by p.departement");
+
+        $sum_punish =  $this->changeToArr($sum_punish);
+
+        $arrdata = [];
+        foreach($sum_punish as $spm) {
+            $arrdata[] = array('value' => $spm['total'],'dep' => $spm['dep'],'group' => $spm['satker']);
+        }
+
+        return response()->json([
+            'dataset' => $arrdata
+        ]);
+    }
+
     public function ListFilterPegawai() {
         $akad = DB::connection('mysqlakad');
         $umum = DB::connection('mysqlumum');  

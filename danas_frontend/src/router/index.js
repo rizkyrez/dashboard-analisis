@@ -18,7 +18,7 @@ import agamapegawai from '../views/pegawai/AgamaPegawai'
 import pendidikanpg from '../views/pegawai/PendidikanPegawai'
 import masakerja from '../views/pegawai/MasaKerja'
 import anakpegawai from '../views/pegawai/AnakKaryawan'
-// import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
+import sumpunishment from '../views/pegawai/SumPunishment'
 // import sibling from '../views/siswa/SiblingSiswa'
 /* eslint-disable */
 const routes = [
@@ -201,6 +201,15 @@ const routes = [
     path: '/kepegawaian/anak-pegawai',
     name: 'AnakKaryawan',
     component: anakpegawai
+  },
+  {
+    meta: {
+      title: 'Dashboard - Kepegawaian - Punishment',
+      requireLogin: true
+    },
+    path: '/kepegawaian/punishment',
+    name: 'SumPunishment',
+    component: sumpunishment
   },
 //   {
 //     meta: {
