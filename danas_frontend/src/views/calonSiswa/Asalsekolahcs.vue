@@ -1,6 +1,6 @@
 <template>
     <!-- eslint-disable -->
-  <hero-bar>Agama</hero-bar>
+  <hero-bar>Internal VS External</hero-bar>
   <filter-bar category="calons" @change-proses="changepros" @clicked-filter="filter"/>
   <main-section>
 
