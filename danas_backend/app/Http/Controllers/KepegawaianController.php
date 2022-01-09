@@ -105,6 +105,10 @@ class KepegawaianController extends Controller
             $arrdata[] = array('value' => $spm['total'],'dep' => $spm['dep'],'group' => $spm['satker']);
         }
 
+        if(count($arrdata) < 1 ) {
+            $arrdata[] = array('value' => 0,'dep' => '');
+        }
+
         return response()->json([
             'dataset' => $arrdata
         ]);

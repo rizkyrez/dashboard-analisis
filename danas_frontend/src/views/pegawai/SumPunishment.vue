@@ -3,7 +3,7 @@
     <hero-bar>Punishment</hero-bar>
     <main-section>
 
-        <div v-if="dataset.length >= 1" class="grid grid-cols-6 lg:w-full sm:w-full md:w-full h-full gap-3">
+        <div class="grid grid-cols-6 lg:w-full sm:w-full md:w-full h-full gap-3">
             <div v-for="dts in dataset" :key="dts" class="w-full h-full col-span-2 text-center">
                 <card-component class="h-auto">
                     <span class="inline-block subpixel-antialiased text-5xl font-bold text-center align-middle my-4">
@@ -16,15 +16,7 @@
                 </card-component>
             </div>
         </div>
-        <div v-if="dataset.length < 1" class="grid grid-cols-1 lg:w-full sm:w-full md:w-full h-full gap-3">
-            <div class="w-full h-full col-span-1 text-center">
-                <card-component class="h-auto">
-                    <span class="inline-block subpixel-antialiased text-5xl font-bold text-center align-middle my-4">
-                            0
-                    </span>
-                </card-component>
-            </div>
-        </div>
+       
 
     </main-section>
 </template>
