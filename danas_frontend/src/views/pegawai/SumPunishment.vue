@@ -4,7 +4,7 @@
     <main-section>
 
         <div class="grid grid-cols-6 lg:w-full sm:w-full md:w-full h-full gap-3">
-            <div v-for="dts in dataset" :key="dts" class="w-full h-full col-span-2 border-solid border-2 border-gray-600 text-center">
+            <div v-for="dts in dataset" :key="dts" class="w-full h-full col-span-2 border-solid border-3 border-gray-600 text-center">
                 <card-component class="h-auto">
                     <span class="inline-block subpixel-antialiased text-5xl font-bold text-center align-middle my-4">
                             {{dts.value}}
