@@ -55,6 +55,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/filtertkt', 'SiswaController@FilterTkt');
         Route::post('/filtersibling', 'SiswaController@filtersibling');
     });
+
+    Route::group(['prefix' => 'guru'], function() {
+        Route::get('/failurerp', 'GuruController@FailureReport');
+    });
+
     Route::group(['prefix' => 'kepegawaian'], function() {
         Route::get('/agama', 'KepegawaianController@AgamaPegawai');
         Route::get('/listfilterpegawai', 'KepegawaianController@ListFilterPegawai');
