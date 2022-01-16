@@ -1,7 +1,7 @@
 <template>
     <!-- eslint-disable -->
   <hero-bar>Jumlah Anak Karyawan</hero-bar>
-  <filter-bar category="pegawai" menutp="pendidikan" @clicked-filter="filter"/>
+  
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">

@@ -157,36 +157,36 @@ export default defineComponent({
         agama
     });
 
-    // const filter = async (e) => {
-    //     if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
-    //         e.tahunajaran = ''
-    //     }
+    const filter = async (e) => {
+        if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
+            e.tahunajaran = ''
+        }
 
-    //     if(e.departemen == 'All') {
-    //         e.departemen = ''
-    //         e.tahunajaran = ''
-    //     }
+        if(e.departemen == 'All') {
+            e.departemen = ''
+            e.tahunajaran = ''
+        }
 
-    //     if(e.agama == 'All') {
-    //         e.agama = ''
-    //     }
+        if(e.agama == 'All') {
+            e.agama = ''
+        }
 
-    //     const fil = {
-    //         departmen: e.departemen,
-    //         tahunajaran: e.tahunajaran,
-    //         agama: e.agama
-    //     }
+        const fil = {
+            departmen: e.departemen,
+            tahunajaran: e.tahunajaran,
+            agama: e.agama
+        }
 
-    //     await axios
-    //         .post("/api/v1/kepegawaian/filterag/", fil)
-    //         .then(res => {
-    //             agdata.value = res.data.dataset
-    //         })
-    //         .catch(error =>{
-    //             console.log('something wrong')
-    //             console.log(JSON.stringify(error))
-    //         })
-    // }
+        await axios
+            .post("/api/v1/kepegawaian/filterag/", fil)
+            .then(res => {
+                agdata.value = res.data.dataset
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error))
+            })
+    }
 
     provide('dataTable', agdata)
 
@@ -198,7 +198,7 @@ export default defineComponent({
       mdiTableMultiple,
       agdata,
       agama,
-    //   filter,
+      filter
     }
   },
 });

@@ -67,27 +67,12 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/masakerja', 'KepegawaianController@MasaKerjaPegawai');
         Route::get('/keluargapegawai', 'KepegawaianController@KeluargaPegawai');
         Route::get('/punishment', 'KepegawaianController@SumPunishment');
-        // Route::get('/siblings', 'SiswaController@siblings');
-        // Route::post('/change', 'SiswaController@change');
-        // Route::post('/filtertrend', 'SiswaController@FilterTrend');
-        // Route::post('/filterag', 'SiswaController@FilterAg');
-        // Route::post('/filtertkt', 'SiswaController@FilterTkt');
-        // Route::post('/filtersibling', 'SiswaController@filtersibling');
+        Route::post('/change', 'KepegawaianController@change');
+        Route::post('/changebagian', 'KepegawaianController@ChangeBagian');
+        Route::post('/filterag', 'KepegawaianController@FilterAg');
+        Route::post('/filterpd', 'KepegawaianController@FilterPendidikan');
+        Route::post('/filtermk', 'KepegawaianController@FilterMasaKerja');
     });
-
-    // Route::group(['prefix' => 'siswa'], function() {
-    //     Route::get('/trend', 'SiswaController@trendsiswa');
-    //     Route::get('/class', 'SiswaController@ClassOcp');
-    //     Route::get('/agama', 'SiswaController@agama');
-    //     Route::get('/listfiltersiswa', 'SiswaController@ListFilterSiswa');
-    //     Route::get('/jmlkelastingkat', 'SiswaController@JmlKelasTingkat');
-    //     Route::get('/siblings', 'SiswaController@siblings');
-    //     Route::post('/change', 'SiswaController@change');
-    //     Route::post('/filtertrend', 'SiswaController@FilterTrend');
-    //     Route::post('/filterag', 'SiswaController@FilterAg');
-    //     Route::post('/filtertkt', 'SiswaController@FilterTkt');
-    //     Route::post('/filtersibling', 'SiswaController@filtersibling');
-    // });
 
     Route::resource('/analytical-code', AnalyticalCodeController::class);
     Route::resource('/analytical-code-field', AnalyticalCodeFieldController::class);    

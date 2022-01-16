@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable -->
   <hero-bar>Masa Kerja Pegawai</hero-bar>
-  <!-- <filter-bar category="calons" @clicked-filter="filter"/> -->
+  <filter-bar category="pegawai" menutp="pendidikan" @clicked-filter="filter"/>
   <main-section>
 
     <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
@@ -83,9 +83,6 @@ export default defineComponent({
     const store = useStore()
     const titleStack = ref(['Dashboard', 'Pegawai'])
     const dataset = ref([])
-    const datatable = ref([])
-    const header = ref([])
-    const sum = ref([])
 
     const getData = async() => {
         await axios
@@ -143,100 +140,34 @@ export default defineComponent({
         getData()
     })
 
-    // const xaxis = computed(() => {
-    //     let arrobj = datatable.value
-
-    //     let dep = arrobj.map(p => p.departemen)
-
-    //     return dep
-    // })
-
-    // const legendat = computed(() => {
-    //     let arobj = dataset.value
-
-    //     let prop = arobj.map(p => p.name)
-
-    //     return prop
-    // })
-
-    // const tooltip = computed(() => {
-    //     let lenxaxis = xaxis.value.length
-
-    //     if(lenxaxis == 1) {
-    //         const atr = {
-    //             trigger: 'item'
-    //         }
-    //         return atr
-    //     }
-    //     else {
-    //         const atr = {
-    //            trigger: 'axis',
-    //             axisPointer:{
-    //                 type: 'shadow',
-    //                     label: {
-    //                         show: true
-    //                     }
-    //             }
-    //         }
-
-    //         return atr
-    //     }
-    // })
-
-    // const grdtotal = computed(() => {
-    //     const prosTotal = sum.value
-
-    //     let sumpros = prosTotal.reduce((a, v) => {
-    //         return a += v
-    //     },0)
-
-    //     return sumpros
-    // })
-
     watchEffect(() => {
         dataset.value
         workperiod.xAxis.data = dataset.value.map(p => p.masa_kerja)
         workperiod.series[0].data = dataset.value.map(p => p.value)
         workperiod
-        // header.value,
-        // datatable.value,p
-        // sum.value,
-        // tooltip,
-        // legendat,
-        // xaxis,
-        // grdtotal
     })
 
     provide('dataTable', dataset)
 
-    // const filter = async (e) => {
-    //     if(e.proses == 'All' || e.proses == null || e.proses == '') {
-    //         e.proses = ''
-    //     }
+    const filter = async (e) => {
+        if(e.departemen == 'All') {
+            e.departemen = ''  
+        }
 
-    //     if(e.departemen == 'All') {
-    //         e.departemen = ''
-    //         e.proses = ''
-    //     }
+        const fil = {
+            departemen: e.departemen,
+        }
 
-    //     const fil = {
-    //         departmen: e.departemen,
-    //         proses: e.proses
-    //     }
-
-    //     await axios
-    //         .post("/api/v1/calons/filter/", fil)
-    //         .then(res => {
-    //             dataset.value = res.data.dataset
-    //             datatable.value = res.data.data_table
-    //             sum.value = res.data.sum_pros
-    //             header.value = res.data.header
-    //         })
-    //         .catch(error =>{
-    //             console.log(JSON.stringify(error))
-    //             alert(error.message)
-    //         })
-    // }
+        await axios
+            .post("/api/v1/kepegawaian/filtermk/", fil)
+            .then(res => {
+                dataset.value = res.data.dataset
+            })
+            .catch(error =>{
+                console.log('something wrong')
+                console.log(JSON.stringify(error))
+            })
+    }
 
     return {
         titleStack,
@@ -245,11 +176,7 @@ export default defineComponent({
         mdiTableMultiple,
         dataset,
         workperiod,
-        // datatable,
-        // header,
-        // sum,
-        // grdtotal,
-        // filter
+        filter
     }
   },
 
