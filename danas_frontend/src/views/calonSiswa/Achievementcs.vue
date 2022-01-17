@@ -19,7 +19,7 @@
 
       <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
         <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-          <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/>
+          <achievement-table :header="header" :datatable="results" :grandtotal="datatable" :percentage="percentase"/>
         </card-component>
       </div>
 
@@ -77,6 +77,7 @@ export default defineComponent({
     const titleStack = ref(['Dashboard', 'Calon Siswa'])
     const datatable = ref([0,0])
     const header = ref(['',''])
+    const results = ref()
 
     const percentase = computed(() => {
         const arrobj = datatable.value
@@ -96,7 +97,7 @@ export default defineComponent({
 
     const achievement = reactive({
         title: {
-            text: "Speedometer",
+            text: "Achievement Calon Siswa",
             left: "center",
         },
         tooltip: {
@@ -168,10 +169,11 @@ export default defineComponent({
 
     onMounted(async () => {
         await axios
-            .get('/api/v1/calons/achievement')
+            .post('/api/v1/calons/achievement')
             .then(res => {
                 datatable.value = res.data.data_table
                 header.value = res.data.header
+                results.value = res.data.datatable
             })
             .catch(error => {
                 alert(error.message)
@@ -204,18 +206,32 @@ export default defineComponent({
         }
 
         const fil = {
-            departmen: e.departemen,
-            proses: e.proses2,
+            departemen: e.departemen,
+            proses_id: e.proses2
         }
 
         await axios
-            .post("/api/v1/calons/filterach/", fil)
-            .then(res => {
-                arraydata.value = res.data.data_table
+            .post('/api/v1/calons/achievement',fil)
+            .then(res => {        
+                datatable.value = res.data.data_table
+                header.value = res.data.header
+                results.value = res.data.datatable
             })
             .catch(error =>{
-                console.log('something wrong')
-                console.log(JSON.stringify(error))
+                // console.log('something wrong')
+                // console.log(JSON.stringify(error))
+                 if (error.response) {
+                    // Request made and server responded
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.log(error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.log('Error', error.message);
+                }
             })
     }
 
@@ -227,11 +243,11 @@ export default defineComponent({
       mdiTableMultiple,
       datatable,
       percentase,
-      datatable,
       grdtotal,
       header,
       achievement,
-      filter
+      filter,
+      results
     }
   },
 });

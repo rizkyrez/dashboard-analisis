@@ -31,7 +31,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/trendcs', 'CalonSiswaController@trendcs');
         Route::get('/agama', 'CalonSiswaController@agama');
         Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
-        Route::get('/achievement', 'CalonSiswaController@achievement');
+        Route::post('/achievement', 'CalonSiswaController@achievement');
         Route::get('/csbpotensial', 'CalonSiswaController@CsbAchievement');
         Route::get('/listfilter', 'CalonSiswaController@ListFilter');
         Route::post('/change', 'CalonSiswaController@change');

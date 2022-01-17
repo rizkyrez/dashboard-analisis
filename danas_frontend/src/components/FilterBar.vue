@@ -43,17 +43,18 @@
         </field>
         </div>
 
-        <div v-if="category == 'calons' && menutp != 'achie'" class="px-3">
+        <!-- <div v-if="category == 'calons' && menutp != 'achie'" class="px-3"> -->
+        <div v-if="category == 'calons' " class="px-3">
         <field label="Proses">
             <control :options="listproses" v-model="proses" :isdisable="valu"/>
         </field>
         </div>
 
-        <div v-else-if="category == 'calons' && menutp == 'achie'" class="px-3">
+        <!-- <div v-else-if="category == 'calons' && menutp == 'achie'" class="px-3">
         <field label="Proses">
             <control :options="listprosachie" v-model="proses2"/>
         </field>
-        </div>
+        </div> -->
 
         <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
         <field label="Tahun Ajaran">
@@ -196,6 +197,7 @@ export default {
         await axios
             .post('/api/v1/calons/change/', fildat)
             .then(res => {
+                console.log(res);
                 listproses.value = res.data.list_proses
             })
             .catch(error => {
