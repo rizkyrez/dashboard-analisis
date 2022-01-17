@@ -10,7 +10,7 @@ export default function useTrendCs(){
 
     const getData = async () => {
         await axios
-            .get('/api/v1/calons/trendcs/')
+            .post('/api/v1/calons/trendcs/')
             .then(res => {
                 dataset.value = res.data.dataset
                 datatable.value = res.data.data_table

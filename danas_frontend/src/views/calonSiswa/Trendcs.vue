@@ -167,12 +167,12 @@ export default defineComponent({
         }
 
         const fil = {
-            departmen: e.departemen,
-            proses: e.proses
+            departemen: e.departemen,
+            proses_id: e.proses
         }
 
         await axios
-            .post("/api/v1/calons/filter/", fil)
+            .post("/api/v1/calons/trendcs/", fil)
             .then(res => {
                 dataset.value = res.data.dataset
                 datatable.value = res.data.data_table

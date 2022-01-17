@@ -28,7 +28,7 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     Route::group(['prefix' => 'calons'], function() {
-        Route::get('/trendcs', 'CalonSiswaController@trendcs');
+        Route::post('/trendcs', 'CalonSiswaController@trendcs');
         Route::get('/agama', 'CalonSiswaController@agama');
         Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
         Route::post('/achievement', 'CalonSiswaController@achievement');

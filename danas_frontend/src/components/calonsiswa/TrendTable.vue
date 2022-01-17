@@ -31,11 +31,11 @@
                     </td>
                 </tr>
             </tbody>
-            <tbody v-else  class="flex flex-col items-center justify-between">
+            <tbody v-else  class="flex flex-col items-right">
                 <tr v-if="typedata == 'trend'" v-for="(rowData,y) in datatable" :key="rowData.departemen" class="flex w-full">
                     <td class="flex w-full">{{rowData.departemen}}</td>
                     <td v-for="detailTotal in rowData.total" :key="detailTotal" class="flex w-full">{{detailTotal}}</td>
-                    <td v-if="header.length > 1" class="flex w-full ">{{rowData.grandtotal}}</td>
+                    <td v-if="header.length > 1" class="flex w-full ">{{rowData.grandtotal}} </td>
                 </tr>
                 <tr class="flex w-full">
                     <td class="font-semibold flex w-full" v-if="cat == 'calons'">

@@ -7,34 +7,51 @@ use Illuminate\Http\Request;
 
 class CalonSiswaController extends Controller
 {
-    public function trendcs() {
+    public function trendcs(Request $request) {
         $akad =  DB::connection('mysqlakad');
+        $filter_departemen = $request->departemen;
+        $filter_proses = $request->proses_id;
         
         // main query
-        $trendcs = $akad->select("select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid group by pps.replid, pps.departemen");
+        // $trendcs = $akad->select("select count(cs.replid) as total, pps.departemen, pps.proses from calonsiswa as cs inner join prosespenerimaansiswa as pps on cs.idproses = pps.replid group by pps.replid, pps.departemen");
 
-        // $trendcs = $akad->table('calonsiswa')
-        // ->select(array('prosespenerimaansiswa.replid', 'prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.proses', DB::raw('COUNT(calonsiswa.replid) as total')))
-        // ->join('prosespenerimaansiswa','prosespenerimaansiswa.replid','=', 'calonsiswa.idproses')
-        // ->groupBy('prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.replid', 'prosespenerimaansiswa.proses')
-        // ->get();
+        $trendcs2 = $akad->table('calonsiswa')
+        ->select(array('prosespenerimaansiswa.replid', 'prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.proses', DB::raw('COUNT(calonsiswa.replid) as total')))
+        ->join('prosespenerimaansiswa','prosespenerimaansiswa.replid','=', 'calonsiswa.idproses')
+        ->when($filter_departemen, function ($query, $filter_departemen) {
+            return $query->where('prosespenerimaansiswa.departemen', $filter_departemen);
+        })
+        ->when($filter_proses, function ($query, $filter_proses) {
+            return $query->where('prosespenerimaansiswa.replid', $filter_proses);
+        })
+        ->groupBy('prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.replid', 'prosespenerimaansiswa.proses')
+        ->orderBy('prosespenerimaansiswa.replid','asc')
+        ->orderBy('prosespenerimaansiswa.departemen','asc')
+        ->get();
 
-        // print_r($trendcs);
-   
         // change to array 
-        $trendcs = $this->changeToArr($trendcs);
+//        $trendcs = $this->changeToArr($trendcs);
 
         // grouping by proses
         $array_group = [];
-        foreach ($trendcs as $key => $item) {
-            $array_group[$item['proses']][$key] =$item;
+        foreach ($trendcs2 as $key => $item) {
+            $array_group[$item->proses][$key] =$item;
         }
      
         // query main departemen
-        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc");
+        // $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join prosespenerimaansiswa as pps on dp.departemen = pps.departemen order by urutan asc");
+        $departemen = $akad->table('departemen')
+        ->select('departemen.departemen', 'departemen.replid', 'departemen.urutan')
+        ->join('prosespenerimaansiswa','prosespenerimaansiswa.departemen','=', 'departemen.departemen')
+        ->when($filter_departemen, function ($query, $filter_departemen) {
+            return $query->where('prosespenerimaansiswa.departemen', $filter_departemen);
+        })
+        ->groupBy('departemen.departemen', 'departemen.replid', 'departemen.urutan')
+        ->orderBy('departemen.urutan','asc')
+        ->get();
      
         // change to array  
-        $departemen = $this->changeToArr($departemen);
+        // $departemen = $this->changeToArr($departemen);
 
 
         $array_table = [];
@@ -43,51 +60,38 @@ class CalonSiswaController extends Controller
         $total_by_departemen = [];
         $arr_headpros = [];
 
+
         // array for series chart
         foreach ($array_group as $key => $arr_proses) {
             $array_detail = array();
             $arr_total = [];
             foreach ($departemen as $dep) {
-               $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_proses);
-               $total = $src_data['total'];
-               if ($src_data == null) {
-                    $total = 0;
-               }
-               $array_detail[] = array($dep['departemen'],$total);
+               $src_data = $this->searchObjectId('departemen', $dep->departemen, $arr_proses);
+               $total = $src_data?$src_data->total:0;
+               $array_detail[] = array($dep->departemen,$total);
                $arr_total[]  = $total;
-        
             }
             $sum = array_sum($arr_total);
             $total_by_proses[] = $sum;
-
             $arr_headpros[] = $key;
-            
             $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail, 'animationDurationUpdate' => 500, 'universalTransition' => array('enabled' =>  true, 'divideShape' =>'clone'));
             $arraydata[] = $array_series;   
         }
-        // print_r($total_by_proses);
-        // print_r('<br/>');die;
 
         // array for table
         foreach ($departemen as $prodep) {
             $array_detail_table = [];
             $array_prs = [];
             foreach ($array_group as $key => $value) {
-                $src_data = $this->searchArrId('departemen', $prodep['departemen'], $value);
-                $total2 = $src_data['total'];
-                if ($src_data == null) {
-                    $total2 = 0;
-                }
+                $src_data = $this->searchObjectId('departemen',$prodep->departemen, $value);
+                $total2 = $src_data?$src_data->total:0;
                 $array_detail_table[] = $total2;
                 $array_prs[] = $key;
             }
 
             $total_by_departemen = array_sum(array_values($array_detail_table));
-            $array_table[] = array('departemen' => $prodep['departemen'],'proses'=> $array_prs, 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
-            // print_r($total_by_departemen);
+            $array_table[] = array('departemen' => $prodep->departemen, 'proses'=> $array_prs, 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
         }
-
-        // print_r($total_by_departemen);die;
 
         return response()->json([
             'data_table' => $array_table,
@@ -158,7 +162,6 @@ class CalonSiswaController extends Controller
         $total_by_departemen = [];
 
         $arr_headpros = [];
-        // array series chart
         foreach ($array_group as $key => $arr_proses) {
             $array_detail = array();
             $arr_total = [];
@@ -193,9 +196,7 @@ class CalonSiswaController extends Controller
             }
             $total_by_departemen = array_sum(array_values($array_detail_table));
             $array_table[] = array('departemen' => $prodep['departemen'],'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
-            // print_r($total_by_departemen);
         }
-        // print_r($total_by_departemen);die;
 
         return response()->json([
             'data_table' => $array_table,
@@ -627,6 +628,15 @@ class CalonSiswaController extends Controller
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
             if ($val[$field] === $value) {
+                return $val;
+            }
+        }
+        return null;
+    }
+
+    protected function searchObjectId($field, $value, $array) {
+        foreach ($array as $val) {
+            if ($val->$field === $value) {
                 return $val;
             }
         }
