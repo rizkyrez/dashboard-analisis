@@ -95,26 +95,25 @@ export default [
       ]
     },
     {
-      to: '/tables',
       label: 'Guru',
       subLabel: 'Guru',
       icon: mdiAccountTie,
       updateMark: true,
       menu: [
         {
-          to: '/report/success-report',
+          to: '/guru/success-report',
           label: 'Succes Report',
         },
         {
-          to: '/failure-report',
+          to: '/guru/failure-report',
           label: 'Failure Report',
         },
         {
-          to: '/teacher-occupancy',
+          to: '/guru/teacher-occupancy',
           label: 'Teachers Occupancy',
         },
         {
-          to: '/administrative',
+          to: '/guru/administrative',
           label: 'Administrativ Monitoring',
         },
       ]

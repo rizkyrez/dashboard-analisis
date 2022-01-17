@@ -19,15 +19,15 @@
         </field>
         </div>
 
-        <div v-else-if="category == 'pegawai'" class="px-3">
+        <div v-else-if="category == 'pegawai' && menutp != 'agama'" class="px-3">
         <field label="Bagian">
-            <control :options="listbagian" v-model="bagian"/>
+            <control :options="listbagian" v-model="bagian" @change="changeBagian()"/>
         </field>
         </div>
 
         <div v-if="category == 'pegawai'" class="px-3">
         <field label="Departemen">
-            <control :options="listdepartemen3" v-model="departemen" />
+            <control :options="listdepartemen3" v-model="departemen" @change="changeTahunajaran2()"/>
         </field>
         </div>
 
@@ -62,7 +62,7 @@
         </field>
         </div>
 
-        <div v-if="category == 'pegawai' && bagian == 'akademik'" class="px-3">
+        <div v-if="category == 'pegawai' && menutp != 'pendidikan'" class="px-3">
         <field label="Tahun Ajaran">
             <control :options="listTahunAjaran2" v-model="tahunajaran" />
         </field>
@@ -222,6 +222,41 @@ export default {
                 console.log(JSON.stringify(error))
             })
     }
+    const changeTahunajaran2 = async () => {
+        const filterdat = {
+            departmen: departemen.value
+        }
+
+        await axios
+            .post('/api/v1/kepegawaian/change/', filterdat)
+            .then(res => {
+                listTahunAjaran2.value = res.data.list_tahunajaran
+            })
+            .catch(error => {
+                alert(error.message)
+                console.log(JSON.stringify(error))
+            })
+    }
+
+    const changeBagian = async () => {
+        if(e.bagian == 'Semua Bagian') {
+            e.bagian = ''  
+        }
+
+        const filterdat = {
+            bagian: bagian.value
+        }
+
+        await axios
+            .post('/api/v1/kepegawaian/changebagian/', filterdat)
+            .then(res => {
+                listdepartemen3.value = res.data.list_dp
+            })
+            .catch(error => {
+                alert(error.message)
+                console.log(JSON.stringify(error))
+            })
+    }
 
     const valu = computed(() => {
         if(departemen.value == 'All') {
@@ -262,6 +297,8 @@ export default {
       opsiAktif,
       changeProses,
       changeTahunajaran,
+      changeTahunajaran2,
+      changeBagian,
       clickedFilter,
       tahunajaran,
       departemen,

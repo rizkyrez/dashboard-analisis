@@ -156,124 +156,48 @@ class KepegawaianController extends Controller
         ]);
     }
 
-    public function FilterTrend(Request $request) {
-        $akad =  DB::connection('mysqlakad');
-
+    public function change(Request $request) {
+        $akad = DB::connection('mysqlakad');
+        
         // fetch request
-        $filter_departemen = ($request->departmen) ? "ta.departemen ='".$request->departmen."'" : "";
-        $filter_tahunajaran = ($request->tahunajaran) ? "ta.tahunajaran ='".$request->tahunajaran."'" : "";
-        $condition = ($filter_departemen && $filter_tahunajaran) ? " and " : "";
+        $filter_tahunajaran = ($request->departmen) ? "where ta.departemen ='".$request->departmen."'" : "";
 
-        // where clause trendcs
-        $clause_trend_siswa = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen.$condition.$filter_tahunajaran : "";
+        // query list option tahunajaran
+        $tahunajaran = $akad->select("select distinct ta.tahunajaran as tahunajaran from tahunajaran as ta inner join departemen as dp on ta.departemen = dp.departemen inner join jbssdm.pegawai as p on p.departement = dp.departemen $filter_tahunajaran group by ta.replid,ta.departemen");
 
-        // trend query
-        $main_query = "select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen $clause_trend_siswa group by ta.replid, dp.departemen";
+        $array_tahunajaran = ['All'];
 
-        $trend_siswa = $akad->select($main_query);
-
-        // change to array 
-        $trend_siswa = $this->changeToArr($trend_siswa);
-        
-        // grouping by proses
-        $array_group = [];
-        foreach ($trend_siswa as $key => $item) {
-            $array_group[$item['tahunajaran']][$key] =$item;
+        foreach($tahunajaran as $thj) {
+            $array_tahunajaran[] = $thj->tahunajaran;
         }
 
-        //  where clause departemen 
-        $clause_departemen = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen : "";
-
-        $second_query = "select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen $clause_departemen group by ta.replid, dp.departemen";
-
-        $trend_siswa2ds = $akad->select($second_query);
-
-        // change to array 
-        $trend_siswa2ds = $this->changeToArr($trend_siswa2ds);
-        
-        // grouping by proses
-        $array_group2 = [];
-        foreach ($trend_siswa2ds as $key => $item) {
-            $array_group2[$item['tahunajaran']][$key] =$item;
-        }
-     
-        // query main departemen
-        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid $clause_departemen order by urutan asc");
-     
-        // change to array  
-        $departemen = $this->changeToArr($departemen);
-
-        $array_table = [];
-        $arraydata = [];
-        $total_by_tahunajaran = [];
-        $total_by_departemen = [];
-
-        // array for series chart
-        foreach ($array_group2 as $key => $arr_tahunajaran) {
-            $array_detail = array();
-            $arr_total = [];
-            foreach ($departemen as $dep) {
-               $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_tahunajaran);
-               $total = $src_data['total'];
-               if ($src_data == null) {
-                    $total = 0;
-               }
-               $array_detail[] = array($dep['departemen'],$total);
-
-               $arr_x[] = $dep['departemen'];
-            }
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
-            $arraydata[] = $array_series;   
-        }
-
-        $arr_headerta = [];
-        // array total
-        foreach ($array_group as $key => $arr_tahunajaran) {
-            $array_detail = array();
-            $arr_total = [];
-            foreach ($departemen as $dep) {
-               $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_tahunajaran);
-               $total = $src_data['total'];
-               if ($src_data == null) {
-                    $total = 0;
-               }
-               
-               $arr_total[]  = $total;
-        
-            }
-            $sum = array_sum($arr_total);
-            $total_by_tahunajaran[] = $sum;
-            $arr_headerta[] = $key;
-        }
-
-        // array for table
-        foreach ($departemen as $prodep) {
-            $array_detail_table = [];
-            foreach ($array_group as $key => $value) {
-                $src_data = $this->searchArrId('departemen', $prodep['departemen'], $value);
-                $total2 = $src_data['total'];
-                if ($src_data == null) {
-                    $total2 = 0;
-                }
-                $array_detail_table[] = $total2;
-                $header[] = $key;
-            }
-            $total_by_departemen = array_sum(array_values($array_detail_table));
-            $array_table[] = array('departemen' => $prodep['departemen'], 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
-            // print_r($total_by_departemen);
-        }
-      
-        // print_r($total_by_departemen);die;   
         return response()->json([
-            'data_table' => $array_table,
-            'dataset' => $arraydata, 
-            'sum_ta' => $total_by_tahunajaran,
-            'header' => $arr_headerta
-        ]);
+            'list_tahunajaran' => $array_tahunajaran,
+        ],200);
+    }
+
+    public function ChangeBagian(Request $request) {
+        $sdm = DB::connection('mysqlsdm');
+        
+        // fetch request
+        $filter_bagian = ($request->bagian) ? "where p.bagian ='".$request->bagian."'" : "";
+
+        // query list option tahunajaran
+        $departemen = $sdm->select("select distinct dp.departemen as departemen from pegawai as p inner join bagianpegawai as bg on p.bagian = bg.bagian inner join jbsakad.departemen as dp on p.departement = dp.departemen $filter_bagian group by dp.departemen");
+
+        $array_departemen = ['All'];
+
+        foreach($departemen as $dpm) {
+            $array_departemen[] = $dpm->departemen;
+        }
+
+        return response()->json([
+            'list_dp' => $array_departemen,
+        ],200);
     }
 
     public function FilterAg(Request $request) {
-        $akad =  DB::connection('mysqlsdm');
+        $sdm = DB::connection('mysqlsdm');
 
         // fetch request
         $filter_departemen = ($request->departmen) ? "ta.departemen ='".$request->departmen."'" : "";
@@ -286,12 +210,10 @@ class KepegawaianController extends Controller
         } 
 
         $query_filter = (isset($condition2)) ? $filter_departemen.$condition.$filter_tahunajaran.$condition2.$filter_agama : $filter_departemen.$condition.$filter_tahunajaran;
-        $clause_agama_siswa = ($filter_departemen || $filter_tahunajaran) ? "where ".$query_filter : "";
-
-        $query_agama = "select count(s.replid) as total, ag.agama from jbsakad.siswa as s inner join jbsakad.kelas as k on s.idkelas = k.replid inner join jbsakad.tahunajaran as ta on k.idtahunajaran = ta.replid inner join jbsumum.agama as ag on s.agama = ag.agama $clause_agama_siswa group by ag.agama";
+        $clause_agama_pegawai = ($filter_departemen || $filter_tahunajaran) ? "where ".$query_filter : "";
 
         // main query
-        $agama = $akad->select($query_agama);
+        $agama = $sdm->select("select count(p.replid) as total, ag.agama as agama from jbssdm.pegawai as p left join jbsumum.agama as ag on p.agama = ag.agama inner join jbsakad.departemen as dp on p.departement = dp.departemen inner join jbsakad.tahunajaran as ta on dp.departemen = ta.departemen $clause_agama_pegawai group by ag.agama order by ag.urutan ASC");
 
         $agama = $this->changeToArr($agama);
 
@@ -299,97 +221,55 @@ class KepegawaianController extends Controller
         foreach ($agama as $agd) {
             $arraydata[] = array('value' => $agd['total'], 'name' => $agd['agama']);
         }
-
+        
         return response()->json([
             'dataset' => $arraydata
         ]);
     }
 
-    public function FilterTkt(Request $request) {
-        $akad =  DB::connection('mysqlakad');
+    public function FilterPendidikan(Request $request) {
+        $sdm = DB::connection('mysqlsdm');
 
         // fetch request
-        $filter_tingkat = ($request->tingkat)? "t.tingkat='".$request->tingkat."'" : "";
-        $filter_tahunajaran = ($request->tahunajaran) ? "ta.tahunajaran ='".$request->tahunajaran."'" : "";
-        $condition = ($filter_tingkat && $filter_tahunajaran) ? " and " : "";
-
-        // where clause tingkat
-        $clause_tingkat_kelas = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat.$condition.$filter_tahunajaran : "";
-
-        // main query
-        $main_query = "select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.    idtahunajaran = ta.replid $clause_tingkat_kelas group by ta.replid, t.tingkat";
-
-        $jml_tkt_kelas = $akad->select($main_query);
-
-        $jml_tkt_kelas = $this->changeToArr($jml_tkt_kelas);
-
-        $array_group = [];
-        foreach ($jml_tkt_kelas as $key => $item) {
-            $array_group[$item['tahunajaran']][$key] =$item;
-        }
-
+        $filter_departemen = ($request->departemen) ? "where p.departement ='".$request->departemen."'" : "";
         
-        //  where clause departemen 
-        $clause_tingkat = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat : "";
+        // main query
+        $pendidikan = $sdm->select("select count(p.replid) as total, ps.tingkat as tingkat from pegawai as p inner join pegsekolah as ps on p.nip = ps.nip inner join jbsumum.tingkatpendidikan as pd on ps.tingkat = pd.pendidikan $filter_departemen group by ps.tingkat");
 
-        // find tingkat
-        $tingkat = $akad->select("select distinct tingkat from tingkat as t inner join departemen as d on t.departemen = d.departemen inner join tahunajaran as ta on d.departemen = ta.departemen $clause_tingkat order by t.urutan asc");
+        $pendidikan = $this->changeToArr($pendidikan);
 
-        $tingkat = $this->changeToArr($tingkat);
-
-        $array_table = [];
         $arraydata = [];
-        $total_by_tahunajaran = [];
-        $total_by_tingkat = [];
-        $arr_headerta = [];
-
-        foreach($array_group as $key => $arrth) {
-            $array_detail = [];
-            $arr_total = [];
-            foreach($tingkat as $tkt) {
-                $src_data = $this->searchArrId('tingkat', $tkt['tingkat'], $arrth);
-                $total = $src_data['total'];
-                if ($src_data == null) {
-                    $total = 0;
-                }
-                $array_detail[] = $total;
-                $arr_total[]  = $total;
-            }
-
-            $sum = array_sum($arr_total);
-            $total_by_tahunajaran[] = $sum;
-
-            $arr_headerta[] = $key;
-            
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
-            $arraydata[] = $array_series;
-
+        foreach ($pendidikan as $pdk) {
+        $arraydata[] = array('value' => $pdk['total'], 'name' => $pdk['tingkat']);
         }
-
-        // array for table
-        foreach ($tingkat as $tnkt) {
-            $array_detail_table = [];
-            foreach ($array_group as $key => $value) {
-                $src_data = $this->searchArrId('tingkat', $tnkt['tingkat'], $value);
-                $total2 = $src_data['total'];
-                if ($src_data == null) {
-                    $total2 = 0;
-                }
-                $array_detail_table[] = $total2;
-            }
-
-            $total_by_tingkat = array_sum(array_values($array_detail_table));
-            $array_table[] = array('tingkat' => $tnkt['tingkat'], 'total' => $array_detail_table,'grandtotal' => $total_by_tingkat);
-            // print_r($total_by_departemen);
-        }
-
+        
         return response()->json([
-            'data_table' => $array_table,
-            'dataset' => $arraydata,    
-            'sum_thj' => $total_by_tahunajaran,
-            'header' => $arr_headerta
-        ],200);
-    } 
+            'dataset' => $arraydata
+        ]);
+    }
+
+    public function FilterMasaKerja(Request $request) {
+        $sdm = DB::connection('mysqlsdm');
+
+        // fetch request
+        $filter_departemen = ($request->departemen) ? "and p.departement ='".$request->departemen."'" : "";
+        
+        // main query
+        $masa_kerja = $sdm->select("select (CASE WHEN  p.mulaikerja = '0000-00-00' THEN 'NULL' ELSE TIMESTAMPDIFF(YEAR,p.mulaikerja,CURRENT_DATE()) END) as lama_kerja, count(p.replid) as total from jbssdm.pegawai as p where p.aktif = 1 $filter_departemen group by lama_kerja order by lama_kerja desc");
+
+        $masa_kerja = $this->changeToArr($masa_kerja);
+
+        asort($masa_kerja);
+
+        $arraydata = [];
+        foreach ($masa_kerja as $msk) {
+            $arraydata[] = array('masa_kerja' => $msk['lama_kerja'], 'value' => $msk['total']);
+        }
+        
+        return response()->json([
+            'dataset' => $arraydata
+        ]);
+    }
 
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
