@@ -521,12 +521,57 @@ class CalonSiswaController extends Controller
         ],200);
     }
 
-    public function CsbAchievement() {
+    public function CsbAchievement(Request $request) {
         $akad = DB::connection('mysqlakad');
+        $filter_departemen =$request->input('departemen');
+        $filter_proses =$request->input('proses_id');
+        $aktif = $filter_proses?false:true;
 
-        $csbsibling = $akad->select("SELECT COUNT(s.replid) AS total, dp.departemen FROM siswa AS s INNER JOIN kelas AS k ON s.idkelas = k.replid INNER JOIN tahunajaran as ta ON k.idtahunajaran = ta.replid INNER JOIN tingkat AS tk ON k.idtingkat = tk.replid INNER JOIN departemen AS dp ON ta.departemen = dp.departemen LEFT JOIN calonsiswa AS cs ON cs.kk_no = s.kk_no JOIN (SELECT MAX(t.tingkat) AS last_tingkat,t.departemen as dpq FROM `tingkat` as t INNER JOIN departemen as dp ON t.departemen = dp.departemen GROUP BY dp.departemen) as q2 WHERE dp.departemen = q2.dpq AND tk.tingkat = q2.last_tingkat AND cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' GROUP BY q2.dpq");
+        // $last_tingkat
+        $targetCsb = $akad->table('siswa as s')
+        ->select(array('d.departemen','ta.replid as idtahunajaran', DB::raw('COUNT(s.replid) as total')))
+        ->join('kelas as k', 'k.replid', '=', 's.idkelas')
+        ->join('tahunajaran as ta','ta.replid', '=', 'k.idtahunajaran')
+        ->join('tingkat as t', 't.replid', '=', 'k.idtingkat')
+        ->join('departemen as d', 'd.departemen', '=', 'ta.departemen')
+        ->join(DB::raw("(SELECT MAX(replid) as replid, departemen FROM tingkat GROUP by departemen) AS p"), function($join){
+            $join->on('t.replid','=','p.replid');
+            $join->on('ta.departemen','=','p.departemen');
+        })
+        ->where('ta.aktif', true)
+        ->groupBy('d.departemen','ta.replid')
+        ->get();
 
-        $csbsibling = $this->changeToArr($csbsibling);
+        $csb_internal = $akad->table('calonsiswa')
+            ->select(DB::raw('count(calonsiswa.replid) as total, prosespenerimaansiswa.proses, prosespenerimaansiswa.idtahunajaran,prosespenerimaansiswa.departemen'))
+            ->join('prosespenerimaansiswa', 'calonsiswa.idproses', '=', 'prosespenerimaansiswa.replid')
+            ->join('tahunajaran as ta','ta.replid', '=', 'prosespenerimaansiswa.idtahunajaran')
+            ->where('ta.aktif', true)
+            ->where('calonsiswa.asalsekolah', 'LIKE', '%narada%')
+            ->groupBy('prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.idtahunajaran', 'prosespenerimaansiswa.proses')
+            ->get();
+        
+        $proses_tahun_ajaran = $akad->table('prosespenerimaansiswa')
+        ->select('tahunajaran.replid as replid', 'tahunajaran.departemen','tahunajaran.tglmulai','tahunajaran.tahunajaran')
+        ->join('tahunajaran', 'prosespenerimaansiswa.idtahunajaran', '=', 'tahunajaran.replid')
+        ->when($aktif, function ($query, $aktif) {
+            return $query->where('tahunajaran.aktif', $aktif);
+        })
+        ->when($filter_departemen, function ($query, $filter_departemen) {
+            return $query->where('tahunajaran.departemen', $filter_departemen);
+        })
+        ->when($filter_proses, function ($query, $filter_proses) {
+            return $query->where('prosespenerimaansiswa.replid', $filter_proses);
+        })->get();
+
+        print_r($proses_tahun_ajaran);
+        foreach ($proses_tahun_ajaran as $tahun_ajaran) {
+            
+        }
+
+        // $csbsibling = $akad->select("SELECT COUNT(s.replid) AS total, dp.departemen FROM siswa AS s INNER JOIN kelas AS k ON s.idkelas = k.replid INNER JOIN tahunajaran as ta ON k.idtahunajaran = ta.replid INNER JOIN tingkat AS tk ON k.idtingkat = tk.replid INNER JOIN departemen AS dp ON ta.departemen = dp.departemen LEFT JOIN calonsiswa AS cs ON cs.kk_no = s.kk_no JOIN (SELECT MAX(t.tingkat) AS last_tingkat,t.departemen as dpq FROM `tingkat` as t INNER JOIN departemen as dp ON t.departemen = dp.departemen GROUP BY dp.departemen) as q2 WHERE dp.departemen = q2.dpq AND tk.tingkat = q2.last_tingkat AND cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' GROUP BY q2.dpq");
+
+        $csbsibling = [] ;//$this->changeToArr($csbsibling);
 
         $achievement = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid WHERE cs.asalsekolah LIKE '%narada%' GROUP BY pps.departemen");
 
