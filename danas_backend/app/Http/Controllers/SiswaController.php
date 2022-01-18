@@ -505,15 +505,15 @@ class SiswaController extends Controller
         $akad =  DB::connection('mysqlakad');
 
         // fetch request
-        $filter_tingkat = ($request->tingkat)? "t.tingkat='".$request->tingkat."'" : "";
+        $filter_departemen = ($request->departemen)? "t.departemen ='".$request->departemen."'" : "";
         $filter_tahunajaran = ($request->tahunajaran) ? "ta.tahunajaran ='".$request->tahunajaran."'" : "";
-        $condition = ($filter_tingkat && $filter_tahunajaran) ? " and " : "";
+        $condition = ($filter_departemen && $filter_tahunajaran) ? " and " : "";
 
-        // where clause tingkat
-        $clause_tingkat_kelas = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat.$condition.$filter_tahunajaran : "";
+        // where clause departemen
+        $clause_tingkat_kelas = ($filter_departemen || $filter_tahunajaran) ? "where ta.departemen = dp.departemen and ".$filter_departemen.$condition.$filter_tahunajaran : "";
 
         // main query
-        $main_query = "select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.    idtahunajaran = ta.replid $clause_tingkat_kelas group by ta.replid, t.tingkat";
+        $main_query = "select count(k.replid) as total, ta.tahunajaran as tahunajaran, t.tingkat as tingkat from kelas as k inner join tingkat as t on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on t.departemen = dp.departemen $clause_tingkat_kelas group by ta.replid, t.tingkat";
 
         $jml_tkt_kelas = $akad->select($main_query);
 
@@ -526,7 +526,7 @@ class SiswaController extends Controller
 
         
         //  where clause departemen 
-        $clause_tingkat = ($filter_tingkat || $filter_tahunajaran) ? "where ".$filter_tingkat : "";
+        $clause_tingkat = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen: "";
 
         // find tingkat
         $tingkat = $akad->select("select distinct tingkat from tingkat as t inner join departemen as d on t.departemen = d.departemen inner join tahunajaran as ta on d.departemen = ta.departemen $clause_tingkat order by t.urutan asc");
@@ -586,6 +586,63 @@ class SiswaController extends Controller
             'header' => $arr_headerta
         ],200);
     } 
+
+    public function FilterClassOcp(Request $request) {
+        $akad = DB::connection('mysqlakad');
+
+        // fetch request
+        $filter_departemen = ($request->departemen)? "dp.departemen ='".$request->departemen."'" : "";
+        $filter_tahunajaran = ($request->tahunajaran) ? "ta.tahunajaran ='".$request->tahunajaran."'" : "";
+        $condition = ($filter_departemen && $filter_tahunajaran) ? " and " : "";
+
+        // where clause departemen
+        $clause_kelas_ocp = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen.$condition.$filter_tahunajaran : "";
+
+        $main_query = "select count(s.replid) as total, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen $clause_kelas_ocp group by k.replid, t.tingkat order by k.replid asc";
+
+        $class_occ = $akad->select($main_query);
+
+        $class_occ = $this->changeToArr($class_occ);
+
+        // query main departemen
+        $tingkat = $akad->select("select distinct t.tingkat from tingkat as t inner join kelas as k on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on t.departemen = dp.departemen $clause_kelas_ocp order by t.urutan asc");
+     
+        // change to array  
+        $tingkat = $this->changeToArr($tingkat);
+
+        $second_query = "select k.kapasitas, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen $clause_kelas_ocp group by k.replid, t.tingkat order by k.replid asc";
+
+        $class_capacity = $akad->select($second_query);
+
+        $class_capacity = $this->changeToArr($class_capacity);
+
+        $arr_data = [];
+        $arr_data_cpt = [];
+        foreach($class_occ as $class) { 
+            $arr_tingkat = [];
+            
+            foreach ($tingkat as $tkt) {
+                $arr_tingkat[] = $tkt['tingkat'];
+            }
+
+            $arr_data[] = $class['total'];
+        }
+
+        $arr_series[] =  array('name' => 'Terisi','zlevel' => 0,'z' => 3,'type' => 'bar','data' => $arr_data, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside','fontSize' => '11'), 'itemStyle' => array('color' => '#005a00'));
+
+        $dat_kelas = [];
+        foreach($class_capacity as $capacity) { 
+            $arr_data_cpt[] = $capacity['kapasitas'];
+            $dat_kelas[] = $capacity['kelas'];
+        }
+
+        $arr_series[] =  array('name' => 'Kapasitas','zlevel' => 0,'z' => 0,'type' => 'bar','data' => $arr_data_cpt, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => 90, 'padding' => 8,'position' => 'top','align' =>  'left',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{c}  {b}", 'distance' => '-5'), 'itemStyle' => array('color' => '#30aa20','opacity' => 0.5));
+
+        return response()->json([
+            'arraydata' => $arr_series,
+            'tingkat' => $dat_kelas
+        ]); 
+    }
 
     // public function filterSibling(Request $request) {
     //     $akad = DB::connection('mysqlakad');

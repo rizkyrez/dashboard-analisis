@@ -1,5 +1,5 @@
 <template>
-    <bar-chart :option="options" heigth=""/>
+    <bar-chart :option="options" class="hhh"/>
 </template>
 
 <script>
@@ -17,3 +17,9 @@ export default {
     }
 }
 </script>
+
+<style lang="postcss">
+.hhh {
+    height: 550px;
+}
+</style>

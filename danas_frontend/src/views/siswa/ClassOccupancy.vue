@@ -1,7 +1,7 @@
 <template>
 <!-- eslint-disable -->
     <hero-bar>Class Occupancy</hero-bar>
-    <filter-bar menutp="tingkat" @clicked-filter="filter"/>
+    <filter-bar category="siswa" @clicked-filter="filter"/>
     <main-section>
         <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
 
@@ -135,45 +135,41 @@ export default {
                 })
         })
 
-        // const filter = async (e) => {
-        //     if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
-        //         e.tahunajaran = ''
-        //     }
+        const filter = async (e) => {
+            if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
+                e.tahunajaran = ''
+            }
 
-        //     if(e.tingkat == 'All') {
-        //         e.tingkat = ''
-        //         e.tahunajaran = ''
-        //     }
+            if(e.departemen == 'All') {
+                e.departemen = ''
+                e.tahunajaran = ''
+            }
 
-        //     const fil = {
-        //         tahunajaran: e.tahunajaran,
-        //         tingkat: e.tingkat
-        //     }
+            const fil = {
+                tahunajaran: e.tahunajaran,
+                departemen: e.departemen
+            }
 
+            await axios
+                .post("/api/v1/siswa/filterclassocp/", fil)
+                .then(res => {
+                    seriesdata.value = res.data.arraydata
+                    datatkt.value = res.data.tingkat
+                })
+                .catch(error =>{
+                    console.log(JSON.stringify(error))
+                    alert(error.message)
+                })
 
-        //     await axios
-        //         .post("/api/v1/siswa/filtertkt/", fil)
-        //         .then(res => {
-        //             dataset.value = res.data.dataset
-        //             datatable.value = res.data.data_table
-        //             sum.value = res.data.sum_thj
-        //             header.value = res.data.header
-        //         })
-        //         .catch(error =>{
-        //             console.log(JSON.stringify(error))
-        //             alert(error.message)
-        //         })
+        }
 
-        //         await nextTick()
-        //             changetb.value = ''
-        // }
-        //
         return {
             titleStack,
             mdiTableBorder,
             mdiChartBar,
             mdiTableMultiple,
             ClassOccOption,
+            filter
             // dataset,
             // datatable,
             // header,

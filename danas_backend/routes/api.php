@@ -54,6 +54,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/filterag', 'SiswaController@FilterAg');
         Route::post('/filtertkt', 'SiswaController@FilterTkt');
         Route::post('/filtersibling', 'SiswaController@filtersibling');
+        Route::post('/filterclassocp', 'SiswaController@FilterClassOcp');
     });
 
     Route::group(['prefix' => 'guru'], function() {

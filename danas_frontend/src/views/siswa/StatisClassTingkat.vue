@@ -1,12 +1,12 @@
 <template>
     <!-- eslint-disable -->
     <hero-bar>Jumlah Kelas Per Tingkat</hero-bar>
-    <filter-bar menutp="tingkat" @clicked-filter="filter"/>
+    <filter-bar category="siswa" @clicked-filter="filter"/>
     <main-section>
 
         <div class="grid md:grid-cols-4 sm:grid-cols-none xl:grid-cols-5 gap-2">
 
-            <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-3 sm:w-1/3 md:w-full ">
+            <div class="lg:w-full sm:col-span-1 md:col-span-2 xl:col-span-3 h-full sm:w-1/3 md:w-full ">
                 <card-component title="Statistik" :icon="mdiChartBar">
                     <chart-kelas-tingkat :options="kelasOption"/>
                 </card-component>
@@ -64,14 +64,15 @@ export default {
                 e.tahunajaran = ''
             }
 
-            if(e.tingkat == 'All') {
-                e.tingkat = ''
+            if(e.departemen == 'All') {
+                e.departemen = ''
                 e.tahunajaran = ''
             }
 
+
             const fil = {
                 tahunajaran: e.tahunajaran,
-                tingkat: e.tingkat
+                departemen: e.departemen
             }
 
 
