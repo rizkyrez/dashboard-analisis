@@ -56,11 +56,11 @@
         </field>
         </div> -->
 
-        <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
+        <!-- <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
         <field label="Tahun Ajaran">
             <control :options="listTahunAjaran" v-model="tahunajaran" />
         </field>
-        </div>
+        </div> -->
 
         <div v-if="category == 'pegawai' && menutp != 'pendidikan'" class="px-3">
         <field label="Tahun Ajaran">
@@ -80,11 +80,11 @@
         </field>
         </div>
 
-        <div v-else-if="category == 'calons' && menutp == 'csbachie'" class="px-3">
+        <!-- <div v-else-if="category == 'calons' && menutp == 'csbachie'" class="px-3">
         <field label="Sibling">
             <control :options="opsiSibling" v-model="sibling"/>
         </field>
-        </div>
+        </div> -->
 
         <div v-else-if="menutp == 'sibling'" class="px-3">
         <field label="aktif">

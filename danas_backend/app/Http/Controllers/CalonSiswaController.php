@@ -527,32 +527,8 @@ class CalonSiswaController extends Controller
         $filter_proses =$request->input('proses_id');
         $aktif = $filter_proses?false:true;
 
-        // $last_tingkat
-        $targetCsb = $akad->table('siswa as s')
-        ->select(array('d.departemen','ta.replid as idtahunajaran', DB::raw('COUNT(s.replid) as total')))
-        ->join('kelas as k', 'k.replid', '=', 's.idkelas')
-        ->join('tahunajaran as ta','ta.replid', '=', 'k.idtahunajaran')
-        ->join('tingkat as t', 't.replid', '=', 'k.idtingkat')
-        ->join('departemen as d', 'd.departemen', '=', 'ta.departemen')
-        ->join(DB::raw("(SELECT MAX(replid) as replid, departemen FROM tingkat GROUP by departemen) AS p"), function($join){
-            $join->on('t.replid','=','p.replid');
-            $join->on('ta.departemen','=','p.departemen');
-        })
-        ->where('ta.aktif', true)
-        ->groupBy('d.departemen','ta.replid')
-        ->get();
-
-        $csb_internal = $akad->table('calonsiswa')
-            ->select(DB::raw('count(calonsiswa.replid) as total, prosespenerimaansiswa.proses, prosespenerimaansiswa.idtahunajaran,prosespenerimaansiswa.departemen'))
-            ->join('prosespenerimaansiswa', 'calonsiswa.idproses', '=', 'prosespenerimaansiswa.replid')
-            ->join('tahunajaran as ta','ta.replid', '=', 'prosespenerimaansiswa.idtahunajaran')
-            ->where('ta.aktif', true)
-            ->where('calonsiswa.asalsekolah', 'LIKE', '%narada%')
-            ->groupBy('prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.idtahunajaran', 'prosespenerimaansiswa.proses')
-            ->get();
-        
         $proses_tahun_ajaran = $akad->table('prosespenerimaansiswa')
-        ->select('tahunajaran.replid as replid', 'tahunajaran.departemen','tahunajaran.tglmulai','tahunajaran.tahunajaran')
+        ->select('tahunajaran.replid as replid', 'tahunajaran.departemen','tahunajaran.tglmulai','tahunajaran.tahunajaran','prosespenerimaansiswa.proses')
         ->join('tahunajaran', 'prosespenerimaansiswa.idtahunajaran', '=', 'tahunajaran.replid')
         ->when($aktif, function ($query, $aktif) {
             return $query->where('tahunajaran.aktif', $aktif);
@@ -564,36 +540,94 @@ class CalonSiswaController extends Controller
             return $query->where('prosespenerimaansiswa.replid', $filter_proses);
         })->get();
 
-        print_r($proses_tahun_ajaran);
+        $datas = [];
         foreach ($proses_tahun_ajaran as $tahun_ajaran) {
+            $tahun_ajaran_before = $akad->table('tahunajaran')
+            ->where('tglmulai','<', $tahun_ajaran->tglmulai)
+            ->where('departemen','=', $tahun_ajaran->departemen)
+            ->orderBy('tglmulai', 'desc')
+            ->first();
             
+            $csb_internal = $akad->table('calonsiswa')
+            ->select(DB::raw('count(calonsiswa.replid) as total, prosespenerimaansiswa.proses, prosespenerimaansiswa.idtahunajaran,prosespenerimaansiswa.departemen'))
+            ->join('prosespenerimaansiswa', 'calonsiswa.idproses', '=', 'prosespenerimaansiswa.replid')
+            ->join('tahunajaran as ta','ta.replid', '=', 'prosespenerimaansiswa.idtahunajaran')
+            ->where('ta.replid', $tahun_ajaran->replid)
+            ->where('ta.departemen', $tahun_ajaran->departemen)
+            ->where('calonsiswa.asalsekolah', 'LIKE', '%narada%')
+            ->groupBy('prosespenerimaansiswa.departemen', 'prosespenerimaansiswa.idtahunajaran', 'prosespenerimaansiswa.proses')
+            ->first();
+
+            // $last_tingkat
+            $total_target_csb = 0;
+            $prosespenerimaansiswa_before_id = '';
+            $prosespenerimaansiswa_before_name = '';
+
+            if ($tahun_ajaran_before) {
+                $targetCsb = $akad->table('siswa as s')
+                ->select(array('d.departemen','ta.replid as idtahunajaran', 'ta.tahunajaran', DB::raw('COUNT(s.replid) as total')))
+                ->join('kelas as k', 'k.replid', '=', 's.idkelas')
+                ->join('tahunajaran as ta','ta.replid', '=', 'k.idtahunajaran')
+                ->join('tingkat as t', 't.replid', '=', 'k.idtingkat')
+                ->join('departemen as d', 'd.departemen', '=', 'ta.departemen')
+                ->join(DB::raw("(SELECT MAX(replid) as replid, departemen FROM tingkat GROUP by departemen) AS p"), function($join){
+                    $join->on('t.replid','=','p.replid');
+                    $join->on('ta.departemen','=','p.departemen');
+                })
+                ->where('ta.replid', $tahun_ajaran_before->replid)
+                ->where('ta.departemen', $tahun_ajaran_before->departemen)
+                ->groupBy('d.departemen', 'ta.replid', 'ta.tahunajaran')
+                ->first();
+
+                $total_target_csb = $targetCsb?$targetCsb->total:0;
+                $prosespenerimaansiswa_before_id = $targetCsb?$targetCsb->idtahunajaran:'';
+                $prosespenerimaansiswa_before_name = $targetCsb?$targetCsb->tahunajaran:'';;
+            }
+            
+            
+            $total_csb_internal = $csb_internal?$csb_internal->total:0;
+            $prosentase_achievement= ($total_target_csb > 0 && $total_csb_internal > 0)?(($total_csb_internal/$total_target_csb)*100):0;
+            $datas[] = array(
+                'departemen' => $tahun_ajaran->departemen,
+                'prosespenerimaansiswa_aktif_id' => $csb_internal?$csb_internal->idtahunajaran:'',
+                'prosespenerimaansiswa_aktif_name' => $tahun_ajaran?$tahun_ajaran->proses:'',
+                'total_aktif' => $total_csb_internal,
+                'prosespenerimaansiswa_before_id' => $prosespenerimaansiswa_before_id,
+                'prosespenerimaansiswa_before_name' => $prosespenerimaansiswa_before_name,
+                'total_before' => $total_target_csb,
+                'prosentase_achievement' => round($prosentase_achievement, 2).'%'
+            );
         }
 
-        // $csbsibling = $akad->select("SELECT COUNT(s.replid) AS total, dp.departemen FROM siswa AS s INNER JOIN kelas AS k ON s.idkelas = k.replid INNER JOIN tahunajaran as ta ON k.idtahunajaran = ta.replid INNER JOIN tingkat AS tk ON k.idtingkat = tk.replid INNER JOIN departemen AS dp ON ta.departemen = dp.departemen LEFT JOIN calonsiswa AS cs ON cs.kk_no = s.kk_no JOIN (SELECT MAX(t.tingkat) AS last_tingkat,t.departemen as dpq FROM `tingkat` as t INNER JOIN departemen as dp ON t.departemen = dp.departemen GROUP BY dp.departemen) as q2 WHERE dp.departemen = q2.dpq AND tk.tingkat = q2.last_tingkat AND cs.kk_no IS NOT NULL AND cs.kk_no <> '' AND s.kk_no IS NOT NULL AND s.kk_no <> '' GROUP BY q2.dpq");
 
-        $csbsibling = [] ;//$this->changeToArr($csbsibling);
+        $result = [];
+        $groupbyDepartemen = $this->group_by('departemen',$datas);
+        $grand_total_aktif = 0;
+        $grand_total_before = 0;
+        foreach ($groupbyDepartemen as $key => $item){
+            $result[] = array(
+                'departemen' => $key,
+                'data_table'=> array(
+                    $item[0]['total_before'],
+                    $item[0]['total_aktif'],
+                    $item[0]['prosentase_achievement'],
+                ),
+                'header'=> array(
+                    $item[0]['prosespenerimaansiswa_before_name'],
+                    $item[0]['prosespenerimaansiswa_aktif_name']
+                ),
+                
+            );
 
-        $achievement = $akad->select("SELECT COUNT(cs.replid) AS total, pps.departemen FROM calonsiswa AS cs INNER JOIN prosespenerimaansiswa AS pps ON cs.idproses = pps.replid WHERE cs.asalsekolah LIKE '%narada%' GROUP BY pps.departemen");
-
-        $achievement = $this->changeToArr($achievement);
-
-        $arr_csb_sibling = [];
-        $arr_achievement_internal = [];
-
-        foreach ($csbsibling as $item) {
-            $arr_csb_sibling[] = $item['total'];
+            $grand_total_aktif = $grand_total_aktif + $item[0]['total_aktif'];
+            $grand_total_before = $grand_total_before + $item[0]['total_before'];
         }
-        foreach ($achievement as $item) {
-            $arr_achievement_internal[] = $item['total'];
-        } 
 
-        $total_csbpot = array_sum($arr_csb_sibling);
-        $total_ach = array_sum($arr_achievement_internal);
-
-        $arraydata = array($total_csbpot,$total_ach);
-
+        $arraydata = array($grand_total_before, $grand_total_aktif);
         return response()->json([
-            'data_table' => $arraydata
+            'datatable' => $result,
+            'data_table' => $arraydata,
+            
         ],200);
     }
 

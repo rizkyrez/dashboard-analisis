@@ -18,7 +18,8 @@
 
             <div class="sm:col-span-1 md:col-span-2 xl:col-span-2 sm:max-w-full sm:w-full pr-1">
                 <card-component title="Tabel" :icon="mdiTableMultiple" has-table>
-                <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/>
+                <!-- <achievement-table :header="header" :datatable="datatable" :grdtotal="grdtotal" :percentage="percentase"/> -->
+                <achievement-table :header="header" :datatable="results" :grandtotal="datatable" :percentage="percentase"/>
                 </card-component>
             </div>
 
@@ -74,6 +75,7 @@ export default defineComponent({
     setup () {
         const titleStack = ref(['Dashboard', 'Calon Siswa'])
         const datatable = ref([0,0])
+        const results = ref()
         const header = ref(['Target CSB Potensial','Achievement CSB Internal'])
 
         const percentase = computed(() => {
@@ -174,9 +176,10 @@ export default defineComponent({
 
         onMounted(async () => {
             await axios
-                .get('/api/v1/calons/csbpotensial')
+                .post('/api/v1/calons/csbpotensial')
                 .then(res => {
                     datatable.value = res.data.data_table
+                    results.value = res.data.datatable
                 })
                 .catch(error => {
                     alert(error.message)
@@ -186,25 +189,28 @@ export default defineComponent({
 
 
         const filter = async (e) => {
-            if(e.proses2 == 'All' || e.proses2 == null || e.proses2 == '') {
-                e.proses2 = ''
-            }
+            // if(e.proses2 == 'All' || e.proses2 == null || e.proses2 == '') {
+            //     e.proses = ''
+            // }
 
             if(e.departemen == 'All') {
-                e.departemen = ''
-                e.proses2 = ''
+                e.departemen = null
+                e.proses = null
             }
 
             const fil = {
-                departmen: e.departemen,
-                proses: e.proses2,
-                sibling: e.sibling
+                departemen: e.departemen,
+                proses_id: e.proses?e.proses.id:null
             }
 
+            console.log(fil);
+
+            
             await axios
-                .post("/api/v1/calons/filtercsb/", fil)
+                .post("/api/v1/calons/csbpotensial/", fil)
                 .then(res => {
-                    arraydata.value = res.data.data_table
+                    datatable.value = res.data.data_table
+                    results.value = res.data.datatable
                 })
                 .catch(error =>{
                     console.log('something wrong')
@@ -224,7 +230,8 @@ export default defineComponent({
             grdtotal,
             header,
             csbachievement,
-            filter
+            filter,
+            results
         }
     },
 });

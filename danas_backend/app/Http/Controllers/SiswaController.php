@@ -128,54 +128,46 @@ class SiswaController extends Controller
         ]);
     }
 
-    public function ClassOcp() {
+    public function ClassOcp(Request $request) {
+        
         $akad = DB::connection('mysqlakad');
+        $filter_departemen =$request->input('departemen');
 
-        $main_query = "select count(s.replid) as total, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.tingkat order by k.replid asc";
+        $capacity_class = $akad->table('siswa as s')
+        ->select(DB::raw('count(s.replid) as total, k.kapasitas, k.replid, k.kelas, t.tingkat, dp.departemen, ta.tahunajaran'))
+        ->join('kelas as k', 's.idkelas', '=', 'k.replid')
+        ->join('tingkat as t', 'k.idtingkat', '=', 't.replid')
+        ->join('tahunajaran as ta', 'k.idtahunajaran', '=', 'ta.replid')
+        ->join('departemen as dp', 'ta.departemen', '=', 'dp.departemen')
+        ->where('ta.aktif', true)
+        ->when($filter_departemen, function ($query, $filter_departemen) {
+            return $query->where('dp.departemen', $filter_departemen);
+        })
+        ->groupBy('k.replid', 'k.kelas', 't.tingkat', 'dp.departemen', 'ta.tahunajaran', 'k.kapasitas')
+        ->orderBy('dp.urutan', 'asc')
+        ->orderBy('t.urutan', 'asc')
+        ->orderBy('k.kelas', 'asc')
+        ->get();
 
-        $class_occ = $akad->select($main_query);
-
-        $class_occ = $this->changeToArr($class_occ);
-
-        // query main departemen
-        $tingkat = $akad->select("select distinct t.tingkat from tingkat as t inner join kelas as k on k.idtingkat = t.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid order by t.urutan asc");
-     
-        // change to array  
-        $tingkat = $this->changeToArr($tingkat);
-
-        $second_query = "select k.kapasitas, k.kelas as kelas, t.tingkat as tingkat, dp.departemen as departemen, ta.tahunajaran from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join tingkat as t on k.idtingkat = t.replid inner join departemen as dp on t.departemen = dp.departemen where ta.aktif = 1 group by k.replid, t.tingkat order by k.replid asc";
-
-        $class_capacity = $akad->select($second_query);
-
-        $class_capacity = $this->changeToArr($class_capacity);
-
-        $arr_data = [];
-        $arr_data_cpt = [];
-        foreach($class_occ as $class) { 
-            $arr_tingkat = [];
-            
-            foreach ($tingkat as $tkt) {
-                $arr_tingkat[] = $tkt['tingkat'];
-            }
-
-            $arr_data[] = $class['total'];
+        $list_class = [];
+        $list_capacity = [];
+        $list_filled = [];
+        foreach($capacity_class as $capacity){
+            $list_capacity[] = $capacity->kapasitas;
+            $list_filled[] = $capacity->total;
+            $list_class[] = $capacity->kelas;
         }
 
-        $arr_series[] =  array('name' => 'Terisi','zlevel' => 0,'z' => 3,'type' => 'bar','data' => $arr_data, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside','fontSize' => '11'), 'itemStyle' => array('color' => '#005a00'));
+        $arr_series[] =  array('name' => 'Terisi','zlevel' => 0,'z' => 3,'type' => 'bar','data' => $list_filled, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true, 'position' => 'inside','fontSize' => '11'), 'itemStyle' => array('color' => '#005a00'));
 
-        $dat_kelas = [];
-        foreach($class_capacity as $capacity) { 
-            $arr_data_cpt[] = $capacity['kapasitas'];
-            $dat_kelas[] = $capacity['kelas'];
-        }
-
-        $arr_series[] =  array('name' => 'Kapasitas','zlevel' => 0,'z' => 0,'type' => 'bar','data' => $arr_data_cpt, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => 90, 'padding' => 8,'position' => 'top','align' =>  'left',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{c}  {b}", 'distance' => '-5'), 'itemStyle' => array('color' => '#30aa20','opacity' => 0.5));
+        $arr_series[] =  array('name' => 'Kapasitas','zlevel' => 0,'z' => 0,'type' => 'bar','data' => $list_capacity, 'barGap' => '-100%','barCategoryGap' => '18%', 'label' => array('show' => true,'rotate' => 90, 'padding' => 8,'position' => 'top','align' =>  'left',  'verticalAlign' => 'center','color' => '#000', 'fontSize' => '11', 'fontWeight' => 'bold', 'formatter' => "{c}  {b}", 'distance' => '-5'), 'itemStyle' => array('color' => '#30aa20','opacity' => 0.5));
 
         return response()->json([
             'arraydata' => $arr_series,
-            'tingkat' => $dat_kelas
+            'tingkat' => $list_class
         ]); 
     }
+
 
     public function agama() {
         $akad = DB::connection('mysqlakad');

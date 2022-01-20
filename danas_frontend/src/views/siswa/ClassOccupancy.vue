@@ -123,7 +123,7 @@ export default {
 
         onMounted(async() => {
             await axios
-                .get('/api/v1/siswa/class/')
+                .post('/api/v1/siswa/class-occupancy/')
                 .then(res => {
                     seriesdata.value = res.data.arraydata
                     datatkt.value = res.data.tingkat
@@ -151,7 +151,7 @@ export default {
             }
 
             await axios
-                .post("/api/v1/siswa/filterclassocp/", fil)
+                .post("/api/v1/siswa/class-occupancy/", fil)
                 .then(res => {
                     seriesdata.value = res.data.arraydata
                     datatkt.value = res.data.tingkat

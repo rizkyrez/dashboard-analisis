@@ -97,7 +97,9 @@ class KepegawaianController extends Controller
         $sdm = DB::connection('mysqlsdm');
         $akad = DB::connection('mysqlakad'); 
 
-        $sum_punish = $sdm->select("SELECT COUNT(trp.id) as total, stk.satker as satker, p.departement as dep FROM tr_punishment AS trp INNER JOIN master_violation AS mv ON mv.id=trp.violation_id INNER JOIN master_punishment AS mp ON mp.punishment_id=trp.punishment_id INNER JOIN pegawai AS p ON p.nip=trp.nip inner join jbsakad.departemen as dp on p.departement = dp.departemen inner join satker as stk on p.satker_id = stk.replid where CURRENT_DATE <= trp.expired_date group by dp.departemen");
+        // $sum_punish = $sdm->select("SELECT COUNT(trp.id) as total, stk.satker as satker, p.departement as dep FROM tr_punishment AS trp INNER JOIN master_violation AS mv ON mv.id=trp.violation_id INNER JOIN master_punishment AS mp ON mp.punishment_id=trp.punishment_id INNER JOIN pegawai AS p ON p.nip=trp.nip inner join jbsakad.departemen as dp on p.departement = dp.departemen inner join satker as stk on p.satker_id = stk.replid where CURRENT_DATE <= trp.expired_date group by dp.departemen");
+        $sum_punish = $sdm->select("SELECT COUNT(trp.id) as total, stk.satker as satker, p.departement as dep FROM tr_punishment AS trp INNER JOIN master_violation AS mv ON mv.id=trp.violation_id INNER JOIN master_punishment AS mp ON mp.punishment_id=trp.punishment_id INNER JOIN pegawai AS p ON p.nip=trp.nip inner join jbsakad.departemen as dp on p.departement = dp.departemen inner join satker as stk on p.satker_id = stk.replid  group by dp.departemen");
+
 
         $sum_punish =  $this->changeToArr($sum_punish);
 

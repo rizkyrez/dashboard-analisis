@@ -32,7 +32,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/agama', 'CalonSiswaController@agama');
         Route::get('/asalsekolah', 'CalonSiswaController@exin_asalsekolah');
         Route::post('/achievement', 'CalonSiswaController@achievement');
-        Route::get('/csbpotensial', 'CalonSiswaController@CsbAchievement');
+        Route::post('/csbpotensial', 'CalonSiswaController@CsbAchievement');
         Route::get('/listfilter', 'CalonSiswaController@ListFilter');
         Route::post('/change', 'CalonSiswaController@change');
         Route::post('/filter', 'CalonSiswaController@filter');
@@ -44,7 +44,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::group(['prefix' => 'siswa'], function() {
         Route::get('/trend', 'SiswaController@trendsiswa');
-        Route::get('/class', 'SiswaController@ClassOcp');
+        Route::post('/class-occupancy', 'SiswaController@ClassOcp');
         Route::get('/agama', 'SiswaController@agama');
         Route::get('/listfiltersiswa', 'SiswaController@ListFilterSiswa');
         Route::get('/jmlkelastingkat', 'SiswaController@JmlKelasTingkat');
@@ -59,6 +59,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::group(['prefix' => 'guru'], function() {
         Route::get('/failurerp', 'GuruController@FailureReport');
+        Route::post('/administrative-monitor', 'GuruController@administrativeMonitor');
     });
 
     Route::group(['prefix' => 'kepegawaian'], function() {

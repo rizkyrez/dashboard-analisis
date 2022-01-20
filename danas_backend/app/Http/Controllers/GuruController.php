@@ -26,6 +26,31 @@ class GuruController extends Controller
         ]);
     }
 
+    public function administrativeMonitor (Request $request) { 
+        
+        $akad = DB::connection('mysqlakad');
+        $filter_departemen = $request->input('departemen');
+        
+        $monitoring_data = $akad->table('nilaiujian as nu')
+        ->select(DB::raw('AVG(DATEDIFF(nu.ts, u.tanggal)), MAX(DATEDIFF(nu.ts, u.tanggal)), MIN(DATEDIFF(nu.ts, u.tanggal)), an.nipguru, t.departemen, ta.replid idtahunajaran, ta.tahunajaran'))
+        ->join('ujian as u', 'u.replid', '=', 'nu.idujian')
+        ->join('kelas as k', 'k.replid', '=', 'u.idkelas')
+        ->join('aturannhb as an', 'an.replid', '=', 'u.idaturan')
+        ->join('tingkat as t', 't.replid', '=', 'an.idtingkat')
+        ->join('tahunajaran as ta', 'ta.replid', '=', 'k.idtahunajaran')
+        ->where('ta.aktif', true)
+        ->when($filter_departemen, function ($query, $filter_departemen) {
+            return $query->where('t.departemen', $filter_departemen);
+        })
+        ->groupBy('ta.replid','an.nipguru','t.departemen','ta.tahunajaran')
+        ->get();
+
+        return response()->json([
+            'dataset' => []
+        ],200);
+
+    }
+
     protected function searchArrId($field, $value, $array) {
         foreach ($array as $val) {
             if ($val[$field] === $value) {
@@ -44,3 +69,4 @@ class GuruController extends Controller
         return $rconvert;
     }
 }
+
