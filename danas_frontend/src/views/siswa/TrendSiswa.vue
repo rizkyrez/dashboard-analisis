@@ -39,6 +39,7 @@ import HeroBar from '@/components/HeroBar'
 import BottomOtherPagesSection from '@/components/BottomOtherPagesSection'
 import TitleSubBar from '@/components/TitleSubBar'
 import useTrendSiswa from '@/composables/useTrendSiswa'
+
 // import useFilter from '@/composables/useFilter'
 
 export default {
@@ -59,14 +60,26 @@ export default {
     const titleStack = ref(['Dashboard', 'Siswa'])
     const { trendOption, dataset, datatable, header, sum, grdtotal } = useTrendSiswa()
 
+    watchEffect(() => {
+      dataset.value,
+      datatable.value,
+      header.value,
+      sum.value,
+      grdtotal.value,
+      trendOption
+    })
+
     const filter = async (e) => {
+        if(e.tahunajaran.includes("(Aktif)") == true) {
+            e.tahunajaran = e.tahunajaran.split(" (Aktif)").join("") 
+        }
+        
         if(e.tahunajaran == 'All' || e.tahunajaran == null || e.tahunajaran == '') {
             e.tahunajaran = ''
         }
 
         if(e.departemen == 'All') {
             e.departemen = ''
-            e.tahunajaran = ''
         }
 
         const fil = {
@@ -86,6 +99,104 @@ export default {
                 console.log(JSON.stringify(error))
                 alert(error.message)
             })
+            
+            const xaxis = [];
+            const legendat = [];
+
+            let arrobj = datatable.value;
+            let dep = arrobj.map(p => p.departemen);
+            xaxis.push(dep);
+
+            let arobj = dataset.value;
+            let prop = arobj.map(p => p.name);
+            legendat.push(prop);
+
+            let lenxaxis = xaxis.length
+            var toltp = () => {
+                if(lenxaxis == 1) {
+                    const atr = {
+                        trigger: 'item',
+                    }
+                    return atr
+                }
+                else {
+                    const atr = {
+                      trigger: 'axis',
+                        axisPointer:{
+                            type: 'shadow',
+                                label: {
+                                    show: true,
+                                }
+                        }
+                    }
+
+                    return atr
+                };
+            }
+            
+            const tooltip = toltp();
+
+            if(e.tahunajaran == '') {
+              trendOption.value = {
+                  tooltip: {
+                    trigger: 'axis'
+                  },
+                  grid: {
+                      left: '6%',
+                      right: '6%',
+                      bottom: '20%',
+                      top:30,
+                      z: 4
+                  },
+                  legend: {
+                      orient: 'horizontal',
+                      left: 'center',
+                      bottom: 'bottom',
+                      itemGap: 12,
+                      padding: 8,
+                  },
+                  xAxis: {
+                      type: 'category',
+                      boundaryGap: false,
+                      data: header,
+                      axisTick: {}
+                  },
+                  yAxis: {type: 'value'},
+                  series: dataset
+              }
+            }
+            else if(e.tahunajaran != '') {
+              trendOption.value = {
+                  notMerge:  true,
+                  tooltip: tooltip,
+                  grid: {
+                      left: '6%',
+                      right: '6%',
+                      bottom: '20%',
+                      top:30,
+                      z: 4
+                  },
+                  legend: {
+                      orient: 'horizontal',
+                      left: 'center',
+                      bottom: 'bottom',
+                      itemGap: 12,
+                      padding: 8,
+                      data: legendat,
+                  },
+                  xAxis: {
+                      type: 'category',
+                      boundaryGap: true,
+                      data: xaxis,
+                      axisTick: {
+                          alignWithLabel: true
+                      }
+                  },
+                  yAxis: {type: 'value'},
+                  series: dataset
+              }
+            }
+        
     }
 
 

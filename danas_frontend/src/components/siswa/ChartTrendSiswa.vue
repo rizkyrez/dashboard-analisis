@@ -1,5 +1,5 @@
 <template >
-    <bar-chart :option="options" />
+    <bar-chart :option="options" :opsic="chartoption" />
 </template>
 <script>
 /* eslint-disable */
@@ -13,7 +13,8 @@ export default {
         BarChart
     },
     props: {
-        options: Array
+        options: Array,
+        chartoption: String,
     },
 }
 </script>

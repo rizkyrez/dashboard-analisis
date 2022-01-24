@@ -8,11 +8,13 @@
 /* eslint-disable */
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart } from 'echarts/charts';
+import { BarChart,LineChart } from 'echarts/charts';
+import { UniversalTransition } from 'echarts/features';
 import {
 //   TitleComponent,
   DatasetComponent,
   TooltipComponent,
+  ToolboxComponent,
   GridComponent,
   LegendComponent,
 } from 'echarts/components';
@@ -21,10 +23,13 @@ import VChart from 'vue-echarts';
 use([
   CanvasRenderer,
   BarChart,
+  LineChart,
   DatasetComponent,
   TooltipComponent,
+  ToolboxComponent,
   GridComponent,
-  LegendComponent
+  LegendComponent,
+  UniversalTransition
 ]);
 
 export default {

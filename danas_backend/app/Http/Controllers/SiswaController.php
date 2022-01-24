@@ -12,7 +12,7 @@ class SiswaController extends Controller
     public function trendsiswa() {
         $akad = DB::connection('mysqlakad');
 
-        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen group by ta.replid, ta.departemen');
+        $trend_siswa = $akad->select('select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen where ta.aktif = 1 group by ta.replid, ta.departemen');
         
         // change to array 
         $trend_siswa = $this->changeToArr($trend_siswa);
@@ -24,7 +24,7 @@ class SiswaController extends Controller
         }
      
         // query main departemen
-        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
+        $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid where ta.aktif = 1 order by urutan asc");
      
         // change to array  
         $departemen = $this->changeToArr($departemen);
@@ -54,7 +54,7 @@ class SiswaController extends Controller
 
             $arr_headerta[] = $key;
             
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
+            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail,'universalTransition' => array('enabled' => true,'divideShape' => 'clone'));
             $arraydata[] = $array_series;   
         }
         // print_r($total_by_proses);
@@ -93,7 +93,7 @@ class SiswaController extends Controller
         $departemen = $akad->select("select distinct dp.departemen from departemen as dp inner join tahunajaran as ta on dp.departemen = ta.departemen inner join kelas as k on k.idtahunajaran = ta.replid order by urutan asc");
 
         // query list option proses
-        $list_tahunajaran = $akad->select("select distinct ta.tahunajaran as tahunajaran from tahunajaran as ta inner join kelas as k on k.idtahunajaran = ta.replid inner join siswa as s on s.idkelas = k.replid group by ta.replid,ta.departemen");
+        $list_tahunajaran = $akad->select("select distinct (CASE WHEN ta.aktif = 1 THEN CONCAT(ta.tahunajaran,' ','(Aktif)') ELSE ta.tahunajaran END) as tahunajaran from tahunajaran as ta inner join kelas as k on k.idtahunajaran = ta.replid inner join siswa as s on s.idkelas = k.replid group by ta.replid,ta.departemen");
 
         $list_agama = $umum->select('select agama from agama order by urutan asc');
 
@@ -353,7 +353,7 @@ class SiswaController extends Controller
         $condition = ($filter_departemen && $filter_tahunajaran) ? " and " : "";
 
         // where clause trendcs
-        $clause_trend_siswa = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen.$condition.$filter_tahunajaran : "";
+        $clause_trend_siswa = ($filter_departemen || $filter_tahunajaran ) ? "where ".$filter_departemen.$condition.$filter_tahunajaran : "";
 
         // trend query
         $main_query = "select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen $clause_trend_siswa group by ta.replid, dp.departemen";
@@ -370,9 +370,9 @@ class SiswaController extends Controller
         }
 
         //  where clause departemen 
-        $clause_departemen = ($filter_departemen || $filter_tahunajaran) ? "where ".$filter_departemen : "";
+        $clause_departemen = ($filter_departemen) ? "where ".$filter_departemen : "";
 
-        $second_query = "select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen $clause_departemen group by ta.replid, dp.departemen";
+        $second_query = "select count(s.replid) as total, ta.tahunajaran as tahunajaran, dp.departemen as departemen from siswa as s inner join kelas as k on s.idkelas = k.replid inner join tahunajaran as ta on k.idtahunajaran = ta.replid inner join departemen as dp on ta.departemen = dp.departemen $clause_trend_siswa group by ta.replid, dp.departemen";
 
         $trend_siswa2ds = $akad->select($second_query);
 
@@ -397,23 +397,25 @@ class SiswaController extends Controller
         $total_by_departemen = [];
 
         // array for series chart
-        foreach ($array_group2 as $key => $arr_tahunajaran) {
-            $array_detail = array();
-            $arr_total = [];
-            foreach ($departemen as $dep) {
-               $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_tahunajaran);
-               $total = $src_data['total'];
-               if ($src_data == null) {
-                    $total = 0;
-               }
-               $array_detail[] = array($dep['departemen'],$total);
+        if($filter_tahunajaran != '') { 
+            foreach ($array_group2 as $key => $arr_tahunajaran) {
+                $array_detail = array();
+                $arr_total = [];
+                foreach ($departemen as $dep) {
+                    $src_data = $this->searchArrId('departemen', $dep['departemen'], $arr_tahunajaran);
+                    $total = $src_data['total'];
+                    if ($src_data == null) {
+                        $total = 0;
+                    }
+                    $array_detail[] = array($dep['departemen'],$total);
 
-               $arr_x[] = $dep['departemen'];
+                    $arr_x[] = $dep['departemen'];
+                }
+                $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail,'universalTransition' => array('enabled' => true,'divideShape' => 'clone'));
+                $arraydata[] = $array_series;    
             }
-            $array_series = array('name' => $key, 'type' => 'bar','data' => $array_detail);
-            $arraydata[] = $array_series;   
         }
-
+        
         $arr_headerta = [];
         // array total
         foreach ($array_group as $key => $arr_tahunajaran) {
@@ -448,6 +450,10 @@ class SiswaController extends Controller
             }
             $total_by_departemen = array_sum(array_values($array_detail_table));
             $array_table[] = array('departemen' => $prodep['departemen'], 'total' => $array_detail_table,'grandtotal' => $total_by_departemen);
+            if($filter_tahunajaran == '') {
+                $array_series = array('name' => $prodep['departemen'], 'type' => 'line','data' => $array_detail_table,'universalTransition' => array('enabled' => true,'divideShape' => 'clone'));
+                $arraydata[] = $array_series; 
+            }
             // print_r($total_by_departemen);
         }
       

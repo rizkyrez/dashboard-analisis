@@ -33,7 +33,7 @@
 
         <div v-else-if="category == 'siswa'" class="px-3">
         <field label="Departemen">
-            <control :options="listdepartemenv2" v-model="departemen" @change="changeTahunajaran()" />
+            <control :options="listdepartemenv2" v-model="departemen"  />
         </field>
         </div>
 
@@ -56,11 +56,11 @@
         </field>
         </div> -->
 
-        <!-- <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
+        <div v-if="category == 'siswa' || menutp == 'tingkat'" class="px-3">
         <field label="Tahun Ajaran">
             <control :options="listTahunAjaran" v-model="tahunajaran" />
         </field>
-        </div> -->
+        </div>
 
         <div v-if="category == 'pegawai' && menutp != 'pendidikan'" class="px-3">
         <field label="Tahun Ajaran">

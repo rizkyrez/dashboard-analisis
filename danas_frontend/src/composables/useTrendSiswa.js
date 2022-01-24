@@ -85,7 +85,7 @@ export default function useTrendSiswa(){
 
     onBeforeMount(getData)
 
-    const trendOption = reactive({
+    const trendOption = ref({
         notMerge:  true,
         tooltip: tooltip,
         grid: {
