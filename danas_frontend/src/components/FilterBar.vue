@@ -37,6 +37,12 @@
         </field>
         </div>
 
+        <div v-else-if="category == 'guru'" class="px-3">
+        <field label="Departemen">
+            <control :options="listdepartemen4" v-model="departemenGuru"  />
+        </field>
+        </div>
+
         <div v-if="menutp === 'tingkat' || menutp == 'sibling'" class="px-3">
         <field label="Tingkat">
             <control :options="listTingkat" v-model="tingkat" />
@@ -144,6 +150,7 @@ export default {
   emits : ['changeProses','clickedFilter'],
   setup (props,{emit}) {
     const departemen = ref('All')
+    const departemenGuru = ref('SMA')
     const proses = ref('All')
     const proses2 = ref('All')
     const agama = ref('All')
@@ -152,7 +159,7 @@ export default {
     const bagian = ref('Semua Bagian')
     const aktifta = ref(1)
     const sibling = ref(1)
-    const { getList, listprosachie, listbagian, listdepartemenv2, listdepartemen, listdepartemen3, listproses, listTahunAjaran, listTahunAjaran2, listagama, listagamav2, listTingkat } = useFilter()
+    const { getList, listprosachie, listbagian, listdepartemenv2, listdepartemen, listdepartemen3, listdepartemen4, listproses, listTahunAjaran, listTahunAjaran2, listagama, listagamav2, listTingkat } = useFilter()
 
     watchEffect(() => {
         departemen.value,
@@ -267,6 +274,7 @@ export default {
 
     const clickedFilter = () => {
         const filterData = {
+            departemenGuru: departemenGuru.value,
             departemen: departemen.value,
             proses: proses.value,
             proses2: proses2.value,
@@ -285,6 +293,7 @@ export default {
       listdepartemenv2,
       listdepartemen,
       listdepartemen3,
+      listdepartemen4,
       listagama,
       listagamav2,
       listproses,
@@ -302,6 +311,7 @@ export default {
       clickedFilter,
       tahunajaran,
       departemen,
+      departemenGuru,
       bagian,
       proses,
       proses2,

@@ -15,6 +15,7 @@ import StatisClassTingkat from '../views/siswa/StatisClassTingkat'
 import sibling from '../views/siswa/SiblingSiswa'
 
 import failreport from '../views/guru/FailureReport'
+import administrativemonitoring from '../views/guru/AdministrativeMonitoring'
 
 import agamapegawai from '../views/pegawai/AgamaPegawai'
 import pendidikanpg from '../views/pegawai/PendidikanPegawai'
@@ -212,7 +213,8 @@ const routes = [
     path: '/kepegawaian/punishment',
     name: 'SumPunishment',
     component: sumpunishment
-  },{
+  },
+  {
     meta: {
       title: 'Dashboard - Guru - Failure Report',
       requireLogin: true
@@ -220,6 +222,15 @@ const routes = [
     path: '/guru/failure-report',
     name: 'FailureReport',
     component: failreport
+  },
+  {
+    meta: {
+      title: 'Dashboard - Guru - Administrative Monitoring',
+      requireLogin: true
+    },
+    path: '/guru/administrative-monitoring',
+    name: 'AdministrativeMonitoring',
+    component: administrativemonitoring
   },
 //   {
 //     meta: {

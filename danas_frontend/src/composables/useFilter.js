@@ -14,6 +14,7 @@ export default function useFilter() {
     const listbagian = ref([])
     const listTahunAjaran2 = ref([])
     const listdepartemen3 = ref([])
+    const listdepartemen4 = ref([])
 
     const filterData = ref([])
 
@@ -39,6 +40,9 @@ export default function useFilter() {
                 const listachie = results[2];
                 const listpegawai = results[3]
 
+                var depGuru = listsiswa.data.list_dp
+                var result = depGuru.filter((el) => !el.toLowerCase().includes(('All').toLowerCase()))
+
                 listdepartemen.value = listcalons.data.list_departemen
                 listproses.value = listcalons.data.list_proses
                 listprosachie.value = listachie.data.header
@@ -50,6 +54,7 @@ export default function useFilter() {
                 listbagian.value = listpegawai.data.list_bg
                 listTahunAjaran2.value = listpegawai.data.list_tahunajaran
                 listdepartemen3.value = listpegawai.data.list_dp
+                listdepartemen4.value = result
 
             })
             .catch(error => {
@@ -103,6 +108,7 @@ export default function useFilter() {
         listbagian.value,
         listTahunAjaran2.value,
         listdepartemen3.value
+        listdepartemen4.value
     })
 
     return {
@@ -113,6 +119,7 @@ export default function useFilter() {
         listTahunAjaran2,
         listdepartemen,
         listdepartemen3,
+        listdepartemen4,
         listbagian,
         listagamav2,
         listTingkat,

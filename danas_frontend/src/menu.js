@@ -113,8 +113,8 @@ export default [
           label: 'Teachers Occupancy',
         },
         {
-          to: '/guru/administrative',
-          label: 'Administrativ Monitoring',
+          to: '/guru/administrative-monitoring',
+          label: 'Administrative Monitoring',
         },
       ]
     },

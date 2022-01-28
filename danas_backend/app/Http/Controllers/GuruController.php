@@ -32,7 +32,7 @@ class GuruController extends Controller
         $filter_departemen = $request->input('departemen');
         
         $monitoring_data = $akad->table('nilaiujian as nu')
-        ->select(DB::raw('AVG(DATEDIFF(nu.ts, u.tanggal)), MAX(DATEDIFF(nu.ts, u.tanggal)), MIN(DATEDIFF(nu.ts, u.tanggal)), an.nipguru, t.departemen, ta.replid idtahunajaran, ta.tahunajaran'))
+        ->select(DB::raw('AVG(DATEDIFF(nu.ts, u.tanggal)) as avg, MAX(DATEDIFF(nu.ts, u.tanggal)) as max, MIN(DATEDIFF(nu.ts, u.tanggal)) as min, an.nipguru, t.departemen, ta.replid idtahunajaran, ta.tahunajaran'))
         ->join('ujian as u', 'u.replid', '=', 'nu.idujian')
         ->join('kelas as k', 'k.replid', '=', 'u.idkelas')
         ->join('aturannhb as an', 'an.replid', '=', 'u.idaturan')
@@ -46,7 +46,7 @@ class GuruController extends Controller
         ->get();
 
         return response()->json([
-            'dataset' => []
+            'dataset' => $monitoring_data
         ],200);
 
     }
